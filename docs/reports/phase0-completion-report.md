@@ -25,9 +25,9 @@ Phase 0の計画に従い、以下のタスクを実施しました。
 
 **使用技術:**
 
-- React 18.2.0
-- TypeScript 5.2.2
-- Vite 5.2.0
+- React 19.2.3
+- TypeScript 5.9.3
+- Vite 7.3.1
 
 **検証方法:**
 
@@ -43,8 +43,8 @@ npm run build
 
 **実施内容:**
 
-- Vitest 1.4.0のインストールと設定
-- React Testing Library 14.2.1のインストール
+- Vitest 4.0.18のインストールと設定
+- React Testing Library 16.3.2のインストール
 - @testing-library/jest-dom 6.4.2の導入
 - テストセットアップファイルの作成（src/test/setup.ts）
 - サンプルテストの作成（src/App.test.tsx）
@@ -106,8 +106,8 @@ export default defineConfig({
 
 **実施内容:**
 
-- ESLint 8.57.0のインストールと設定（.eslintrc.cjs）
-- Prettier 3.2.5のインストールと設定（.prettierrc, .prettierignore）
+- ESLint 9.39.2のインストールと設定（eslint.config.js - Flat Config形式）
+- Prettier 3.8.1のインストールと設定（.prettierrc, .prettierignore）
 - TypeScript ESLintプラグインの設定
 - React Hooksプラグインの設定
 - npmスクリプトの追加（lint, format, format:check）
@@ -142,7 +142,7 @@ npm run format:check
 **実施内容:**
 
 - Husky 9.0.11のインストールと初期化
-- lint-staged 15.2.2のインストール
+- lint-staged 16.2.7のインストール
 - pre-commitフックの設定
 - .lintstagedrc.jsonの作成
 
@@ -204,7 +204,7 @@ npm run format:check
 | tsconfig.json      | TypeScript設定             | ✅         |
 | tsconfig.node.json | Node用TypeScript設定       | ✅         |
 | vite.config.ts     | Vite設定                   | ✅         |
-| .eslintrc.cjs      | ESLint設定                 | ✅         |
+| eslint.config.js   | ESLint設定 (Flat Config)   | ✅         |
 | .prettierrc        | Prettier設定               | ✅         |
 | .prettierignore    | Prettierの除外設定         | ✅         |
 | .lintstagedrc.json | lint-staged設定            | ✅         |
@@ -336,8 +336,8 @@ Phase 0の完了条件:
 
 ```json
 {
-  "react": "^18.2.0",
-  "react-dom": "^18.2.0"
+  "react": "^19.2.3",
+  "react-dom": "^19.2.3"
 }
 ```
 
@@ -345,25 +345,28 @@ Phase 0の完了条件:
 
 ```json
 {
-  "@types/react": "^18.2.66",
-  "@types/react-dom": "^18.2.22",
-  "@typescript-eslint/eslint-plugin": "^7.2.0",
-  "@typescript-eslint/parser": "^7.2.0",
-  "@vitejs/plugin-react": "^4.2.1",
-  "@vitest/ui": "^1.4.0",
-  "eslint": "^8.57.0",
-  "eslint-plugin-react-hooks": "^4.6.0",
-  "eslint-plugin-react-refresh": "^0.4.6",
-  "typescript": "^5.2.2",
-  "vite": "^5.2.0",
-  "vitest": "^1.4.0",
-  "@testing-library/react": "^14.2.1",
+  "@eslint/js": "^9.39.2",
+  "@types/react": "^19.2.9",
+  "@types/react-dom": "^19.2.3",
+  "@typescript-eslint/eslint-plugin": "^8.53.1",
+  "@typescript-eslint/parser": "^8.53.1",
+  "@vitejs/plugin-react": "^5.1.2",
+  "@vitest/ui": "^4.0.18",
+  "eslint": "^9.39.2",
+  "eslint-plugin-react-hooks": "^7.0.1",
+  "eslint-plugin-react-refresh": "^0.4.26",
+  "globals": "^17.1.0",
+  "typescript": "^5.9.3",
+  "typescript-eslint": "^8.53.1",
+  "vite": "^7.3.1",
+  "vitest": "^4.0.18",
+  "@testing-library/react": "^16.3.2",
   "@testing-library/jest-dom": "^6.4.2",
   "@testing-library/user-event": "^14.5.2",
-  "jsdom": "^24.0.0",
-  "prettier": "^3.2.5",
+  "jsdom": "^27.4.0",
+  "prettier": "^3.8.1",
   "husky": "^9.0.11",
-  "lint-staged": "^15.2.2"
+  "lint-staged": "^16.2.7"
 }
 ```
 
@@ -514,6 +517,7 @@ npm run preview
 
 ## 10. 改訂履歴
 
-| バージョン | 日付       | 変更内容                   | 作成者           |
-| ---------- | ---------- | -------------------------- | ---------------- |
-| 1.0        | 2026-01-26 | Phase 0 完了報告書初版作成 | リードエンジニア |
+| バージョン | 日付       | 変更内容                                     | 作成者           |
+| ---------- | ---------- | -------------------------------------------- | ---------------- |
+| 1.0        | 2026-01-26 | Phase 0 完了報告書初版作成                   | リードエンジニア |
+| 1.1        | 2026-01-26 | 全パッケージを最新版に更新（React 19.2.3等） | リードエンジニア |

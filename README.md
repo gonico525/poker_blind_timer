@@ -8,13 +8,13 @@
 
 ## 技術スタック
 
-- **フレームワーク**: React 18
-- **言語**: TypeScript 5.2
-- **ビルドツール**: Vite 5.2
-- **テスト**: Vitest 1.4 + React Testing Library 14.2
-- **Linting**: ESLint 8.57
-- **Formatting**: Prettier 3.2
-- **Git Hooks**: Husky 9.0 + lint-staged 15.2
+- **フレームワーク**: React 19.2
+- **言語**: TypeScript 5.9
+- **ビルドツール**: Vite 7.3
+- **テスト**: Vitest 4.0 + React Testing Library 16.3
+- **Linting**: ESLint 9.39 (Flat Config)
+- **Formatting**: Prettier 3.8
+- **Git Hooks**: Husky 9.0 + lint-staged 16.2
 
 ## セットアップ
 
