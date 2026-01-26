@@ -2,13 +2,13 @@
 
 ## 概要
 
-| 項目 | 内容 |
-|------|------|
-| チーム名 | Team A |
-| 担当領域 | 基盤・状態管理 |
+| 項目       | 内容                                            |
+| ---------- | ----------------------------------------------- |
+| チーム名   | Team A                                          |
+| 担当領域   | 基盤・状態管理                                  |
 | 主な成果物 | 型定義、ユーティリティ、Context、StorageService |
-| 依存先 | なし（他チームの基盤となる） |
-| 依存元 | Team B, C, D |
+| 依存先     | なし（他チームの基盤となる）                    |
+| 依存元     | Team B, C, D                                    |
 
 ---
 
@@ -60,6 +60,7 @@ src/
 #### Step 1.1: 型定義
 
 **参照ドキュメント:**
+
 - [02-data-models.md](../specs/02-data-models.md) - 全ての型定義
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション8「型エクスポート戦略」
 
@@ -95,12 +96,14 @@ src/
 ```
 
 **テスト方針:**
+
 - 型定義自体はテスト不要（TypeScriptコンパイラが検証）
 - 型ガード関数はユニットテスト作成
 
 #### Step 1.2: 定数定義
 
 **参照ドキュメント:**
+
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション3.2「src/utils/constants.ts」
 
 **TDD実装順序:**
@@ -145,6 +148,7 @@ describe('AUDIO_FILES', () => {
 #### Step 1.3: ユーティリティ関数
 
 **参照ドキュメント:**
+
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション3.2「ユーティリティ関数の配置」
 - [02-data-models.md](../specs/02-data-models.md) - ヘルパー関数の仕様
 
@@ -226,12 +230,18 @@ describe('formatBlindLevel', () => {
 ```typescript
 describe('isValidBlindLevel', () => {
   it('should return true for valid blind level', () => {
-    expect(isValidBlindLevel({ smallBlind: 100, bigBlind: 200, ante: 0 })).toBe(true);
+    expect(isValidBlindLevel({ smallBlind: 100, bigBlind: 200, ante: 0 })).toBe(
+      true
+    );
   });
 
   it('should return false for invalid smallBlind', () => {
-    expect(isValidBlindLevel({ smallBlind: 0, bigBlind: 200, ante: 0 })).toBe(false);
-    expect(isValidBlindLevel({ smallBlind: -1, bigBlind: 200, ante: 0 })).toBe(false);
+    expect(isValidBlindLevel({ smallBlind: 0, bigBlind: 200, ante: 0 })).toBe(
+      false
+    );
+    expect(isValidBlindLevel({ smallBlind: -1, bigBlind: 200, ante: 0 })).toBe(
+      false
+    );
   });
 
   it('should return false for non-object', () => {
@@ -288,11 +298,34 @@ describe('validatePresetName', () => {
 
 **目標**: アプリケーションの状態管理基盤を構築
 
+**作業開始前の必須確認:**
+
+Phase 1の成果物を確認してから実装を開始してください。以下のファイルを必ず確認すること：
+
+1. **型定義の確認**
+   - `src/types/domain.ts`: TournamentState, Settings, Preset, BreakConfig等
+   - `src/types/context.ts`: TournamentAction, SettingsAction の全アクション型
+   - `src/types/storage.ts`: StorageKey, StorageSchema
+   - `src/types/notification.ts`: Notification, ConfirmOptions
+
+2. **ユーティリティ関数の確認**
+   - `src/utils/constants.ts`: STORAGE_KEYS, DEFAULTS 定数
+   - `src/utils/validation.ts`: isValidPreset, isValidBreakConfig 関数
+
+3. **ドメインロジックの確認**
+   - `src/domain/models/Preset.ts`: createDefaultPresets, mergeWithDefaultPresets
+   - `src/domain/models/Break.ts`: shouldTakeBreak, getLevelsUntilBreak
+
+4. **Phase 1完了報告書の確認**
+   - `docs/reports/phase1-completion-report.md`: 実装詳細、テスト結果
+
 #### Step 2.1: StorageService
 
 **参照ドキュメント:**
+
 - [features/storage.md](../specs/features/storage.md) - ストレージ機能仕様
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション4「初期化シーケンス」
+- **Phase 1成果物**: `src/types/storage.ts`, `src/utils/constants.ts`
 
 **TDD実装順序:**
 
@@ -349,6 +382,7 @@ describe('StorageService', () => {
 #### Step 2.2: TournamentContext
 
 **参照ドキュメント:**
+
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション1「Context間アクション責務マトリクス」
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション6「休憩フローの状態遷移」
 - [01-architecture.md](../specs/01-architecture.md) - TournamentContext の設計
@@ -398,7 +432,11 @@ describe('tournamentReducer', () => {
     it('should decrement remainingTime by 1', () => {
       const runningState = {
         ...initialState,
-        timer: { status: 'running' as const, remainingTime: 100, elapsedTime: 0 },
+        timer: {
+          status: 'running' as const,
+          remainingTime: 100,
+          elapsedTime: 0,
+        },
       };
       const state = tournamentReducer(runningState, { type: 'TICK' });
       expect(state.timer.remainingTime).toBe(99);
@@ -408,7 +446,11 @@ describe('tournamentReducer', () => {
     it('should not tick below 0', () => {
       const runningState = {
         ...initialState,
-        timer: { status: 'running' as const, remainingTime: 0, elapsedTime: 600 },
+        timer: {
+          status: 'running' as const,
+          remainingTime: 0,
+          elapsedTime: 600,
+        },
       };
       const state = tournamentReducer(runningState, { type: 'TICK' });
       expect(state.timer.remainingTime).toBe(0);
@@ -442,7 +484,11 @@ describe('tournamentReducer', () => {
     it('should reset timer for current level', () => {
       const state = {
         ...initialState,
-        timer: { status: 'running' as const, remainingTime: 100, elapsedTime: 500 },
+        timer: {
+          status: 'running' as const,
+          remainingTime: 100,
+          elapsedTime: 500,
+        },
       };
       const newState = tournamentReducer(state, { type: 'RESET' });
       expect(newState.timer.remainingTime).toBe(initialState.levelDuration);
@@ -511,6 +557,7 @@ describe('tournamentReducer', () => {
 #### Step 2.3: SettingsContext
 
 **参照ドキュメント:**
+
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション1.2「SettingsContext のアクション」
 - [features/presets.md](../specs/features/presets.md) - プリセット管理
 
@@ -608,6 +655,7 @@ describe('settingsReducer', () => {
 #### Step 2.4: NotificationContext
 
 **参照ドキュメント:**
+
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション5「グローバル通知システム」
 
 **TDD実装順序:**
@@ -651,6 +699,7 @@ describe('NotificationContext', () => {
 #### Step 3.1: Break ロジック
 
 **参照ドキュメント:**
+
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション6.2「休憩判定ロジック」
 
 ```typescript
@@ -667,8 +716,8 @@ describe('shouldTakeBreak', () => {
 
   it('should return true at break frequency', () => {
     const config = { enabled: true, frequency: 4, duration: 600 };
-    expect(shouldTakeBreak(3, config)).toBe(true);  // level 4 (0-indexed: 3)
-    expect(shouldTakeBreak(7, config)).toBe(true);  // level 8 (0-indexed: 7)
+    expect(shouldTakeBreak(3, config)).toBe(true); // level 4 (0-indexed: 3)
+    expect(shouldTakeBreak(7, config)).toBe(true); // level 8 (0-indexed: 7)
   });
 
   it('should return false between breaks', () => {
@@ -701,20 +750,20 @@ describe('getLevelsUntilBreak', () => {
 describe('createDefaultPresets', () => {
   it('should create standard preset', () => {
     const presets = createDefaultPresets();
-    const standard = presets.find(p => p.id === 'default-standard');
+    const standard = presets.find((p) => p.id === 'default-standard');
     expect(standard).toBeDefined();
     expect(standard?.blindLevels.length).toBeGreaterThan(0);
   });
 
   it('should create turbo preset', () => {
     const presets = createDefaultPresets();
-    const turbo = presets.find(p => p.id === 'default-turbo');
+    const turbo = presets.find((p) => p.id === 'default-turbo');
     expect(turbo).toBeDefined();
   });
 
   it('should create deep stack preset', () => {
     const presets = createDefaultPresets();
-    const deep = presets.find(p => p.id === 'default-deepstack');
+    const deep = presets.find((p) => p.id === 'default-deepstack');
     expect(deep).toBeDefined();
   });
 });
@@ -723,14 +772,16 @@ describe('mergeWithDefaultPresets', () => {
   it('should add missing default presets', () => {
     const userPresets = [{ id: 'user-1', name: 'My Preset', blindLevels: [] }];
     const merged = mergeWithDefaultPresets(userPresets);
-    expect(merged.some(p => p.id === 'default-standard')).toBe(true);
-    expect(merged.some(p => p.id === 'user-1')).toBe(true);
+    expect(merged.some((p) => p.id === 'default-standard')).toBe(true);
+    expect(merged.some((p) => p.id === 'user-1')).toBe(true);
   });
 
   it('should not duplicate default presets', () => {
     const defaults = createDefaultPresets();
     const merged = mergeWithDefaultPresets(defaults);
-    const standardCount = merged.filter(p => p.id === 'default-standard').length;
+    const standardCount = merged.filter(
+      (p) => p.id === 'default-standard'
+    ).length;
     expect(standardCount).toBe(1);
   });
 });
@@ -743,6 +794,7 @@ describe('mergeWithDefaultPresets', () => {
 #### Step 4.1: App.tsx
 
 **参照ドキュメント:**
+
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション4「初期化シーケンス」
 
 ```typescript
@@ -806,26 +858,27 @@ describe('App', () => {
 
 ### Phase 1 完了時に提供
 
-| 提供物 | 使用方法 | 使用チーム |
-|--------|---------|-----------|
-| 型定義 | `import type { ... } from '@/types'` | 全チーム |
-| 定数 | `import { DEFAULTS, LIMITS } from '@/utils'` | 全チーム |
-| フォーマット関数 | `import { formatTime } from '@/utils'` | Team B, D |
-| バリデーション関数 | `import { isValidPreset } from '@/utils'` | Team D |
+| 提供物             | 使用方法                                     | 使用チーム |
+| ------------------ | -------------------------------------------- | ---------- |
+| 型定義             | `import type { ... } from '@/types'`         | 全チーム   |
+| 定数               | `import { DEFAULTS, LIMITS } from '@/utils'` | 全チーム   |
+| フォーマット関数   | `import { formatTime } from '@/utils'`       | Team B, D  |
+| バリデーション関数 | `import { isValidPreset } from '@/utils'`    | Team D     |
 
 ### Phase 2A 完了時に提供
 
-| 提供物 | 使用方法 | 使用チーム |
-|--------|---------|-----------|
-| useTournament | `const { state, dispatch } = useTournament()` | Team B, C |
-| useSettings | `const { settings } = useSettings()` | Team C, D |
-| useNotification | `const { showNotification } = useNotification()` | Team D |
-| StorageService | モック: `vi.mock('@/services/StorageService')` | Team D |
+| 提供物          | 使用方法                                         | 使用チーム |
+| --------------- | ------------------------------------------------ | ---------- |
+| useTournament   | `const { state, dispatch } = useTournament()`    | Team B, C  |
+| useSettings     | `const { settings } = useSettings()`             | Team C, D  |
+| useNotification | `const { showNotification } = useNotification()` | Team D     |
+| StorageService  | モック: `vi.mock('@/services/StorageService')`   | Team D     |
 
 ---
 
 ## 改訂履歴
 
-| バージョン | 日付 | 変更内容 | 作成者 |
-|-----------|------|---------|--------|
-| 1.0 | 2026-01-26 | 初版作成 | システムアーキテクト |
+| バージョン | 日付       | 変更内容                                                   | 作成者               |
+| ---------- | ---------- | ---------------------------------------------------------- | -------------------- |
+| 1.0        | 2026-01-26 | 初版作成                                                   | システムアーキテクト |
+| 1.1        | 2026-01-26 | Phase 2A開始前の「前フェーズ成果物の確認」セクションを追加 | リードエンジニア     |

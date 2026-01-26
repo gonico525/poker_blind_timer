@@ -175,6 +175,11 @@ Phase 5: 結合・統合テスト
 | 前提条件 | Phase 0 完了                     |
 | 並行可能 | 不可（他チームの前提）           |
 
+**作業開始前の確認事項:**
+
+- [ ] Phase 0の成果物確認（プロジェクト構成、設定ファイル）
+- [ ] 開発環境のセットアップ確認（npm install, npm test実行可能）
+
 **完了条件:**
 
 - 全ての型定義が完了し、テストがパス
@@ -191,6 +196,14 @@ Phase 5: 結合・統合テスト
 | 成果物   | StorageService, SettingsContext, TournamentContext, NotificationContext |
 | 前提条件 | Phase 1 完了                                                            |
 
+**作業開始前の必須確認:**
+
+- [ ] Phase 1成果物の確認：
+  - [ ] `src/types/` の型定義（TournamentAction, SettingsAction等）
+  - [ ] `src/utils/` のバリデーション関数、定数
+  - [ ] `src/domain/models/` のドメインロジック
+- [ ] Phase 1完了報告書の確認（`docs/reports/phase1-completion-report.md`）
+
 **Phase 2B: AudioService（Team C）**
 
 | 項目     | 内容                    |
@@ -200,6 +213,13 @@ Phase 5: 結合・統合テスト
 | 前提条件 | Phase 1 完了            |
 | 並行可能 | Phase 2A, 2C と並行可能 |
 
+**作業開始前の必須確認:**
+
+- [ ] Phase 1成果物の確認：
+  - [ ] `src/utils/constants.ts` の AUDIO_FILES 定数
+  - [ ] `src/types/` のSettings型定義
+- [ ] Phase 1完了報告書の確認
+
 **Phase 2C: KeyboardService（Team C）**
 
 | 項目     | 内容                    |
@@ -208,6 +228,12 @@ Phase 5: 結合・統合テスト
 | 成果物   | KeyboardService         |
 | 前提条件 | Phase 1 完了            |
 | 並行可能 | Phase 2A, 2B と並行可能 |
+
+**作業開始前の必須確認:**
+
+- [ ] Phase 1成果物の確認：
+  - [ ] `src/types/context.ts` の TournamentAction型定義
+- [ ] Phase 1完了報告書の確認
 
 #### Phase 3: フック層（並行開発継続）
 
@@ -219,6 +245,13 @@ Phase 5: 結合・統合テスト
 | 成果物   | useTimer, usePresets               |
 | 前提条件 | Phase 2A 完了                      |
 
+**作業開始前の必須確認:**
+
+- [ ] Phase 2A成果物の確認：
+  - [ ] TournamentContext / SettingsContext の実装
+  - [ ] Context APIの使用方法
+- [ ] Phase 2A完了報告書の確認
+
 **Phase 3B: 連携フック（Team C）**
 
 | 項目     | 内容                                       |
@@ -227,6 +260,13 @@ Phase 5: 結合・統合テスト
 | 成果物   | useAudioNotification, useKeyboardShortcuts |
 | 前提条件 | Phase 2A, 2B, 2C 完了                      |
 
+**作業開始前の必須確認:**
+
+- [ ] Phase 2成果物の確認：
+  - [ ] TournamentContext の実装
+  - [ ] AudioService / KeyboardService の実装
+- [ ] Phase 2完了報告書の確認
+
 #### Phase 4: UI層（全チーム並行）
 
 | 項目     | 内容               |
@@ -234,6 +274,13 @@ Phase 5: 結合・統合テスト
 | 担当     | 全チーム           |
 | 成果物   | 全UIコンポーネント |
 | 前提条件 | Phase 3 完了       |
+
+**作業開始前の必須確認:**
+
+- [ ] Phase 3成果物の確認：
+  - [ ] 全てのカスタムフック（useTimer, usePresets等）の実装
+  - [ ] フックの使用方法とAPI
+- [ ] Phase 3完了報告書の確認
 
 **Team別担当:**
 
@@ -251,6 +298,13 @@ Phase 5: 結合・統合テスト
 | 担当     | 全チーム合流          |
 | 成果物   | 統合テスト、E2Eテスト |
 | 前提条件 | Phase 4 完了          |
+
+**作業開始前の必須確認:**
+
+- [ ] Phase 4成果物の確認：
+  - [ ] 全UIコンポーネントの実装
+  - [ ] コンポーネントの統合状態
+- [ ] Phase 4完了報告書の確認
 
 ---
 
@@ -489,7 +543,8 @@ describe('useAudioNotification', () => {
 
 ## 改訂履歴
 
-| バージョン | 日付       | 変更内容                                   | 作成者               |
-| ---------- | ---------- | ------------------------------------------ | -------------------- |
-| 1.0        | 2026-01-26 | 初版作成                                   | システムアーキテクト |
-| 1.1        | 2026-01-26 | 技術スタック更新（React 19.2, Vite 7.3等） | リードエンジニア     |
+| バージョン | 日付       | 変更内容                                           | 作成者               |
+| ---------- | ---------- | -------------------------------------------------- | -------------------- |
+| 1.0        | 2026-01-26 | 初版作成                                           | システムアーキテクト |
+| 1.1        | 2026-01-26 | 技術スタック更新（React 19.2, Vite 7.3等）         | リードエンジニア     |
+| 1.2        | 2026-01-26 | 各フェーズに「前フェーズ成果物の確認」タスクを追加 | リードエンジニア     |

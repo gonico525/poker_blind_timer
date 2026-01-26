@@ -2,13 +2,13 @@
 
 ## 概要
 
-| 項目 | 内容 |
-|------|------|
-| チーム名 | Team C |
-| 担当領域 | 音声・キーボード |
-| 主な成果物 | AudioService、KeyboardService、関連フック |
-| 依存先 | Team A（型定義、Context）、Team B（タイマー状態） |
-| 依存元 | なし |
+| 項目       | 内容                                              |
+| ---------- | ------------------------------------------------- |
+| チーム名   | Team C                                            |
+| 担当領域   | 音声・キーボード                                  |
+| 主な成果物 | AudioService、KeyboardService、関連フック         |
+| 依存先     | Team A（型定義、Context）、Team B（タイマー状態） |
+| 依存元     | なし                                              |
 
 ---
 
@@ -46,10 +46,10 @@ src/
 
 **Team A からの提供物が必要:**
 
-| 提供物 | 提供元 | 使用箇所 |
-|--------|--------|---------|
+| 提供物           | 提供元         | 使用箇所     |
+| ---------------- | -------------- | ------------ |
 | AUDIO_FILES 定数 | Team A Phase 1 | AudioService |
-| 型定義 | Team A Phase 1 | 全ファイル |
+| 型定義           | Team A Phase 1 | 全ファイル   |
 
 **開始可能タイミング**: Team A Phase 1 完了後（Phase 2A と並行可能）
 
@@ -57,10 +57,10 @@ src/
 
 **追加で必要な提供物:**
 
-| 提供物 | 提供元 | 使用箇所 |
-|--------|--------|---------|
+| 提供物            | 提供元          | 使用箇所                                   |
+| ----------------- | --------------- | ------------------------------------------ |
 | TournamentContext | Team A Phase 2A | useAudioNotification, useKeyboardShortcuts |
-| SettingsContext | Team A Phase 2A | useAudioNotification（音声ON/OFF設定） |
+| SettingsContext   | Team A Phase 2A | useAudioNotification（音声ON/OFF設定）     |
 
 **開始可能タイミング**: Team A Phase 2A 完了後
 
@@ -72,7 +72,20 @@ src/
 
 **目標**: 音声再生の基盤サービスを構築
 
+**作業開始前の必須確認:**
+
+Phase 1の成果物を確認してから実装を開始してください。以下のファイルを必ず確認すること：
+
+1. **Phase 1成果物の確認**
+   - `src/utils/constants.ts`: AUDIO_FILES 定数（音声ファイルパス）
+   - `src/types/domain.ts`: Settings 型定義
+   - `src/types/context.ts`: SettingsAction 型定義
+
+2. **完了報告書の確認**
+   - `docs/reports/phase1-completion-report.md`: Phase 1の実装詳細
+
 **参照ドキュメント:**
+
 - [features/audio.md](../specs/features/audio.md) - 音声機能仕様（**必読**）
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション7「音声ファイル準備方針」
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション2「イベント通知メカニズム」
@@ -101,7 +114,9 @@ describe('AudioService', () => {
       currentTime: 0,
     };
 
-    vi.spyOn(window, 'Audio').mockImplementation(() => mockAudioElement as unknown as HTMLAudioElement);
+    vi.spyOn(window, 'Audio').mockImplementation(
+      () => mockAudioElement as unknown as HTMLAudioElement
+    );
   });
 
   afterEach(() => {
@@ -195,7 +210,9 @@ describe('AudioService', () => {
 
   describe('error handling', () => {
     it('should handle play errors gracefully', async () => {
-      mockAudioElement.play = vi.fn().mockRejectedValue(new Error('Play failed'));
+      mockAudioElement.play = vi
+        .fn()
+        .mockRejectedValue(new Error('Play failed'));
       await AudioService.preload();
 
       // エラーをスローしないことを確認
@@ -332,7 +349,19 @@ export const AudioService = {
 
 **目標**: キーボードイベントの管理サービスを構築
 
+**作業開始前の必須確認:**
+
+Phase 1の成果物を確認してから実装を開始してください。以下のファイルを必ず確認すること：
+
+1. **Phase 1成果物の確認**
+   - `src/types/context.ts`: TournamentAction 型定義（START, PAUSE, RESET等のアクション）
+   - `src/types/domain.ts`: Timer, TimerStatus 型定義
+
+2. **完了報告書の確認**
+   - `docs/reports/phase1-completion-report.md`: Phase 1の実装詳細
+
 **参照ドキュメント:**
+
 - [features/keyboard.md](../specs/features/keyboard.md) - キーボード機能仕様（**必読**）
 - [urs/requirements.md](../urs/requirements.md) - セクション3.1.4「キーボードショートカット」
 
@@ -356,7 +385,10 @@ describe('KeyboardService', () => {
       const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
       KeyboardService.initialize();
 
-      expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+      expect(addEventListenerSpy).toHaveBeenCalledWith(
+        'keydown',
+        expect.any(Function)
+      );
     });
   });
 
@@ -366,7 +398,10 @@ describe('KeyboardService', () => {
       KeyboardService.initialize();
       KeyboardService.cleanup();
 
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+      expect(removeEventListenerSpy).toHaveBeenCalledWith(
+        'keydown',
+        expect.any(Function)
+      );
     });
   });
 
@@ -587,9 +622,27 @@ export const KeyboardService = {
 
 **目標**: Context と Service を連携させるフックを構築
 
+**作業開始前の必須確認:**
+
+Phase 2の成果物を確認してから実装を開始してください。以下のファイルを必ず確認すること：
+
+1. **Phase 2A成果物の確認（Team A）**
+   - `src/contexts/TournamentContext.tsx`: TournamentContext の実装
+   - `src/contexts/SettingsContext.tsx`: SettingsContext の実装
+   - useTournament, useSettings フックの使用方法
+
+2. **Phase 2B/2C成果物の確認（Team C自チーム）**
+   - `src/services/AudioService.ts`: AudioService の実装と使用方法
+   - `src/services/KeyboardService.ts`: KeyboardService の実装と使用方法
+
+3. **完了報告書の確認**
+   - `docs/reports/phase2a-completion-report.md`: Phase 2Aの実装詳細
+   - `docs/reports/phase2bc-completion-report.md`: Phase 2B/2Cの実装詳細
+
 #### Step 3B.1: useAudioNotification
 
 **参照ドキュメント:**
+
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション2「イベント通知メカニズム」（**必読**）
 - [features/audio.md](../specs/features/audio.md) - 音声通知タイミング
 
@@ -780,6 +833,7 @@ export function useAudioNotification(): void {
 #### Step 3B.3: useKeyboardShortcuts
 
 **参照ドキュメント:**
+
 - [features/keyboard.md](../specs/features/keyboard.md) - キーボードショートカット仕様（**必読**）
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション1「Context間アクション責務マトリクス」
 
@@ -966,9 +1020,15 @@ export function useKeyboardShortcuts(): void {
 
   useEffect(() => {
     const unsubscribers = [
-      KeyboardService.subscribe('Space', handleToggle, { preventDefault: true }),
-      KeyboardService.subscribe('ArrowRight', handleNextLevel, { preventDefault: true }),
-      KeyboardService.subscribe('ArrowLeft', handlePrevLevel, { preventDefault: true }),
+      KeyboardService.subscribe('Space', handleToggle, {
+        preventDefault: true,
+      }),
+      KeyboardService.subscribe('ArrowRight', handleNextLevel, {
+        preventDefault: true,
+      }),
+      KeyboardService.subscribe('ArrowLeft', handlePrevLevel, {
+        preventDefault: true,
+      }),
       KeyboardService.subscribe('KeyR', handleReset),
       KeyboardService.subscribe('KeyF', handleFullscreen),
       KeyboardService.subscribe('Escape', handleEscape),
@@ -978,7 +1038,15 @@ export function useKeyboardShortcuts(): void {
     return () => {
       unsubscribers.forEach((unsubscribe) => unsubscribe());
     };
-  }, [handleToggle, handleNextLevel, handlePrevLevel, handleReset, handleFullscreen, handleEscape, handleHelp]);
+  }, [
+    handleToggle,
+    handleNextLevel,
+    handlePrevLevel,
+    handleReset,
+    handleFullscreen,
+    handleEscape,
+    handleHelp,
+  ]);
 }
 ```
 
@@ -1002,11 +1070,13 @@ ffmpeg -f lavfi -i anullsrc=r=44100:cl=mono -t 0.5 -q:a 9 public/sounds/break-st
 ### 本番用音声ファイル
 
 推奨音源サイト:
+
 - [Freesound.org](https://freesound.org/) - CC0ライセンス
 - [Mixkit](https://mixkit.co/free-sound-effects/) - 無料商用利用可
 - [Zapsplat](https://www.zapsplat.com/) - 登録後無料
 
 音声ファイル要件:
+
 - フォーマット: MP3
 - サンプルレート: 44100Hz
 - 長さ: 0.3〜1秒程度
@@ -1019,7 +1089,7 @@ ffmpeg -f lavfi -i anullsrc=r=44100:cl=mono -t 0.5 -q:a 9 public/sounds/break-st
 ### Phase 2B 完了条件
 
 - [ ] AudioService が実装され、全テストがパス
-- [ ] preload, play*, setVolume, setEnabled が動作
+- [ ] preload, play\*, setVolume, setEnabled が動作
 - [ ] エラーハンドリングが実装されている
 - [ ] モックファイルが作成されている
 - [ ] ダミー音声ファイルが配置されている
@@ -1047,13 +1117,13 @@ ffmpeg -f lavfi -i anullsrc=r=44100:cl=mono -t 0.5 -q:a 9 public/sounds/break-st
 
 ### 必要な状態（Team B から提供）
 
-| 状態 | 用途 |
-|------|------|
-| `state.timer.remainingTime` | 警告音トリガー |
-| `state.timer.status` | タイマー状態確認 |
-| `state.isOnBreak` | 休憩開始音トリガー |
-| `state.currentLevel` | レベル変更判定 |
-| `state.blindLevels.length` | レベル上限確認 |
+| 状態                        | 用途               |
+| --------------------------- | ------------------ |
+| `state.timer.remainingTime` | 警告音トリガー     |
+| `state.timer.status`        | タイマー状態確認   |
+| `state.isOnBreak`           | 休憩開始音トリガー |
+| `state.currentLevel`        | レベル変更判定     |
+| `state.blindLevels.length`  | レベル上限確認     |
 
 ### 連携テスト
 
@@ -1083,18 +1153,18 @@ describe('Timer + Audio + Keyboard integration', () => {
 
 ## 参照ドキュメント一覧
 
-| ドキュメント | 必須度 | 内容 |
-|------------|--------|------|
-| [features/audio.md](../specs/features/audio.md) | **必読** | 音声機能の詳細仕様 |
-| [features/keyboard.md](../specs/features/keyboard.md) | **必読** | キーボード機能の詳細仕様 |
-| [04-interface-definitions.md](../specs/04-interface-definitions.md) | **必読** | イベント通知メカニズム |
-| [02-data-models.md](../specs/02-data-models.md) | 参照 | 型定義 |
-| [urs/requirements.md](../urs/requirements.md) | 参照 | ショートカットキー一覧 |
+| ドキュメント                                                        | 必須度   | 内容                     |
+| ------------------------------------------------------------------- | -------- | ------------------------ |
+| [features/audio.md](../specs/features/audio.md)                     | **必読** | 音声機能の詳細仕様       |
+| [features/keyboard.md](../specs/features/keyboard.md)               | **必読** | キーボード機能の詳細仕様 |
+| [04-interface-definitions.md](../specs/04-interface-definitions.md) | **必読** | イベント通知メカニズム   |
+| [02-data-models.md](../specs/02-data-models.md)                     | 参照     | 型定義                   |
+| [urs/requirements.md](../urs/requirements.md)                       | 参照     | ショートカットキー一覧   |
 
 ---
 
 ## 改訂履歴
 
-| バージョン | 日付 | 変更内容 | 作成者 |
-|-----------|------|---------|--------|
-| 1.0 | 2026-01-26 | 初版作成 | システムアーキテクト |
+| バージョン | 日付       | 変更内容 | 作成者               |
+| ---------- | ---------- | -------- | -------------------- |
+| 1.0        | 2026-01-26 | 初版作成 | システムアーキテクト |
