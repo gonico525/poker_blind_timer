@@ -2,13 +2,13 @@
 
 ## 概要
 
-| 項目 | 内容 |
-|------|------|
-| チーム名 | Team B |
-| 担当領域 | タイマー・表示 |
-| 主な成果物 | useTimer、タイマー関連UIコンポーネント |
-| 依存先 | Team A（型定義、Context） |
-| 依存元 | Team C（音声通知連携）、Team D（設定連携） |
+| 項目       | 内容                                       |
+| ---------- | ------------------------------------------ |
+| チーム名   | Team B                                     |
+| 担当領域   | タイマー・表示                             |
+| 主な成果物 | useTimer、タイマー関連UIコンポーネント     |
+| 依存先     | Team A（型定義、Context）                  |
+| 依存元     | Team C（音声通知連携）、Team D（設定連携） |
 
 ---
 
@@ -52,12 +52,12 @@ src/
 
 **Team A からの提供物が必要:**
 
-| 提供物 | 提供元 | 使用箇所 |
-|--------|--------|---------|
-| 型定義（Timer, BlindLevel, etc.） | Team A Phase 1 | 全ファイル |
-| formatTime, formatBlindLevel | Team A Phase 1 | 表示コンポーネント |
-| TournamentContext | Team A Phase 2A | useTimer, 全コンポーネント |
-| DEFAULTS, LIMITS | Team A Phase 1 | useTimer |
+| 提供物                            | 提供元          | 使用箇所                   |
+| --------------------------------- | --------------- | -------------------------- |
+| 型定義（Timer, BlindLevel, etc.） | Team A Phase 1  | 全ファイル                 |
+| formatTime, formatBlindLevel      | Team A Phase 1  | 表示コンポーネント         |
+| TournamentContext                 | Team A Phase 2A | useTimer, 全コンポーネント |
+| DEFAULTS, LIMITS                  | Team A Phase 1  | useTimer                   |
 
 **開始可能タイミング**: Team A Phase 1 完了後
 
@@ -69,7 +69,29 @@ src/
 
 **目標**: タイマーの制御ロジックを実装
 
+**作業開始前の必須確認:**
+
+Phase 1の成果物とPhase 2Aの成果物を確認してから実装を開始してください。以下のファイルを必ず確認すること：
+
+1. **Phase 1成果物の確認**
+   - `src/types/domain.ts`: Timer, TimerStatus, BlindLevel, TournamentState型
+   - `src/types/context.ts`: TournamentAction の全アクション型（START, PAUSE, TICK等）
+   - `src/utils/timeFormat.ts`: formatTime, formatLongTime 関数
+   - `src/utils/blindFormat.ts`: formatBlindLevel 関数
+   - `src/utils/constants.ts`: DEFAULTS, LIMITS 定数
+   - `src/domain/models/Break.ts`: shouldTakeBreak, getLevelsUntilBreak 関数
+
+2. **Phase 2A成果物の確認**
+   - `src/contexts/TournamentContext.tsx`: TournamentContext の実装
+   - TournamentContext の使用方法（useTournament フック）
+   - dispatch で使用可能なアクション
+
+3. **完了報告書の確認**
+   - `docs/reports/phase1-completion-report.md`: Phase 1の実装詳細
+   - `docs/reports/phase2a-completion-report.md`: Phase 2Aの実装詳細（Phase 2A完了後）
+
 **参照ドキュメント:**
+
 - [features/timer.md](../specs/features/timer.md) - タイマー機能仕様（**必読**）
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション1「Context間アクション責務マトリクス」
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション2「イベント通知メカニズム」
@@ -454,7 +476,13 @@ export function useTimer() {
         dispatch({ type: 'NEXT_LEVEL' });
       }
     }
-  }, [state.timer.remainingTime, state.timer.status, state.currentLevel, state.breakConfig, dispatch]);
+  }, [
+    state.timer.remainingTime,
+    state.timer.status,
+    state.currentLevel,
+    state.breakConfig,
+    dispatch,
+  ]);
 
   return {
     // 状態
@@ -464,7 +492,10 @@ export function useTimer() {
     currentLevel: state.currentLevel,
     isOnBreak: state.isOnBreak,
     breakRemainingTime: state.breakRemainingTime,
-    levelsUntilBreak: getLevelsUntilBreak(state.currentLevel, state.breakConfig),
+    levelsUntilBreak: getLevelsUntilBreak(
+      state.currentLevel,
+      state.breakConfig
+    ),
 
     // 算出プロパティ
     isRunning: state.timer.status === 'running',
@@ -494,6 +525,7 @@ export function useTimer() {
 ### Phase 4: UIコンポーネント
 
 **参照ドキュメント:**
+
 - [03-design-system.md](../specs/03-design-system.md) - デザインシステム（**必読**）
 - [features/timer.md](../specs/features/timer.md) - タイマー表示仕様
 
@@ -811,11 +843,11 @@ describe('Timer Flow Integration', () => {
 
 Team C の `useAudioNotification` が監視する状態:
 
-| 状態 | 用途 |
-|------|------|
+| 状態                        | 用途                         |
+| --------------------------- | ---------------------------- |
 | `state.timer.remainingTime` | 警告音トリガー（60秒、30秒） |
-| `state.isOnBreak` | 休憩開始音トリガー |
-| `state.currentLevel` | レベル変更音トリガー |
+| `state.isOnBreak`           | 休憩開始音トリガー           |
+| `state.currentLevel`        | レベル変更音トリガー         |
 
 ### 連携テスト
 
@@ -845,18 +877,18 @@ describe('Timer + Audio integration', () => {
 
 ## 参照ドキュメント一覧
 
-| ドキュメント | 必須度 | 内容 |
-|------------|--------|------|
-| [features/timer.md](../specs/features/timer.md) | **必読** | タイマー機能の詳細仕様 |
+| ドキュメント                                                        | 必須度   | 内容                    |
+| ------------------------------------------------------------------- | -------- | ----------------------- |
+| [features/timer.md](../specs/features/timer.md)                     | **必読** | タイマー機能の詳細仕様  |
 | [04-interface-definitions.md](../specs/04-interface-definitions.md) | **必読** | Context連携、休憩フロー |
-| [03-design-system.md](../specs/03-design-system.md) | **必読** | UI設計、タイポグラフィ |
-| [02-data-models.md](../specs/02-data-models.md) | 参照 | 型定義詳細 |
-| [features/blinds.md](../specs/features/blinds.md) | 参照 | ブラインド表示仕様 |
+| [03-design-system.md](../specs/03-design-system.md)                 | **必読** | UI設計、タイポグラフィ  |
+| [02-data-models.md](../specs/02-data-models.md)                     | 参照     | 型定義詳細              |
+| [features/blinds.md](../specs/features/blinds.md)                   | 参照     | ブラインド表示仕様      |
 
 ---
 
 ## 改訂履歴
 
-| バージョン | 日付 | 変更内容 | 作成者 |
-|-----------|------|---------|--------|
-| 1.0 | 2026-01-26 | 初版作成 | システムアーキテクト |
+| バージョン | 日付       | 変更内容 | 作成者               |
+| ---------- | ---------- | -------- | -------------------- |
+| 1.0        | 2026-01-26 | 初版作成 | システムアーキテクト |

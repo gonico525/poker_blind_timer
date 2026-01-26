@@ -2,13 +2,13 @@
 
 ## 概要
 
-| 項目 | 内容 |
-|------|------|
-| チーム名 | Team D |
-| 担当領域 | プリセット・設定UI |
+| 項目       | 内容                                                 |
+| ---------- | ---------------------------------------------------- |
+| チーム名   | Team D                                               |
+| 担当領域   | プリセット・設定UI                                   |
 | 主な成果物 | usePresets、PresetManager、BlindEditor、設定パネル群 |
-| 依存先 | Team A（Context、Storage）、Team B（タイマー連携） |
-| 依存元 | なし |
+| 依存先     | Team A（Context、Storage）、Team B（タイマー連携）   |
+| 依存元     | なし                                                 |
 
 ---
 
@@ -64,14 +64,14 @@ src/
 
 **Team A からの提供物が必要:**
 
-| 提供物 | 提供元 | 使用箇所 |
-|--------|--------|---------|
-| 型定義（Preset, BlindLevel, etc.） | Team A Phase 1 | 全ファイル |
-| バリデーション関数 | Team A Phase 1 | PresetForm, BlindEditor |
-| SettingsContext | Team A Phase 2A | usePresets, 全設定コンポーネント |
-| TournamentContext | Team A Phase 2A | usePresets（LOAD_PRESET連携） |
-| NotificationContext | Team A Phase 2A | エラー/成功通知 |
-| StorageService | Team A Phase 2A | インポート/エクスポート |
+| 提供物                             | 提供元          | 使用箇所                         |
+| ---------------------------------- | --------------- | -------------------------------- |
+| 型定義（Preset, BlindLevel, etc.） | Team A Phase 1  | 全ファイル                       |
+| バリデーション関数                 | Team A Phase 1  | PresetForm, BlindEditor          |
+| SettingsContext                    | Team A Phase 2A | usePresets, 全設定コンポーネント |
+| TournamentContext                  | Team A Phase 2A | usePresets（LOAD_PRESET連携）    |
+| NotificationContext                | Team A Phase 2A | エラー/成功通知                  |
+| StorageService                     | Team A Phase 2A | インポート/エクスポート          |
 
 **開始可能タイミング**: Team A Phase 2A 完了後
 
@@ -83,7 +83,28 @@ src/
 
 **目標**: プリセット管理のビジネスロジックを実装
 
+**作業開始前の必須確認:**
+
+Phase 1およびPhase 2Aの成果物を確認してから実装を開始してください。以下のファイルを必ず確認すること：
+
+1. **Phase 1成果物の確認**
+   - `src/types/domain.ts`: Preset, BlindLevel, BreakConfig等の型定義を確認
+   - `src/types/context.ts`: SettingsAction, TournamentAction等のアクション型定義を確認
+   - `src/utils/constants.ts`: LIMITS.MAX_PRESETS等の定数値を確認
+   - `src/utils/validation.ts`: isValidPreset, validatePresetName等のバリデーション関数を確認
+   - `src/domain/models/Preset.ts`: createDefaultPresets, mergeWithDefaultPresets等の関数を確認
+
+2. **Phase 2A成果物の確認**
+   - `src/contexts/SettingsContext.tsx`: SettingsContext の state 構造とdispatch可能なアクション(ADD_PRESET, UPDATE_PRESET, DELETE_PRESET等)を確認
+   - `src/contexts/TournamentContext.tsx`: TournamentContext の LOAD_PRESET アクションの実装を確認
+   - `src/contexts/NotificationContext.tsx`: showNotification 関数のシグネチャと使用方法を確認
+
+3. **完了報告書の確認**
+   - `docs/reports/phase1-completion-report.md`: Phase 1で実装された全機能の動作確認
+   - `docs/reports/phase2a-completion-report.md`: Phase 2Aで実装されたContextの動作確認
+
 **参照ドキュメント:**
+
 - [features/presets.md](../specs/features/presets.md) - プリセット機能仕様（**必読**）
 - [04-interface-definitions.md](../specs/04-interface-definitions.md) - セクション1.3「LOAD_PRESETの処理フロー」（**必読**）
 - [features/storage.md](../specs/features/storage.md) - ストレージ仕様
@@ -375,7 +396,12 @@ describe('usePresets - import/export', () => {
   describe('exportAllPresets', () => {
     it('should export all custom presets', () => {
       const presets = [
-        { id: 'default-standard', name: 'Standard', type: 'default', blindLevels: [] },
+        {
+          id: 'default-standard',
+          name: 'Standard',
+          type: 'default',
+          blindLevels: [],
+        },
         { id: 'custom-1', name: 'Custom 1', type: 'custom', blindLevels: [] },
         { id: 'custom-2', name: 'Custom 2', type: 'custom', blindLevels: [] },
       ];
@@ -407,7 +433,9 @@ describe('usePresets - import/export', () => {
         await result.current.importPreset(importData);
       });
 
-      expect(result.current.customPresets.some(p => p.name === 'Imported')).toBe(true);
+      expect(
+        result.current.customPresets.some((p) => p.name === 'Imported')
+      ).toBe(true);
     });
 
     it('should throw error for invalid JSON', async () => {
@@ -437,7 +465,12 @@ describe('usePresets - import/export', () => {
     });
 
     it('should rename duplicate preset names', async () => {
-      const existing = { id: 'custom-1', name: 'My Preset', type: 'custom', blindLevels: [] };
+      const existing = {
+        id: 'custom-1',
+        name: 'My Preset',
+        type: 'custom',
+        blindLevels: [],
+      };
 
       const { result } = renderHook(() => usePresets(), {
         wrapper: createWrapper([existing]),
@@ -452,7 +485,9 @@ describe('usePresets - import/export', () => {
         await result.current.importPreset(importData);
       });
 
-      const imported = result.current.customPresets.find(p => p.name.includes('(2)'));
+      const imported = result.current.customPresets.find((p) =>
+        p.name.includes('(2)')
+      );
       expect(imported).toBeDefined();
     });
   });
@@ -499,7 +534,10 @@ export function usePresets() {
     (presetId: PresetId) => {
       const preset = state.presets.find((p) => p.id === presetId);
       if (!preset) {
-        showNotification({ type: 'error', message: 'プリセットが見つかりません' });
+        showNotification({
+          type: 'error',
+          message: 'プリセットが見つかりません',
+        });
         return;
       }
 
@@ -509,7 +547,10 @@ export function usePresets() {
       // TournamentContextにプリセットをロード
       tournamentDispatch({ type: 'LOAD_PRESET', payload: { preset } });
 
-      showNotification({ type: 'success', message: `${preset.name} をロードしました` });
+      showNotification({
+        type: 'success',
+        message: `${preset.name} をロードしました`,
+      });
     },
     [state.presets, dispatch, tournamentDispatch, showNotification]
   );
@@ -539,7 +580,10 @@ export function usePresets() {
       };
 
       dispatch({ type: 'ADD_PRESET', payload: { preset: newPreset } });
-      showNotification({ type: 'success', message: `${data.name} を保存しました` });
+      showNotification({
+        type: 'success',
+        message: `${data.name} を保存しました`,
+      });
 
       return newPreset;
     },
@@ -548,7 +592,10 @@ export function usePresets() {
 
   // プリセットを更新
   const updatePreset = useCallback(
-    async (presetId: PresetId, updates: Partial<NewPresetData>): Promise<void> => {
+    async (
+      presetId: PresetId,
+      updates: Partial<NewPresetData>
+    ): Promise<void> => {
       const preset = state.presets.find((p) => p.id === presetId);
       if (!preset) {
         throw new Error('プリセットが見つかりません');
@@ -590,7 +637,10 @@ export function usePresets() {
       }
 
       dispatch({ type: 'DELETE_PRESET', payload: { presetId } });
-      showNotification({ type: 'success', message: `${preset.name} を削除しました` });
+      showNotification({
+        type: 'success',
+        message: `${preset.name} を削除しました`,
+      });
     },
     [state.presets, dispatch, showNotification]
   );
@@ -704,7 +754,33 @@ export function usePresets() {
 
 ### Phase 4: UIコンポーネント
 
+**作業開始前の必須確認:**
+
+Phase 1、Phase 2A、Phase 3Aの成果物を確認してから実装を開始してください。以下のファイルを必ず確認すること：
+
+1. **Phase 1成果物の確認**
+   - `src/types/domain.ts`: Preset, BlindLevel, BreakConfig, Settings, Theme等の型定義を確認
+   - `src/utils/constants.ts`: LIMITS, DEFAULTS等の定数値を確認（MAX_BLIND_LEVELS, MIN_LEVEL_DURATION等）
+   - `src/utils/validation.ts`: isValidBlindLevel, validatePresetName等のバリデーション関数を確認
+   - `src/utils/blindFormat.ts`: formatBlindLevel, formatBlindValue等のフォーマット関数を確認
+   - `src/utils/timeFormat.ts`: formatTime等の時間フォーマット関数を確認
+
+2. **Phase 2A成果物の確認**
+   - `src/contexts/SettingsContext.tsx`: useSettings フックの使用方法を確認
+   - `src/contexts/TournamentContext.tsx`: useTournament フックの使用方法を確認
+   - `src/contexts/NotificationContext.tsx`: useNotification フックの使用方法を確認
+
+3. **Phase 3A成果物の確認**
+   - `src/hooks/usePresets.ts`: usePresets フックのAPI（presets, loadPreset, addPreset, updatePreset, deletePreset, duplicatePreset, exportPreset, importPreset等）を確認
+   - `src/hooks/usePresets.test.ts`: テストコードから使用例を確認
+
+4. **完了報告書の確認**
+   - `docs/reports/phase1-completion-report.md`: Phase 1で実装された全機能の動作確認
+   - `docs/reports/phase2a-completion-report.md`: Phase 2Aで実装されたContextの動作確認
+   - `docs/reports/phase3a-completion-report.md`: Phase 3Aで実装されたusePresetsの動作確認
+
 **参照ドキュメント:**
+
 - [03-design-system.md](../specs/03-design-system.md) - デザインシステム（**必読**）
 - [features/presets.md](../specs/features/presets.md) - プリセットUI仕様
 - [features/blinds.md](../specs/features/blinds.md) - ブラインド編集UI仕様
@@ -1119,19 +1195,20 @@ describe('ImportExport', () => {
 
 ## 参照ドキュメント一覧
 
-| ドキュメント | 必須度 | 内容 |
-|------------|--------|------|
-| [features/presets.md](../specs/features/presets.md) | **必読** | プリセット機能の詳細仕様 |
-| [features/blinds.md](../specs/features/blinds.md) | **必読** | ブラインド編集仕様 |
-| [04-interface-definitions.md](../specs/04-interface-definitions.md) | **必読** | LOAD_PRESET フロー |
-| [03-design-system.md](../specs/03-design-system.md) | **必読** | UI設計、フォーム設計 |
-| [features/storage.md](../specs/features/storage.md) | 参照 | ストレージ仕様 |
-| [02-data-models.md](../specs/02-data-models.md) | 参照 | 型定義詳細 |
+| ドキュメント                                                        | 必須度   | 内容                     |
+| ------------------------------------------------------------------- | -------- | ------------------------ |
+| [features/presets.md](../specs/features/presets.md)                 | **必読** | プリセット機能の詳細仕様 |
+| [features/blinds.md](../specs/features/blinds.md)                   | **必読** | ブラインド編集仕様       |
+| [04-interface-definitions.md](../specs/04-interface-definitions.md) | **必読** | LOAD_PRESET フロー       |
+| [03-design-system.md](../specs/03-design-system.md)                 | **必読** | UI設計、フォーム設計     |
+| [features/storage.md](../specs/features/storage.md)                 | 参照     | ストレージ仕様           |
+| [02-data-models.md](../specs/02-data-models.md)                     | 参照     | 型定義詳細               |
 
 ---
 
 ## 改訂履歴
 
-| バージョン | 日付 | 変更内容 | 作成者 |
-|-----------|------|---------|--------|
-| 1.0 | 2026-01-26 | 初版作成 | システムアーキテクト |
+| バージョン | 日付       | 変更内容                                            | 作成者               |
+| ---------- | ---------- | --------------------------------------------------- | -------------------- |
+| 1.1        | 2026-01-26 | Phase 3A, Phase 4に前フェーズ成果物確認タスクを追加 | システムアーキテクト |
+| 1.0        | 2026-01-26 | 初版作成                                            | システムアーキテクト |
