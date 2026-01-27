@@ -21,8 +21,41 @@ class AudioServiceImpl {
       return new Promise((resolve) => {
         try {
           const audio = new Audio(src);
+          let resolved = false;
+
+          // タイムアウト（2秒後に強制解決）
+          const timeout = setTimeout(() => {
+            if (!resolved) {
+              resolved = true;
+              console.warn(`Audio load timeout: ${src}`);
+              resolve(new Audio());
+            }
+          }, 2000);
+
+          // エラーイベントをキャッチ
+          audio.addEventListener('error', () => {
+            if (!resolved) {
+              resolved = true;
+              clearTimeout(timeout);
+              console.warn(`Failed to load audio: ${src}`);
+              resolve(new Audio()); // 空のAudioを返す
+            }
+          });
+
+          // 読み込み成功
+          audio.addEventListener(
+            'canplaythrough',
+            () => {
+              if (!resolved) {
+                resolved = true;
+                clearTimeout(timeout);
+                resolve(audio);
+              }
+            },
+            { once: true }
+          );
+
           audio.load();
-          resolve(audio);
         } catch (error) {
           console.warn(`Failed to load audio: ${src}`, error);
           resolve(new Audio()); // 空のAudioを返す

@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { useKeyboardShortcuts } from './useKeyboardShortcuts';
 import { KeyboardService } from '@/services/KeyboardService';
 import * as TournamentContext from '@/contexts/TournamentContext';
-import type { TournamentState } from '@/types';
+import type { TournamentState, TournamentAction } from '@/types';
 
 // モック化
 vi.mock('@/services/KeyboardService');
@@ -11,7 +11,7 @@ vi.mock('@/contexts/TournamentContext');
 
 describe('useKeyboardShortcuts', () => {
   let mockTournamentState: TournamentState;
-  let mockDispatch: ReturnType<typeof vi.fn>;
+  let mockDispatch: vi.Mock<[action: TournamentAction], void>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -35,12 +35,12 @@ describe('useKeyboardShortcuts', () => {
       breakRemainingTime: 0,
     };
 
-    mockDispatch = vi.fn();
+    mockDispatch = vi.fn<[action: TournamentAction], void>();
 
     // useTournamentをモック化
     vi.mocked(TournamentContext.useTournament).mockReturnValue({
       state: mockTournamentState,
-      dispatch: mockDispatch as any,
+      dispatch: mockDispatch,
     });
   });
 
@@ -96,9 +96,9 @@ describe('useKeyboardShortcuts', () => {
       renderHook(() => useKeyboardShortcuts());
 
       // Space キーのハンドラを取得して実行
-      const spaceHandler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'Space'
-      )?.[1];
+      const spaceHandler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'Space')?.[1];
 
       expect(spaceHandler).toBeDefined();
       spaceHandler!({} as KeyboardEvent);
@@ -111,9 +111,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const spaceHandler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'Space'
-      )?.[1];
+      const spaceHandler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'Space')?.[1];
 
       spaceHandler!({} as KeyboardEvent);
 
@@ -125,9 +125,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const spaceHandler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'Space'
-      )?.[1];
+      const spaceHandler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'Space')?.[1];
 
       spaceHandler!({} as KeyboardEvent);
 
@@ -142,9 +142,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'ArrowRight'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'ArrowRight')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -157,9 +157,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'ArrowRight'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'ArrowRight')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -172,9 +172,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'ArrowRight'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'ArrowRight')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -187,9 +187,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'ArrowLeft'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'ArrowLeft')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -202,9 +202,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'ArrowLeft'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'ArrowLeft')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -217,9 +217,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'ArrowLeft'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'ArrowLeft')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -231,9 +231,9 @@ describe('useKeyboardShortcuts', () => {
     it('should reset timer on R', () => {
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'KeyR'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'KeyR')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -254,9 +254,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'KeyF'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'KeyF')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -275,9 +275,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'KeyF'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'KeyF')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -297,9 +297,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'Escape'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'Escape')?.[1];
 
       handler!({} as KeyboardEvent);
 
@@ -317,9 +317,9 @@ describe('useKeyboardShortcuts', () => {
 
       renderHook(() => useKeyboardShortcuts());
 
-      const handler = vi.mocked(KeyboardService.subscribe).mock.calls.find(
-        (call) => call[0] === 'Escape'
-      )?.[1];
+      const handler = vi
+        .mocked(KeyboardService.subscribe)
+        .mock.calls.find((call) => call[0] === 'Escape')?.[1];
 
       handler!({} as KeyboardEvent);
 
