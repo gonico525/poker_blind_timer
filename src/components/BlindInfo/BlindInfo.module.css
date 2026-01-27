@@ -1,109 +1,179 @@
-/* ブラインド情報コンテナ */
+/* ============================================
+   Blind Info - PC Optimized
+   Prominent display with poker aesthetics
+   ============================================ */
+
 .blindInfo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-6);
-  background-color: var(--color-bg-tertiary);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  gap: var(--spacing-4);
+  gap: var(--spacing-6);
+  width: 100%;
 }
 
-/* レベル番号 */
+/* ============================================
+   Level Number
+   ============================================ */
+
 .levelNumber {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-h3);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
 }
 
-/* ブラインドラッパー */
+/* ============================================
+   Blinds Display
+   ============================================ */
+
 .blindsWrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--spacing-3);
 }
 
-/* ブラインド表示（メイン） */
+/* Main Blinds - Gold Accent */
 .blinds {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
+  align-items: baseline;
+  gap: var(--spacing-4);
   font-family: var(--font-family-numeric);
   font-size: var(--font-size-h1);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   color: var(--color-accent);
-  line-height: var(--line-height-tight);
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
 }
 
 .blindValue {
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: 0.02em;
 }
 
 .separator {
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-normal);
+  font-size: 0.8em;
+  margin: 0 calc(-1 * var(--spacing-2));
 }
 
-/* ブラインドラベル（SB/BB） */
+/* Blind Labels (SB / BB) */
 .blindLabels {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.blindLabel {
-  min-width: 20px;
-  text-align: center;
-}
-
-/* アンティ情報 */
-.ante {
+  gap: var(--spacing-8);
   font-family: var(--font-family-sans);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.blindLabel {
+  min-width: 30px;
+  text-align: center;
+}
+
+/* ============================================
+   Ante
+   ============================================ */
+
+.ante {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
-  padding: var(--spacing-2) var(--spacing-4);
-  background-color: var(--color-bg-secondary);
-  border-radius: var(--radius-md);
+  padding: var(--spacing-2) var(--spacing-6);
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-tertiary) 0%,
+    var(--color-bg-secondary) 100%
+  );
+  border-radius: var(--radius-full);
   border: 1px solid var(--color-border);
 }
 
-/* レスポンシブ対応 */
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+/* Large Desktop (1920px+) - Extra Large */
+@media (min-width: 1920px) {
+  .levelNumber {
+    font-size: var(--font-size-h1);
+  }
+
+  .blinds {
+    font-size: 64px;
+  }
+
+  .blindLabels {
+    font-size: var(--font-size-lg);
+    gap: var(--spacing-10);
+  }
+
+  .ante {
+    font-size: var(--font-size-h5);
+  }
+}
+
+/* Desktop (1280px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1280px) {
+  .blinds {
+    font-size: var(--font-size-h1);
+  }
+}
+
+/* Tablet Landscape (768px - 1279px) */
 @media (max-width: 1279px) {
   .levelNumber {
-    font-size: var(--font-size-h4);
+    font-size: var(--font-size-h3);
   }
 
   .blinds {
     font-size: var(--font-size-h2);
   }
 
-  .ante {
+  .blindLabels {
     font-size: var(--font-size-sm);
+    gap: var(--spacing-6);
+  }
+
+  .ante {
+    font-size: var(--font-size-base);
   }
 }
 
+/* Tablet Portrait / Mobile (< 768px) */
 @media (max-width: 767px) {
   .levelNumber {
-    font-size: var(--font-size-h5);
+    font-size: var(--font-size-h4);
   }
 
   .blinds {
     font-size: var(--font-size-h3);
+    gap: var(--spacing-3);
+  }
+
+  .blindLabels {
+    font-size: var(--font-size-xs);
+    gap: var(--spacing-4);
   }
 
   .blindInfo {
-    padding: var(--spacing-4);
+    gap: var(--spacing-4);
+  }
+
+  .blindsWrapper {
+    gap: var(--spacing-2);
+  }
+
+  .ante {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-1) var(--spacing-4);
   }
 }

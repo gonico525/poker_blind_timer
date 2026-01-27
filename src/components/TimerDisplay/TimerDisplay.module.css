@@ -1,175 +1,304 @@
-/* タイマー表示コンテナ */
+/* ============================================
+   Timer Display - PC Optimized
+   Maximum visibility for tournament display
+   ============================================ */
+
 .timerDisplay {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-12);
-  background-color: var(--color-bg-tertiary);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  justify-content: center;
+  width: 100%;
   position: relative;
 }
 
-/* タイマーラッパー */
+/* ============================================
+   Timer Section
+   ============================================ */
+
 .timerWrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: var(--spacing-8) 0;
+  gap: var(--spacing-4);
 }
 
 .label {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-h6);
+  font-size: var(--font-size-h5);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-3);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
 }
 
-/* タイマー表示（メイン） */
+/* Main Timer - Maximum Impact */
 .timer {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-display-xl);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-extrabold);
+  line-height: 1;
   color: var(--color-timer-normal);
   text-align: center;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: color var(--transition-base) var(--ease-out);
 }
 
-/* 経過時間ラッパー */
+/* ============================================
+   Elapsed Time
+   ============================================ */
+
 .elapsedWrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: var(--spacing-6);
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-8);
 }
 
 .elapsedLabel {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
   color: var(--color-text-tertiary);
-  margin-bottom: var(--spacing-2);
-}
-
-.elapsed {
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-h4);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-secondary);
-}
-
-/* 休憩インジケーター */
-.breakIndicator {
-  position: absolute;
-  top: var(--spacing-4);
-  right: var(--spacing-4);
-  padding: var(--spacing-2) var(--spacing-4);
-  background-color: var(--color-timer-break);
-  color: var(--color-text-inverse);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  border-radius: var(--radius-md);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
-/* 一時停止インジケーター */
+.elapsed {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================
+   Status Indicators
+   ============================================ */
+
+/* Break Indicator */
+.breakIndicator {
+  position: absolute;
+  top: calc(-1 * var(--spacing-16));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--spacing-3) var(--spacing-8);
+  background: linear-gradient(
+    135deg,
+    var(--color-timer-break) 0%,
+    var(--color-info) 100%
+  );
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  box-shadow: var(--shadow-xl);
+  animation: slideDown var(--transition-slow) var(--ease-out);
+}
+
+/* Paused Indicator */
 .pausedIndicator {
   position: absolute;
-  bottom: var(--spacing-4);
-  padding: var(--spacing-2) var(--spacing-4);
-  background-color: var(--color-bg-hover);
-  color: var(--color-text-secondary);
+  bottom: calc(-1 * var(--spacing-12));
+  padding: var(--spacing-2) var(--spacing-6);
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-warning);
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-}
-
-/* ステータスごとのスタイル */
-.timerDisplay.idle {
-  border: 2px solid var(--color-border);
-}
-
-.timerDisplay.running {
-  border: 2px solid var(--color-primary);
-}
-
-.timerDisplay.paused {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-full);
   border: 2px solid var(--color-warning);
-  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-/* 警告状態 */
+/* ============================================
+   Timer States
+   ============================================ */
+
+.timerDisplay.idle .timer {
+  opacity: 0.7;
+}
+
+.timerDisplay.running .timer {
+  animation: fadeIn var(--transition-base) var(--ease-out);
+}
+
+.timerDisplay.paused .timer {
+  opacity: 0.8;
+}
+
+/* Warning State (< 60 seconds) */
 .timerDisplay.warning .timer {
   color: var(--color-timer-warning);
+  animation: pulse 2s var(--ease-in-out) infinite;
 }
 
-/* 重大な警告状態 */
+/* Critical State (< 30 seconds) */
 .timerDisplay.critical .timer {
   color: var(--color-error);
-  animation: pulse 1s var(--ease-in-out) infinite;
+  animation: criticalPulse 1s var(--ease-in-out) infinite;
 }
 
-/* 休憩中 */
-.timerDisplay.break {
-  border: 2px solid var(--color-timer-break);
-  background-color: var(--color-bg-secondary);
-}
-
+/* Break State */
 .timerDisplay.break .timer {
   color: var(--color-timer-break);
 }
 
-/* パルスアニメーション */
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 @keyframes pulse {
   0%,
   100% {
     opacity: 1;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.6;
+    opacity: 0.8;
+    transform: scale(0.98);
   }
 }
 
-/* レスポンシブ対応 */
+@keyframes criticalPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  25% {
+    opacity: 0.7;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  75% {
+    opacity: 0.7;
+    transform: scale(0.97);
+  }
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+/* Large Desktop (1920px+) - Extra Large Display */
+@media (min-width: 1920px) {
+  .timer {
+    font-size: 160px;
+  }
+
+  .label {
+    font-size: var(--font-size-h4);
+  }
+
+  .elapsed {
+    font-size: var(--font-size-h2);
+  }
+
+  .breakIndicator {
+    font-size: var(--font-size-h3);
+  }
+}
+
+/* Desktop (1280px - 1919px) - Standard Display */
+@media (max-width: 1919px) and (min-width: 1280px) {
+  .timer {
+    font-size: var(--font-size-display-xl);
+  }
+}
+
+/* Tablet Landscape (768px - 1279px) */
 @media (max-width: 1279px) {
   .timer {
     font-size: var(--font-size-display-lg);
   }
 
+  .label {
+    font-size: var(--font-size-h6);
+  }
+
   .elapsed {
+    font-size: var(--font-size-h4);
+  }
+
+  .breakIndicator {
     font-size: var(--font-size-h5);
+    padding: var(--spacing-2) var(--spacing-6);
   }
 }
 
+/* Tablet Portrait / Mobile (< 768px) */
 @media (max-width: 767px) {
   .timer {
     font-size: var(--font-size-display-md);
   }
 
-  .elapsed {
-    font-size: var(--font-size-h6);
+  .label {
+    font-size: var(--font-size-base);
   }
 
-  .timerDisplay {
-    padding: var(--spacing-8);
+  .elapsed {
+    font-size: var(--font-size-h5);
+  }
+
+  .elapsedWrapper {
+    margin-top: var(--spacing-6);
+  }
+
+  .breakIndicator {
+    font-size: var(--font-size-base);
+    padding: var(--spacing-2) var(--spacing-4);
+    top: calc(-1 * var(--spacing-12));
+  }
+
+  .pausedIndicator {
+    font-size: var(--font-size-sm);
   }
 }
 
-/* アクセシビリティ: アニメーション無効設定を尊重 */
+/* ============================================
+   Accessibility
+   ============================================ */
+
 @media (prefers-reduced-motion: reduce) {
-  .timer {
+  .timer,
+  .breakIndicator {
+    animation: none !important;
     transition: none;
   }
 
+  .timerDisplay.warning .timer,
   .timerDisplay.critical .timer {
-    animation: none;
+    animation: none !important;
   }
 }
