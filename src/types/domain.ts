@@ -43,7 +43,12 @@ export type PresetId = string;
 /**
  * プリセットタイプ
  */
-export type PresetType = 'default' | 'custom';
+export type PresetType =
+  | 'default'
+  | 'standard'
+  | 'turbo'
+  | 'deepstack'
+  | 'custom';
 
 /**
  * プリセットエンティティ
@@ -55,6 +60,8 @@ export interface Preset {
   blindLevels: BlindLevel[];
   levelDuration: number;
   breakConfig: BreakConfig;
+  createdAt: number;
+  updatedAt: number;
 }
 
 /**

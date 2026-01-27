@@ -193,6 +193,8 @@ describe('tournamentReducer', () => {
         blindLevels: [{ smallBlind: 50, bigBlind: 100, ante: 10 }],
         breakConfig: { enabled: true, frequency: 3, duration: 300 },
         levelDuration: 900,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
       };
       const state = tournamentReducer(initialState, {
         type: 'LOAD_PRESET',

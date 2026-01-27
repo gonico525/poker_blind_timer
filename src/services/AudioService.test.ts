@@ -85,7 +85,7 @@ describe('AudioService', () => {
 
     it('should resolve even if some files fail to load', async () => {
       // 次のAudioインスタンスのloadが失敗するようにする
-      const OriginalAudio = (global as unknown as { Audio: typeof Audio })
+      const OriginalAudio = (globalThis as unknown as { Audio: typeof Audio })
         .Audio;
       const MockAudioWithError = class extends OriginalAudio {
         load = vi.fn().mockImplementation(() => {
