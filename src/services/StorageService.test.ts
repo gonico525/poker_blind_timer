@@ -75,6 +75,8 @@ describe('StorageService', () => {
           blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
           levelDuration: 600,
           breakConfig: { enabled: false, frequency: 4, duration: 600 },
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
         },
       ];
       StorageService.savePresets(presets);

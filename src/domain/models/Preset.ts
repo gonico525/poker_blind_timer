@@ -2,13 +2,31 @@
  * プリセット関連のドメインロジック
  */
 
-import type { Preset } from '@/types';
+import type { Preset, PresetId } from '@/types';
+
+/**
+ * ユニークなプリセットIDを生成
+ * @returns プリセットID
+ */
+export function generatePresetId(): PresetId {
+  return `preset-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+}
+
+/**
+ * デフォルトプリセットかどうかを判定
+ * @param id - プリセットID
+ * @returns デフォルトプリセットの場合true
+ */
+export function isDefaultPreset(id: PresetId): boolean {
+  return id.startsWith('default-');
+}
 
 /**
  * デフォルトプリセットを作成
  * @returns デフォルトプリセットの配列
  */
 export function createDefaultPresets(): Preset[] {
+  const now = Date.now();
   return [
     {
       id: 'default-standard',
@@ -20,6 +38,8 @@ export function createDefaultPresets(): Preset[] {
         frequency: 4,
         duration: 600, // 10分
       },
+      createdAt: now,
+      updatedAt: now,
       blindLevels: [
         { smallBlind: 25, bigBlind: 50, ante: 0 },
         { smallBlind: 50, bigBlind: 100, ante: 0 },
@@ -45,6 +65,8 @@ export function createDefaultPresets(): Preset[] {
         frequency: 6,
         duration: 300, // 5分
       },
+      createdAt: now,
+      updatedAt: now,
       blindLevels: [
         { smallBlind: 25, bigBlind: 50, ante: 0 },
         { smallBlind: 50, bigBlind: 100, ante: 0 },
@@ -70,6 +92,8 @@ export function createDefaultPresets(): Preset[] {
         frequency: 4,
         duration: 900, // 15分
       },
+      createdAt: now,
+      updatedAt: now,
       blindLevels: [
         { smallBlind: 25, bigBlind: 50, ante: 0 },
         { smallBlind: 50, bigBlind: 100, ante: 0 },
