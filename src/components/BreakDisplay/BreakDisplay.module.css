@@ -1,104 +1,125 @@
-/* 休憩表示コンテナ */
+/* ============================================
+   Break Display - PC Optimized
+   Full-screen break announcement
+   ============================================ */
+
 .breakDisplay {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-12);
-  background-color: var(--color-bg-tertiary);
-  border: 2px solid var(--color-timer-break);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  gap: var(--spacing-8);
+  justify-content: center;
+  gap: var(--spacing-10);
+  width: 100%;
   animation: slideUp var(--transition-slow) var(--ease-out);
 }
 
-/* 休憩ヘッダー */
+/* ============================================
+   Break Header
+   ============================================ */
+
 .breakHeader {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--spacing-4);
 }
 
 .breakTitle {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-h1);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-display-md);
+  font-weight: var(--font-weight-extrabold);
   color: var(--color-timer-break);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.2em;
   margin: 0;
+  text-shadow: 0 4px 12px rgba(52, 152, 219, 0.5);
 }
 
 .breakMessage {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-h3);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   margin: 0;
+  letter-spacing: 0.1em;
 }
 
-/* 休憩タイマー */
+/* ============================================
+   Break Timer
+   ============================================ */
+
 .breakTimer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-3);
+  gap: var(--spacing-4);
 }
 
 .breakLabel {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-h5);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
 }
 
 .breakTime {
   font-family: var(--font-family-mono);
-  font-size: var(--font-size-display-lg);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-display-xl);
+  font-weight: var(--font-weight-extrabold);
   color: var(--color-timer-break);
-  line-height: var(--line-height-tight);
-}
-
-/* スキップボタン */
-.skipButton {
-  padding: var(--spacing-3) var(--spacing-8);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-inverse);
-  background-color: var(--color-accent);
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-base) var(--ease-out);
-  text-transform: uppercase;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
   letter-spacing: 0.05em;
 }
 
-.skipButton:hover {
-  background-color: var(--color-accent-light);
-  transform: translateY(-1px);
+/* ============================================
+   Skip Button
+   ============================================ */
+
+.skipButton {
+  padding: var(--spacing-4) var(--spacing-10);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-inverse);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    var(--color-accent-light) 100%
+  );
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base) var(--ease-out);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   box-shadow: var(--shadow-lg);
 }
 
+.skipButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
 .skipButton:active {
-  background-color: var(--color-accent-dark);
   transform: translateY(0);
+  box-shadow: var(--shadow-md);
 }
 
 .skipButton:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-accent-light);
+  outline-offset: 3px;
 }
 
-/* スライドアップアニメーション */
+/* ============================================
+   Animations
+   ============================================ */
+
 @keyframes slideUp {
   from {
-    transform: translateY(20px);
+    transform: translateY(40px);
     opacity: 0;
   }
   to {
@@ -107,28 +128,89 @@
   }
 }
 
-/* レスポンシブ対応 */
-@media (max-width: 1279px) {
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+/* Large Desktop (1920px+) */
+@media (min-width: 1920px) {
   .breakTitle {
+    font-size: 96px;
+  }
+
+  .breakMessage {
     font-size: var(--font-size-h2);
   }
 
   .breakTime {
-    font-size: var(--font-size-display-md);
+    font-size: 160px;
+  }
+
+  .breakLabel {
+    font-size: var(--font-size-h4);
+  }
+
+  .skipButton {
+    font-size: var(--font-size-h5);
+    padding: var(--spacing-5) var(--spacing-12);
   }
 }
 
+/* Desktop (1280px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1280px) {
+  .breakTitle {
+    font-size: var(--font-size-display-md);
+  }
+
+  .breakTime {
+    font-size: var(--font-size-display-xl);
+  }
+}
+
+/* Tablet Landscape (768px - 1279px) */
+@media (max-width: 1279px) {
+  .breakTitle {
+    font-size: var(--font-size-h1);
+  }
+
+  .breakMessage {
+    font-size: var(--font-size-h4);
+  }
+
+  .breakTime {
+    font-size: var(--font-size-display-lg);
+  }
+
+  .breakLabel {
+    font-size: var(--font-size-base);
+  }
+
+  .skipButton {
+    font-size: var(--font-size-base);
+    padding: var(--spacing-3) var(--spacing-8);
+  }
+}
+
+/* Tablet Portrait / Mobile (< 768px) */
 @media (max-width: 767px) {
   .breakDisplay {
-    padding: var(--spacing-8);
+    gap: var(--spacing-6);
   }
 
   .breakTitle {
-    font-size: var(--font-size-h3);
+    font-size: var(--font-size-h2);
+  }
+
+  .breakMessage {
+    font-size: var(--font-size-base);
   }
 
   .breakTime {
     font-size: var(--font-size-display-md);
+  }
+
+  .breakLabel {
+    font-size: var(--font-size-sm);
   }
 
   .skipButton {
@@ -137,7 +219,10 @@
   }
 }
 
-/* アクセシビリティ: アニメーション無効設定を尊重 */
+/* ============================================
+   Accessibility
+   ============================================ */
+
 @media (prefers-reduced-motion: reduce) {
   .breakDisplay {
     animation: none;
