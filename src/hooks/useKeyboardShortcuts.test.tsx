@@ -11,7 +11,7 @@ vi.mock('@/contexts/TournamentContext');
 
 describe('useKeyboardShortcuts', () => {
   let mockTournamentState: TournamentState;
-  let mockDispatch: any;
+  let mockDispatch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -101,7 +101,7 @@ describe('useKeyboardShortcuts', () => {
       )?.[1];
 
       expect(spaceHandler).toBeDefined();
-      spaceHandler!({} as any);
+      spaceHandler!({} as KeyboardEvent);
 
       expect(mockDispatch).toHaveBeenCalledWith({ type: 'START' });
     });
@@ -115,7 +115,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'Space'
       )?.[1];
 
-      spaceHandler!({} as any);
+      spaceHandler!({} as KeyboardEvent);
 
       expect(mockDispatch).toHaveBeenCalledWith({ type: 'PAUSE' });
     });
@@ -129,7 +129,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'Space'
       )?.[1];
 
-      spaceHandler!({} as any);
+      spaceHandler!({} as KeyboardEvent);
 
       expect(mockDispatch).toHaveBeenCalledWith({ type: 'START' });
     });
@@ -146,7 +146,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'ArrowRight'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(mockDispatch).toHaveBeenCalledWith({ type: 'NEXT_LEVEL' });
     });
@@ -161,7 +161,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'ArrowRight'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(mockDispatch).not.toHaveBeenCalled();
     });
@@ -176,7 +176,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'ArrowRight'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(mockDispatch).not.toHaveBeenCalled();
     });
@@ -191,7 +191,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'ArrowLeft'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(mockDispatch).toHaveBeenCalledWith({ type: 'PREV_LEVEL' });
     });
@@ -206,7 +206,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'ArrowLeft'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(mockDispatch).not.toHaveBeenCalled();
     });
@@ -221,7 +221,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'ArrowLeft'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(mockDispatch).not.toHaveBeenCalled();
     });
@@ -235,7 +235,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'KeyR'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(mockDispatch).toHaveBeenCalledWith({ type: 'RESET' });
     });
@@ -258,7 +258,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'KeyF'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(requestFullscreen).toHaveBeenCalled();
     });
@@ -279,7 +279,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'KeyF'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(exitFullscreen).toHaveBeenCalled();
     });
@@ -301,7 +301,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'Escape'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(exitFullscreen).toHaveBeenCalled();
     });
@@ -321,7 +321,7 @@ describe('useKeyboardShortcuts', () => {
         (call) => call[0] === 'Escape'
       )?.[1];
 
-      handler!({} as any);
+      handler!({} as KeyboardEvent);
 
       expect(exitFullscreen).not.toHaveBeenCalled();
     });
