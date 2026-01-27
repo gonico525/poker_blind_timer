@@ -57,6 +57,8 @@ describe('mergeWithDefaultPresets', () => {
         blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
         levelDuration: 600,
         breakConfig: { enabled: false, frequency: 4, duration: 600 },
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
       },
     ];
     const merged = mergeWithDefaultPresets(userPresets);
@@ -85,6 +87,8 @@ describe('mergeWithDefaultPresets', () => {
         blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
         levelDuration: 600,
         breakConfig: { enabled: false, frequency: 4, duration: 600 },
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
       },
       {
         id: 'user-2',
@@ -93,6 +97,8 @@ describe('mergeWithDefaultPresets', () => {
         blindLevels: [{ smallBlind: 50, bigBlind: 100, ante: 0 }],
         levelDuration: 900,
         breakConfig: { enabled: true, frequency: 3, duration: 300 },
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
       },
     ];
     const merged = mergeWithDefaultPresets(userPresets);
