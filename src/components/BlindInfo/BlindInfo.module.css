@@ -1,0 +1,109 @@
+/* ブラインド情報コンテナ */
+.blindInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-6);
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  gap: var(--spacing-4);
+}
+
+/* レベル番号 */
+.levelNumber {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ブラインドラッパー */
+.blindsWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+/* ブラインド表示（メイン） */
+.blinds {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-family: var(--font-family-numeric);
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+  line-height: var(--line-height-tight);
+}
+
+.blindValue {
+  font-weight: var(--font-weight-bold);
+}
+
+.separator {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+}
+
+/* ブラインドラベル（SB/BB） */
+.blindLabels {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.blindLabel {
+  min-width: 20px;
+  text-align: center;
+}
+
+/* アンティ情報 */
+.ante {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1279px) {
+  .levelNumber {
+    font-size: var(--font-size-h4);
+  }
+
+  .blinds {
+    font-size: var(--font-size-h2);
+  }
+
+  .ante {
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 767px) {
+  .levelNumber {
+    font-size: var(--font-size-h5);
+  }
+
+  .blinds {
+    font-size: var(--font-size-h3);
+  }
+
+  .blindInfo {
+    padding: var(--spacing-4);
+  }
+}

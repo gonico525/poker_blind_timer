@@ -1,0 +1,109 @@
+/* 次レベル情報コンテナ */
+.nextLevelInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-6);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  gap: var(--spacing-3);
+}
+
+/* ヘッダー */
+.header {
+  width: 100%;
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+/* ブラインド表示 */
+.blinds {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-family: var(--font-family-numeric);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.blindValue {
+  font-weight: var(--font-weight-bold);
+}
+
+.separator {
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-normal);
+}
+
+/* アンティ情報 */
+.ante {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-1) var(--spacing-3);
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+
+/* 休憩情報 */
+.breakInfo {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-timer-break);
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: rgba(52, 152, 219, 0.1);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-timer-break);
+  text-align: center;
+}
+
+/* 最後のレベル */
+.lastLevel {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-3) var(--spacing-6);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1279px) {
+  .blinds {
+    font-size: var(--font-size-h5);
+  }
+
+  .title {
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 767px) {
+  .nextLevelInfo {
+    padding: var(--spacing-4);
+  }
+
+  .blinds {
+    font-size: var(--font-size-h6);
+  }
+
+  .title,
+  .ante,
+  .breakInfo {
+    font-size: var(--font-size-xs);
+  }
+}
