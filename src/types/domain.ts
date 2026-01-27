@@ -82,4 +82,5 @@ export interface Settings {
   theme: Theme;
   soundEnabled: boolean;
   volume: number;
+  keyboardShortcutsEnabled: boolean;
 }
