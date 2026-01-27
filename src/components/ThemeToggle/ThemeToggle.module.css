@@ -1,0 +1,52 @@
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast) var(--ease-in-out);
+}
+
+.toggle:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-light);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.toggle:active {
+  transform: scale(0.98);
+}
+
+.icon {
+  font-size: var(--font-size-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  user-select: none;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .toggle {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+  }
+
+  .icon {
+    font-size: var(--font-size-base);
+  }
+}
