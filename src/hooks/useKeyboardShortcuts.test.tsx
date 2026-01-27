@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { useKeyboardShortcuts } from './useKeyboardShortcuts';
 import { KeyboardService } from '@/services/KeyboardService';
 import * as TournamentContext from '@/contexts/TournamentContext';
-import type { TournamentState, TournamentAction } from '@/types';
+import type { TournamentState } from '@/types';
 
 // モック化
 vi.mock('@/services/KeyboardService');
@@ -11,7 +11,7 @@ vi.mock('@/contexts/TournamentContext');
 
 describe('useKeyboardShortcuts', () => {
   let mockTournamentState: TournamentState;
-  let mockDispatch: vi.Mock<[action: TournamentAction], void>;
+  let mockDispatch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -35,7 +35,7 @@ describe('useKeyboardShortcuts', () => {
       breakRemainingTime: 0,
     };
 
-    mockDispatch = vi.fn<[action: TournamentAction], void>();
+    mockDispatch = vi.fn();
 
     // useTournamentをモック化
     vi.mocked(TournamentContext.useTournament).mockReturnValue({

@@ -66,7 +66,7 @@ function MainLayout() {
             {timer.isOnBreak ? (
               <BreakDisplay
                 remainingTime={timer.remainingTime}
-                onSkipBreak={timer.skipBreak}
+                onSkip={timer.skipBreak}
               />
             ) : (
               <>

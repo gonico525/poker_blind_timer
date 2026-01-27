@@ -1,16 +1,16 @@
 .main-layout {
   min-height: 100vh;
-  background: var(--bg-primary, #1a1a1a);
-  color: var(--text-primary, #ffffff);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
 }
 
 .main-header {
-  background: var(--bg-secondary, #2a2a2a);
+  background: var(--color-bg-secondary);
   padding: 1.5rem 2rem;
-  border-bottom: 2px solid var(--border-color, #3a3a3a);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid var(--color-border);
+  box-shadow: var(--shadow-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -20,7 +20,7 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 600;
-  color: var(--accent-primary, #4caf50);
+  color: var(--color-primary);
 }
 
 .header-controls {
@@ -31,17 +31,17 @@
 
 .settings-button {
   padding: 0.5rem 1rem;
-  background: var(--bg-tertiary, #3a3a3a);
-  color: var(--text-primary, #ffffff);
-  border: 1px solid var(--border-color, #4a4a4a);
-  border-radius: var(--radius-md, 6px);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   font-size: 1rem;
   cursor: pointer;
-  transition: all var(--transition-normal, 0.2s);
+  transition: all var(--transition-base);
 }
 
 .settings-button:hover {
-  background: var(--bg-hover, #4a4a4a);
+  background: var(--color-bg-hover);
   transform: translateY(-1px);
 }
 
@@ -76,7 +76,7 @@
 .settings-view h2 {
   font-size: 1.5rem;
   margin: 0 0 1.5rem 0;
-  color: var(--accent-primary, #4caf50);
+  color: var(--color-primary);
   text-align: center;
 }
 
