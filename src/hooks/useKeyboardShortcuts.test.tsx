@@ -40,7 +40,7 @@ describe('useKeyboardShortcuts', () => {
     // useTournamentをモック化
     vi.mocked(TournamentContext.useTournament).mockReturnValue({
       state: mockTournamentState,
-      dispatch: mockDispatch,
+      dispatch: mockDispatch as any,
     });
   });
 
