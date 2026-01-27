@@ -5,7 +5,7 @@ import styles from './BlindInfo.module.css';
 
 export interface BlindInfoProps {
   level: number;
-  blindLevel: BlindLevel;
+  blindLevel: BlindLevel | undefined;
 }
 
 /**
@@ -13,6 +13,11 @@ export interface BlindInfoProps {
  * 現在のレベル番号とブラインド金額（SB/BB/Ante）を表示
  */
 export const BlindInfo: React.FC<BlindInfoProps> = ({ level, blindLevel }) => {
+  // blindLevelがundefinedの場合は何も表示しない
+  if (!blindLevel) {
+    return null;
+  }
+
   const { smallBlind, bigBlind, ante } = blindLevel;
 
   return (
