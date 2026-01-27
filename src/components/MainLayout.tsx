@@ -1,31 +1,106 @@
-import { useAudioNotification, useKeyboardShortcuts } from '@/hooks';
+import { useState } from 'react';
+import {
+  useAudioNotification,
+  useKeyboardShortcuts,
+  useTimer,
+  usePresets,
+} from '@/hooks';
+import { useSettings } from '@/contexts/SettingsContext';
+import {
+  TimerDisplay,
+  BlindInfo,
+  TimerControls,
+  NextLevelInfo,
+  BreakDisplay,
+  ThemeToggle,
+  PresetManager,
+} from '@/components';
 import './MainLayout.css';
 
 function MainLayout() {
-  // 音声通知とキーボードショートカットをグローバルに有効化
+  // フック群
   useAudioNotification();
   useKeyboardShortcuts();
+  const timer = useTimer();
+  const { presets, loadPreset, currentPresetId } = usePresets();
+  const { state: settingsState, dispatch: settingsDispatch } = useSettings();
+
+  // UI状態
+  const [showSettings, setShowSettings] = useState(false);
+
+  // テーマ変更ハンドラ
+  const handleThemeChange = (theme: 'light' | 'dark') => {
+    settingsDispatch({ type: 'SET_THEME', payload: { theme } });
+  };
 
   return (
     <div className="main-layout" data-testid="main-layout">
       <header className="main-header">
         <h1>Poker Blind Timer</h1>
-      </header>
-      <main className="main-content">
-        <div className="placeholder-message">
-          <h2>Phase 4 Team A: 基盤UIコンポーネント完成</h2>
-          <p>タイマーUIコンポーネント（Team B）と設定UIコンポーネント（Team D）の実装待ちです。</p>
-          <div className="status-info">
-            <h3>実装済み機能:</h3>
-            <ul>
-              <li>✅ 初期化シーケンス</li>
-              <li>✅ ローディング画面</li>
-              <li>✅ エラー画面</li>
-              <li>✅ 音声通知システム</li>
-              <li>✅ キーボードショートカット</li>
-            </ul>
-          </div>
+        <div className="header-controls">
+          <ThemeToggle
+            theme={settingsState.settings.theme}
+            onChange={handleThemeChange}
+          />
+          <button
+            className="settings-button"
+            onClick={() => setShowSettings(!showSettings)}
+          >
+            {showSettings ? '✕ 閉じる' : '⚙️ 設定'}
+          </button>
         </div>
+      </header>
+
+      <main className="main-content">
+        {showSettings ? (
+          <div className="settings-view">
+            <h2>プリセット選択</h2>
+            <PresetManager
+              presets={presets}
+              currentPresetId={currentPresetId}
+              onLoad={loadPreset}
+            />
+          </div>
+        ) : (
+          <div className="timer-view">
+            {timer.isOnBreak ? (
+              <BreakDisplay
+                remainingTime={timer.remainingTime}
+                onSkipBreak={timer.skipBreak}
+              />
+            ) : (
+              <>
+                <TimerDisplay
+                  remainingTime={timer.remainingTime}
+                  elapsedTime={timer.elapsedTime}
+                  status={timer.status}
+                  isOnBreak={timer.isOnBreak}
+                />
+                <BlindInfo
+                  level={timer.currentLevel}
+                  blindLevel={timer.currentBlind}
+                />
+                <NextLevelInfo
+                  nextBlind={timer.nextBlind}
+                  levelsUntilBreak={timer.levelsUntilBreak}
+                />
+              </>
+            )}
+
+            <TimerControls
+              status={timer.status}
+              isOnBreak={timer.isOnBreak}
+              hasNextLevel={timer.hasNextLevel}
+              hasPrevLevel={timer.hasPrevLevel}
+              onStart={timer.start}
+              onPause={timer.pause}
+              onReset={timer.reset}
+              onNextLevel={timer.nextLevel}
+              onPrevLevel={timer.prevLevel}
+              onSkipBreak={timer.skipBreak}
+            />
+          </div>
+        )}
       </main>
     </div>
   );
