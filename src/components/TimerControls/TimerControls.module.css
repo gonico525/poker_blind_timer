@@ -1,0 +1,181 @@
+/* コントロールコンテナ */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-6);
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* ボタン共通スタイル */
+.button {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base) var(--ease-out);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-height: 44px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* メインボタングループ */
+.mainButtons {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.mainButtons .button {
+  flex: 1;
+}
+
+/* レベル操作ボタングループ */
+.levelButtons {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.levelButtons .button {
+  flex: 1;
+}
+
+/* 休憩操作ボタングループ */
+.breakButtons {
+  display: flex;
+}
+
+.breakButtons .button {
+  flex: 1;
+}
+
+/* プライマリボタン（開始） */
+.button.primary {
+  color: var(--color-text-inverse);
+  background-color: var(--color-primary);
+}
+
+.button.primary:hover:not(:disabled) {
+  background-color: var(--color-primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.button.primary:active:not(:disabled) {
+  background-color: var(--color-primary-dark);
+  transform: translateY(0);
+}
+
+/* 警告ボタン（一時停止） */
+.button.warning {
+  color: var(--color-text-inverse);
+  background-color: var(--color-warning);
+}
+
+.button.warning:hover:not(:disabled) {
+  background-color: #f5a623;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.button.warning:active:not(:disabled) {
+  background-color: #e09112;
+  transform: translateY(0);
+}
+
+/* 成功ボタン（再開） */
+.button.success {
+  color: var(--color-text-inverse);
+  background-color: var(--color-success);
+}
+
+.button.success:hover:not(:disabled) {
+  background-color: #2ecc71;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.button.success:active:not(:disabled) {
+  background-color: #27ae60;
+  transform: translateY(0);
+}
+
+/* セカンダリボタン */
+.button.secondary {
+  color: var(--color-text-primary);
+  background-color: transparent;
+  border: 2px solid var(--color-border);
+}
+
+.button.secondary:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-hover);
+}
+
+.button.secondary:active:not(:disabled) {
+  background-color: var(--color-bg-secondary);
+}
+
+/* アクセントボタン（休憩スキップ） */
+.button.accent {
+  color: var(--color-text-inverse);
+  background-color: var(--color-accent);
+}
+
+.button.accent:hover:not(:disabled) {
+  background-color: var(--color-accent-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.button.accent:active:not(:disabled) {
+  background-color: var(--color-accent-dark);
+  transform: translateY(0);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 767px) {
+  .controls {
+    padding: var(--spacing-4);
+  }
+
+  .button {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-2) var(--spacing-4);
+  }
+
+  .mainButtons,
+  .levelButtons {
+    flex-direction: column;
+  }
+
+  .mainButtons .button,
+  .levelButtons .button {
+    width: 100%;
+  }
+}
+
+/* アクセシビリティ: アニメーション無効設定を尊重 */
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+
+  .button:hover:not(:disabled) {
+    transform: none;
+  }
+}
