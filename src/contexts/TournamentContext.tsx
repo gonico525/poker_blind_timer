@@ -46,14 +46,14 @@ export function tournamentReducer(
         const newElapsedTime =
           state.timer.elapsedTime + (newRemainingTime > 0 ? 1 : 0);
 
-        // 休憩タイマーが0になったら、休憩を終了して次のレベルに進む
+        // 休憩タイマーが0になったら、休憩を終了して次のレベルに進む（自動進行のためタイマーは継続）
         if (newRemainingTime === 0 && state.timer.remainingTime > 0) {
           return {
             ...state,
             isOnBreak: false,
             breakRemainingTime: 0,
             timer: {
-              status: 'idle',
+              status: 'running',
               remainingTime: state.levelDuration,
               elapsedTime: 0,
             },
