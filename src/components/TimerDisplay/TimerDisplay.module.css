@@ -141,7 +141,6 @@
 /* Critical State (< 30 seconds) */
 .timerDisplay.critical .timer {
   color: var(--color-error);
-  animation: criticalPulse 1s var(--ease-in-out) infinite;
 }
 
 /* Break State */
@@ -297,8 +296,7 @@
     transition: none;
   }
 
-  .timerDisplay.warning .timer,
-  .timerDisplay.critical .timer {
+  .timerDisplay.warning .timer {
     animation: none !important;
   }
 }
