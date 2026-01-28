@@ -1,3 +1,8 @@
+/* ============================================
+   Main Layout - PC Screen Optimized
+   Designed for poker tournament display
+   ============================================ */
+
 .main-layout {
   min-height: 100vh;
   background: var(--color-bg-primary);
@@ -6,90 +11,179 @@
   flex-direction: column;
 }
 
+/* ============================================
+   Header
+   ============================================ */
+
 .main-header {
   background: var(--color-bg-secondary);
-  padding: 1.5rem 2rem;
-  border-bottom: 2px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  padding: var(--spacing-3) var(--spacing-6);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .main-header h1 {
   margin: 0;
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-primary);
+  letter-spacing: 0.05em;
 }
 
 .header-controls {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-3);
   align-items: center;
 }
 
 .settings-button {
-  padding: 0.5rem 1rem;
+  padding: var(--spacing-2) var(--spacing-4);
   background: var(--color-bg-tertiary);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  font-size: 1rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
 }
 
 .settings-button:hover {
   background: var(--color-bg-hover);
-  transform: translateY(-1px);
+  border-color: var(--color-primary);
 }
 
 .settings-button:active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
+
+/* ============================================
+   Main Content - Timer View
+   ============================================ */
 
 .main-content {
   flex: 1;
-  padding: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
+  padding: var(--spacing-4);
+  overflow: auto;
 }
 
 .timer-view {
   width: 100%;
+  max-width: 1400px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  align-items: center;
+  gap: var(--spacing-4);
 }
+
+/* Timer and Blind Info - Center Stage */
+.timer-view > :first-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4) 0;
+}
+
+/* Bottom Section - Next Level and Controls */
+.timer-view > :nth-child(2),
+.timer-view > :nth-child(3),
+.timer-view > :nth-child(4) {
+  flex-shrink: 0;
+}
+
+/* Next Level Info - Compact horizontal layout */
+.timer-view > :nth-child(3) {
+  align-self: stretch;
+}
+
+/* Controls - Full width at bottom */
+.timer-view > :last-child {
+  align-self: stretch;
+}
+
+/* ============================================
+   Settings View
+   ============================================ */
 
 .settings-view {
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
+  padding: var(--spacing-6);
 }
 
 .settings-view h2 {
-  font-size: 1.5rem;
-  margin: 0 0 1.5rem 0;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-primary);
   text-align: center;
+  margin: 0 0 var(--spacing-8) 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-/* レスポンシブデザイン */
-@media (max-width: 768px) {
-  .main-header {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+/* Large Desktop (1920px+) */
+@media (min-width: 1920px) {
+  .timer-view {
+    max-width: 1800px;
   }
 
   .main-header h1 {
-    font-size: 1.5rem;
+    font-size: var(--font-size-h3);
+  }
+}
+
+/* Desktop (1280px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1280px) {
+  .timer-view {
+    max-width: 1200px;
+  }
+}
+
+/* Tablet Landscape (768px - 1279px) */
+@media (max-width: 1279px) {
+  .main-header {
+    padding: var(--spacing-3) var(--spacing-6);
+  }
+
+  .main-header h1 {
+    font-size: var(--font-size-h5);
+  }
+
+  .main-content {
+    padding: var(--spacing-4);
+  }
+
+  .timer-view {
+    gap: var(--spacing-6);
+  }
+}
+
+/* Tablet Portrait / Mobile (< 768px) */
+@media (max-width: 767px) {
+  .main-header {
+    flex-direction: column;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+  }
+
+  .main-header h1 {
+    font-size: var(--font-size-h6);
   }
 
   .header-controls {
@@ -98,6 +192,35 @@
   }
 
   .main-content {
-    padding: 1rem;
+    padding: var(--spacing-3);
+  }
+
+  .timer-view {
+    gap: var(--spacing-4);
+  }
+
+  .settings-view {
+    padding: var(--spacing-4);
+  }
+
+  .settings-view h2 {
+    font-size: var(--font-size-h4);
+    margin-bottom: var(--spacing-6);
+  }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+  .main-header,
+  .settings-button {
+    display: none;
+  }
+
+  .main-layout {
+    background: white;
+    color: black;
   }
 }

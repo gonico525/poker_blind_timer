@@ -1,35 +1,48 @@
-/* 次レベル情報コンテナ */
+/* ============================================
+   Next Level Info - PC Optimized
+   Compact horizontal layout for bottom section
+   ============================================ */
+
 .nextLevelInfo {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  padding: var(--spacing-6);
-  background-color: var(--color-bg-secondary);
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-6);
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-bg-tertiary);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  gap: var(--spacing-3);
 }
 
-/* ヘッダー */
+/* ============================================
+   Header & Title
+   ============================================ */
+
 .header {
-  width: 100%;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
 }
 
 .title {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-secondary);
+  color: var(--color-text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
 }
 
-/* ブラインド表示 */
+/* ============================================
+   Blinds Display
+   ============================================ */
+
 .blinds {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--spacing-2);
   font-family: var(--font-family-numeric);
   font-size: var(--font-size-h4);
@@ -44,66 +57,133 @@
 .separator {
   color: var(--color-text-tertiary);
   font-weight: var(--font-weight-normal);
+  font-size: 0.9em;
 }
 
-/* アンティ情報 */
+/* ============================================
+   Ante Info
+   ============================================ */
+
 .ante {
   font-family: var(--font-family-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   padding: var(--spacing-1) var(--spacing-3);
-  background-color: var(--color-bg-tertiary);
+  background-color: var(--color-bg-secondary);
   border-radius: var(--radius-sm);
+  white-space: nowrap;
 }
 
-/* 休憩情報 */
+/* ============================================
+   Break Info
+   ============================================ */
+
 .breakInfo {
   font-family: var(--font-family-sans);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-timer-break);
   padding: var(--spacing-2) var(--spacing-4);
   background-color: rgba(52, 152, 219, 0.1);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-timer-break);
-  text-align: center;
+  white-space: nowrap;
 }
 
-/* 最後のレベル */
+/* ============================================
+   Last Level
+   ============================================ */
+
 .lastLevel {
   font-family: var(--font-family-sans);
   font-size: var(--font-size-h5);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  padding: var(--spacing-3) var(--spacing-6);
+  color: var(--color-accent);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
-/* レスポンシブ対応 */
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+/* Large Desktop (1920px+) */
+@media (min-width: 1920px) {
+  .nextLevelInfo {
+    gap: var(--spacing-12);
+    padding: var(--spacing-5) var(--spacing-8);
+  }
+
+  .blinds {
+    font-size: var(--font-size-h3);
+  }
+
+  .title {
+    font-size: var(--font-size-base);
+  }
+
+  .ante,
+  .breakInfo {
+    font-size: var(--font-size-base);
+  }
+}
+
+/* Desktop (1280px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1280px) {
+  .nextLevelInfo {
+    gap: var(--spacing-8);
+  }
+}
+
+/* Tablet Landscape (768px - 1279px) */
 @media (max-width: 1279px) {
+  .nextLevelInfo {
+    gap: var(--spacing-6);
+    padding: var(--spacing-3) var(--spacing-5);
+  }
+
   .blinds {
     font-size: var(--font-size-h5);
   }
 
   .title {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
+  }
+
+  .ante,
+  .breakInfo {
+    font-size: var(--font-size-xs);
   }
 }
 
+/* Tablet Portrait / Mobile (< 768px) */
 @media (max-width: 767px) {
   .nextLevelInfo {
-    padding: var(--spacing-4);
+    flex-direction: column;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .header {
+    width: 100%;
+    justify-content: center;
   }
 
   .blinds {
     font-size: var(--font-size-h6);
   }
 
-  .title,
+  .title {
+    font-size: var(--font-size-xs);
+  }
+
   .ante,
   .breakInfo {
     font-size: var(--font-size-xs);
+  }
+
+  .lastLevel {
+    font-size: var(--font-size-base);
   }
 }
