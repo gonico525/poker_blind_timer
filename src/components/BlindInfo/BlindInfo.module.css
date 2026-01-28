@@ -79,23 +79,9 @@
 }
 
 /* ============================================
-   Ante
+   Ante (displayed inline with SB/BB)
+   Note: Ante is now displayed within .blinds and .blindLabels
    ============================================ */
-
-.ante {
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  padding: var(--spacing-2) var(--spacing-6);
-  background: linear-gradient(
-    135deg,
-    var(--color-bg-tertiary) 0%,
-    var(--color-bg-secondary) 100%
-  );
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border);
-}
 
 /* ============================================
    Responsive Design
@@ -114,10 +100,6 @@
   .blindLabels {
     font-size: var(--font-size-lg);
     gap: var(--spacing-10);
-  }
-
-  .ante {
-    font-size: var(--font-size-h5);
   }
 }
 
@@ -141,10 +123,6 @@
   .blindLabels {
     font-size: var(--font-size-sm);
     gap: var(--spacing-6);
-  }
-
-  .ante {
-    font-size: var(--font-size-base);
   }
 }
 
@@ -170,10 +148,5 @@
 
   .blindsWrapper {
     gap: var(--spacing-1);
-  }
-
-  .ante {
-    font-size: var(--font-size-sm);
-    padding: var(--spacing-1) var(--spacing-4);
   }
 }

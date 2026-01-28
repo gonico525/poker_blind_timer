@@ -37,21 +37,28 @@ export const BlindInfo: React.FC<BlindInfoProps> = ({ level, blindLevel }) => {
           <span className={styles.blindValue}>
             {formatBlindValue(bigBlind)}
           </span>
+          {ante > 0 && (
+            <>
+              <span className={styles.separator}>/</span>
+              <span className={styles.blindValue} data-testid="ante">
+                {formatBlindValue(ante)}
+              </span>
+            </>
+          )}
         </div>
 
         <div className={styles.blindLabels}>
           <span className={styles.blindLabel}>SB</span>
           <span className={styles.separator}>/</span>
           <span className={styles.blindLabel}>BB</span>
+          {ante > 0 && (
+            <>
+              <span className={styles.separator}>/</span>
+              <span className={styles.blindLabel}>Ante</span>
+            </>
+          )}
         </div>
       </div>
-
-      {/* アンティ情報 */}
-      {ante > 0 && (
-        <div className={styles.ante} data-testid="ante">
-          Ante: {formatBlindValue(ante)}
-        </div>
-      )}
     </div>
   );
 };
