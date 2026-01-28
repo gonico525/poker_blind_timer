@@ -40,12 +40,14 @@ export function tournamentReducer(
         return state;
       }
 
-      // 休憩中の場合、休憩タイマーをカウントダウン
+      // 休憩中の場合、タイマーをカウントダウン
       if (state.isOnBreak) {
-        const newBreakRemainingTime = Math.max(0, state.breakRemainingTime - 1);
+        const newRemainingTime = Math.max(0, state.timer.remainingTime - 1);
+        const newElapsedTime =
+          state.timer.elapsedTime + (newRemainingTime > 0 ? 1 : 0);
 
         // 休憩タイマーが0になったら、休憩を終了して次のレベルに進む
-        if (newBreakRemainingTime === 0 && state.breakRemainingTime > 0) {
+        if (newRemainingTime === 0 && state.timer.remainingTime > 0) {
           return {
             ...state,
             isOnBreak: false,
@@ -60,7 +62,12 @@ export function tournamentReducer(
 
         return {
           ...state,
-          breakRemainingTime: newBreakRemainingTime,
+          breakRemainingTime: newRemainingTime,
+          timer: {
+            ...state.timer,
+            remainingTime: newRemainingTime,
+            elapsedTime: newElapsedTime,
+          },
         };
       }
 
@@ -99,7 +106,7 @@ export function tournamentReducer(
             breakRemainingTime: state.breakConfig.duration,
             timer: {
               status: 'running',
-              remainingTime: state.levelDuration,
+              remainingTime: state.breakConfig.duration,
               elapsedTime: 0,
             },
           };
@@ -146,7 +153,7 @@ export function tournamentReducer(
           breakRemainingTime: state.breakConfig.duration,
           timer: {
             status: 'idle',
-            remainingTime: state.levelDuration,
+            remainingTime: state.breakConfig.duration,
             elapsedTime: 0,
           },
         };
@@ -264,7 +271,7 @@ export function tournamentReducer(
         breakRemainingTime: state.breakConfig.duration,
         timer: {
           status: 'idle',
-          remainingTime: state.levelDuration,
+          remainingTime: state.breakConfig.duration,
           elapsedTime: 0,
         },
       };
