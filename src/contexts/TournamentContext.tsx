@@ -43,6 +43,21 @@ export function tournamentReducer(
       // 休憩中の場合、休憩タイマーをカウントダウン
       if (state.isOnBreak) {
         const newBreakRemainingTime = Math.max(0, state.breakRemainingTime - 1);
+
+        // 休憩タイマーが0になったら、休憩を終了して次のレベルに進む
+        if (newBreakRemainingTime === 0 && state.breakRemainingTime > 0) {
+          return {
+            ...state,
+            isOnBreak: false,
+            breakRemainingTime: 0,
+            timer: {
+              status: 'idle',
+              remainingTime: state.levelDuration,
+              elapsedTime: 0,
+            },
+          };
+        }
+
         return {
           ...state,
           breakRemainingTime: newBreakRemainingTime,
@@ -53,6 +68,54 @@ export function tournamentReducer(
       const newRemainingTime = Math.max(0, state.timer.remainingTime - 1);
       const newElapsedTime =
         state.timer.elapsedTime + (newRemainingTime > 0 ? 1 : 0);
+
+      // タイマーが0になったら、次のレベルに自動進行
+      if (newRemainingTime === 0 && state.timer.remainingTime > 0) {
+        // 最後のレベルの場合はタイマーを停止するのみ
+        if (state.currentLevel >= state.blindLevels.length - 1) {
+          return {
+            ...state,
+            timer: {
+              status: 'idle',
+              remainingTime: 0,
+              elapsedTime: state.timer.elapsedTime + 1,
+            },
+          };
+        }
+
+        // 休憩判定（現在のレベル終了後に休憩を取るか）
+        const takeBreak = shouldTakeBreak(
+          state.currentLevel,
+          state.breakConfig
+        );
+        const newLevel = state.currentLevel + 1;
+
+        if (takeBreak) {
+          // 休憩を開始
+          return {
+            ...state,
+            currentLevel: newLevel,
+            isOnBreak: true,
+            breakRemainingTime: state.breakConfig.duration,
+            timer: {
+              status: 'running',
+              remainingTime: state.levelDuration,
+              elapsedTime: 0,
+            },
+          };
+        }
+
+        // 次のレベルに進む
+        return {
+          ...state,
+          currentLevel: newLevel,
+          timer: {
+            status: 'running',
+            remainingTime: state.levelDuration,
+            elapsedTime: 0,
+          },
+        };
+      }
 
       return {
         ...state,
