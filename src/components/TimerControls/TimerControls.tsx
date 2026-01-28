@@ -79,7 +79,7 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
         <button
           className={`${styles.button} ${styles.secondary}`}
           onClick={onPrevLevel}
-          disabled={!hasPrevLevel || isOnBreak}
+          disabled={!hasPrevLevel || isOnBreak || status === 'running'}
           aria-label="Previous level"
         >
           ← Previous
@@ -88,7 +88,7 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
         <button
           className={`${styles.button} ${styles.secondary}`}
           onClick={onNextLevel}
-          disabled={!hasNextLevel || isOnBreak}
+          disabled={!hasNextLevel || isOnBreak || status === 'running'}
           aria-label="Next level"
         >
           Next →

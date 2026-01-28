@@ -135,6 +135,11 @@ export function tournamentReducer(
     }
 
     case 'NEXT_LEVEL': {
+      // タイマーが動いている場合は変更不可
+      if (state.timer.status === 'running') {
+        return state;
+      }
+
       // 最後のレベルの場合は進めない
       if (state.currentLevel >= state.blindLevels.length - 1) {
         return state;
@@ -172,6 +177,11 @@ export function tournamentReducer(
     }
 
     case 'PREV_LEVEL': {
+      // タイマーが動いている場合は変更不可
+      if (state.timer.status === 'running') {
+        return state;
+      }
+
       // 最初のレベルの場合は戻れない
       if (state.currentLevel <= 0) {
         return state;
@@ -286,10 +296,21 @@ export function tournamentReducer(
     }
 
     case 'SKIP_BREAK': {
+      // 休憩中でない場合は何もしない
+      if (!state.isOnBreak) {
+        return state;
+      }
+
+      // 休憩をスキップして次のレベルに進む（タイマーをリセット）
       return {
         ...state,
         isOnBreak: false,
         breakRemainingTime: 0,
+        timer: {
+          status: 'idle',
+          remainingTime: state.levelDuration,
+          elapsedTime: 0,
+        },
       };
     }
 
