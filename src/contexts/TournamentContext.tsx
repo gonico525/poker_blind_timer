@@ -13,8 +13,8 @@ export function tournamentReducer(
 ): TournamentState {
   switch (action.type) {
     case 'START': {
-      // 既に実行中、または休憩中は開始しない
-      if (state.timer.status === 'running' || state.isOnBreak) {
+      // 既に実行中は開始しない
+      if (state.timer.status === 'running') {
         return state;
       }
       return {
@@ -91,7 +91,7 @@ export function tournamentReducer(
         const newLevel = state.currentLevel + 1;
 
         if (takeBreak) {
-          // 休憩を開始
+          // 休憩を開始（自動進行のため、タイマーは継続して動作）
           return {
             ...state,
             currentLevel: newLevel,
