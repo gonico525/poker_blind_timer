@@ -14,14 +14,14 @@ describe('BlindInfo', () => {
     expect(screen.getByTestId('level-number')).toHaveTextContent('Level 2');
   });
 
-  it('should display SB/BB', () => {
+  it('should display SB/BB/Ante in one line', () => {
     render(<BlindInfo level={1} blindLevel={mockBlindLevel} />);
-    expect(screen.getByTestId('blinds')).toHaveTextContent('100/200');
+    expect(screen.getByTestId('blinds')).toHaveTextContent('100/200/25');
   });
 
   it('should display ante when present', () => {
     render(<BlindInfo level={1} blindLevel={mockBlindLevel} />);
-    expect(screen.getByTestId('ante')).toHaveTextContent('Ante: 25');
+    expect(screen.getByTestId('ante')).toHaveTextContent('25');
   });
 
   it('should not display ante when 0', () => {
@@ -32,7 +32,7 @@ describe('BlindInfo', () => {
   it('should format large values with K suffix', () => {
     const largeBlind = { smallBlind: 1000, bigBlind: 2000, ante: 200 };
     render(<BlindInfo level={1} blindLevel={largeBlind} />);
-    expect(screen.getByTestId('blinds')).toHaveTextContent('1K/2K');
+    expect(screen.getByTestId('blinds')).toHaveTextContent('1K/2K/200');
   });
 
   it('should display level 0 as Level 1', () => {
