@@ -142,6 +142,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     };
   });
 
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', state.settings.theme);
+  }, [state.settings.theme]);
+
   // Persist settings to localStorage
   useEffect(() => {
     StorageService.saveSettings(state.settings);
