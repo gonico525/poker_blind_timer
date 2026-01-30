@@ -7,14 +7,15 @@ import {
 } from '@/hooks';
 import { useSettings } from '@/contexts/SettingsContext';
 import {
+  AppHeader,
   TimerDisplay,
   BlindInfo,
   TimerControls,
   NextLevelInfo,
   BreakDisplay,
-  ThemeToggle,
-  PresetManager,
+  PresetManagementModal,
 } from '@/components';
+import type { PresetId } from '@/types';
 import './MainLayout.css';
 
 function MainLayout() {
@@ -26,82 +27,99 @@ function MainLayout() {
   const { state: settingsState, dispatch: settingsDispatch } = useSettings();
 
   // UI状態
-  const [showSettings, setShowSettings] = useState(false);
+  const [showPresetManagement, setShowPresetManagement] = useState(false);
+
+  // プリセット選択ハンドラ
+  const handlePresetSelect = (presetId: PresetId) => {
+    loadPreset(presetId);
+  };
+
+  // プリセット管理モーダルを開く
+  const handleOpenPresetManagement = () => {
+    setShowPresetManagement(true);
+  };
+
+  // プリセット管理モーダルを閉じる
+  const handleClosePresetManagement = () => {
+    setShowPresetManagement(false);
+  };
 
   // テーマ変更ハンドラ
   const handleThemeChange = (theme: 'light' | 'dark') => {
     settingsDispatch({ type: 'SET_THEME', payload: { theme } });
   };
 
+  // 音量変更ハンドラ
+  const handleVolumeChange = (volume: number) => {
+    settingsDispatch({ type: 'SET_VOLUME', payload: { volume } });
+  };
+
+  // 音声ON/OFF変更ハンドラ
+  const handleSoundEnabledChange = (enabled: boolean) => {
+    settingsDispatch({ type: 'SET_SOUND_ENABLED', payload: { enabled } });
+  };
+
   return (
     <div className="main-layout" data-testid="main-layout">
-      <header className="main-header">
-        <h1>Poker Blind Timer</h1>
-        <div className="header-controls">
-          <ThemeToggle
-            theme={settingsState.settings.theme}
-            onChange={handleThemeChange}
-          />
-          <button
-            className="settings-button"
-            onClick={() => setShowSettings(!showSettings)}
-          >
-            {showSettings ? '✕ 閉じる' : '⚙️ 設定'}
-          </button>
-        </div>
-      </header>
+      <AppHeader
+        presets={presets}
+        currentPresetId={currentPresetId}
+        onPresetSelect={handlePresetSelect}
+        onPresetManage={handleOpenPresetManagement}
+        volume={settingsState.settings.volume}
+        isSoundEnabled={settingsState.settings.soundEnabled}
+        onVolumeChange={handleVolumeChange}
+        onSoundEnabledChange={handleSoundEnabledChange}
+        theme={settingsState.settings.theme}
+        onThemeChange={handleThemeChange}
+      />
 
       <main className="main-content">
-        {showSettings ? (
-          <div className="settings-view">
-            <h2>プリセット選択</h2>
-            <PresetManager
-              presets={presets}
-              currentPresetId={currentPresetId}
-              onLoad={loadPreset}
+        <div className="timer-view">
+          {timer.isOnBreak ? (
+            <BreakDisplay
+              remainingTime={timer.remainingTime}
+              onSkip={timer.skipBreak}
             />
-          </div>
-        ) : (
-          <div className="timer-view">
-            {timer.isOnBreak ? (
-              <BreakDisplay
+          ) : (
+            <>
+              <TimerDisplay
                 remainingTime={timer.remainingTime}
-                onSkip={timer.skipBreak}
+                elapsedTime={timer.elapsedTime}
+                status={timer.status}
+                isOnBreak={timer.isOnBreak}
               />
-            ) : (
-              <>
-                <TimerDisplay
-                  remainingTime={timer.remainingTime}
-                  elapsedTime={timer.elapsedTime}
-                  status={timer.status}
-                  isOnBreak={timer.isOnBreak}
-                />
-                <BlindInfo
-                  level={timer.currentLevel}
-                  blindLevel={timer.currentBlind}
-                />
-                <NextLevelInfo
-                  nextBlind={timer.nextBlind}
-                  levelsUntilBreak={timer.levelsUntilBreak}
-                />
-              </>
-            )}
+              <BlindInfo
+                level={timer.currentLevel}
+                blindLevel={timer.currentBlind}
+              />
+              <NextLevelInfo
+                nextBlind={timer.nextBlind}
+                levelsUntilBreak={timer.levelsUntilBreak}
+              />
+            </>
+          )}
 
-            <TimerControls
-              status={timer.status}
-              isOnBreak={timer.isOnBreak}
-              hasNextLevel={timer.hasNextLevel}
-              hasPrevLevel={timer.hasPrevLevel}
-              onStart={timer.start}
-              onPause={timer.pause}
-              onReset={timer.reset}
-              onNextLevel={timer.nextLevel}
-              onPrevLevel={timer.prevLevel}
-              onSkipBreak={timer.skipBreak}
-            />
-          </div>
-        )}
+          <TimerControls
+            status={timer.status}
+            isOnBreak={timer.isOnBreak}
+            hasNextLevel={timer.hasNextLevel}
+            hasPrevLevel={timer.hasPrevLevel}
+            onStart={timer.start}
+            onPause={timer.pause}
+            onReset={timer.reset}
+            onNextLevel={timer.nextLevel}
+            onPrevLevel={timer.prevLevel}
+            onSkipBreak={timer.skipBreak}
+          />
+        </div>
       </main>
+
+      <PresetManagementModal
+        isOpen={showPresetManagement}
+        onClose={handleClosePresetManagement}
+        currentPresetId={currentPresetId}
+      />
     </div>
   );
 }
