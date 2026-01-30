@@ -8,7 +8,7 @@
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-6);
 }
 
 .emptyState {
@@ -25,17 +25,18 @@
 }
 
 .section {
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-8);
+  padding-bottom: var(--spacing-6);
   border-bottom: 1px solid var(--color-border);
 }
 
 .section:last-of-type {
   border-bottom: none;
+  margin-bottom: 0;
 }
 
 .sectionTitle {
-  margin: 0 0 var(--spacing-md) 0;
+  margin: 0 0 var(--spacing-4) 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
@@ -44,22 +45,27 @@
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-2);
 }
 
 .nameInput {
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-3) var(--spacing-4);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   outline: none;
-  transition: border-color var(--transition-base);
+  transition: all var(--transition-base);
+}
+
+.nameInput:hover {
+  border-color: var(--color-border-light);
 }
 
 .nameInput:focus {
   border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
 }
 
 .nameInput.error {
@@ -69,36 +75,38 @@
 .errorMessage {
   font-size: var(--font-size-sm);
   color: var(--color-error);
+  margin-top: var(--spacing-1);
 }
 
 .settingsGrid {
   display: grid;
-  gap: var(--spacing-md);
+  gap: var(--spacing-4);
 }
 
 .actions {
   display: flex;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg);
+  gap: var(--spacing-4);
+  padding: var(--spacing-6);
   border-top: 1px solid var(--color-border);
   background-color: var(--color-bg-secondary);
 }
 
 .saveButton {
   flex: 1;
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-3) var(--spacing-6);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-inverse);
   background-color: var(--color-primary);
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-base);
 }
 
 .saveButton:hover:not(:disabled) {
   background-color: var(--color-primary-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .saveButton:disabled {
@@ -114,19 +122,20 @@
 
 .useButton {
   flex: 1;
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-3) var(--spacing-6);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-inverse);
   background-color: var(--color-accent);
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-base);
 }
 
 .useButton:hover:not(:disabled) {
   background-color: var(--color-accent-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .useButton:disabled {
