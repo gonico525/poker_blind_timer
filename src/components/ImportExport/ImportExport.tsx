@@ -1,0 +1,172 @@
+import { useRef, useState } from 'react';
+import type { Preset } from '@/types';
+import { isValidPreset } from '@/utils/validation';
+import styles from './ImportExport.module.css';
+
+export interface ImportExportProps {
+  presets: Preset[];
+  onImport: (presets: Preset[]) => void;
+}
+
+/**
+ * ImportExport コンポーネント
+ * データのインポート/エクスポート機能
+ */
+export function ImportExport({ presets, onImport }: ImportExportProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  // エクスポート処理
+  const handleExport = () => {
+    try {
+      const data = JSON.stringify(presets, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+      const filename = `poker-presets-${dateStr}.json`;
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+
+      setSuccess(`プリセットをエクスポートしました（${presets.length}件）`);
+      setError(null);
+
+      // 成功メッセージを3秒後に消す
+      setTimeout(() => setSuccess(null), 3000);
+    } catch {
+      setError('エクスポートに失敗しました');
+      setSuccess(null);
+    }
+  };
+
+  // インポート処理
+  const handleImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // ファイル入力をリセット（同じファイルを再選択できるように）
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      // データがプリセット配列かどうかをチェック
+      if (!Array.isArray(data)) {
+        setError('無効なファイル形式です。プリセット配列が必要です。');
+        setSuccess(null);
+        return;
+      }
+
+      // 各プリセットをバリデーション
+      const validPresets: Preset[] = [];
+      const invalidCount = data.length;
+
+      for (const item of data) {
+        if (isValidPreset(item)) {
+          validPresets.push(item);
+        }
+      }
+
+      if (validPresets.length === 0) {
+        setError('有効なプリセットが見つかりませんでした');
+        setSuccess(null);
+        return;
+      }
+
+      const skippedCount = invalidCount - validPresets.length;
+
+      onImport(validPresets);
+
+      if (skippedCount > 0) {
+        setSuccess(
+          `${validPresets.length}件のプリセットをインポートしました（${skippedCount}件をスキップ）`
+        );
+      } else {
+        setSuccess(`${validPresets.length}件のプリセットをインポートしました`);
+      }
+      setError(null);
+
+      // 成功メッセージを3秒後に消す
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        setError('JSONの解析に失敗しました。ファイル形式を確認してください。');
+      } else {
+        setError('インポートに失敗しました');
+      }
+      setSuccess(null);
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.buttonGroup}>
+        <button
+          type="button"
+          onClick={handleExport}
+          className={styles.button}
+          aria-label="プリセットをエクスポート"
+          disabled={presets.length === 0}
+        >
+          <span className={styles.icon} aria-hidden="true">
+            📤
+          </span>
+          <span>エクスポート</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleImport}
+          className={styles.button}
+          aria-label="プリセットをインポート"
+        >
+          <span className={styles.icon} aria-hidden="true">
+            📥
+          </span>
+          <span>インポート</span>
+        </button>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          onChange={handleFileChange}
+          className={styles.fileInput}
+          aria-label="JSONファイルを選択"
+        />
+      </div>
+
+      {error && (
+        <div className={styles.message} role="alert" aria-live="assertive">
+          <span className={styles.errorIcon}>⚠️</span>
+          <span className={styles.errorText}>{error}</span>
+        </div>
+      )}
+
+      {success && (
+        <div className={styles.message} role="status" aria-live="polite">
+          <span className={styles.successIcon}>✓</span>
+          <span className={styles.successText}>{success}</span>
+        </div>
+      )}
+    </div>
+  );
+}
