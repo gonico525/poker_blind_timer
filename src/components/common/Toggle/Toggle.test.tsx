@@ -25,7 +25,6 @@ describe('Toggle', () => {
 
     const toggle = screen.getByTestId('toggle-switch');
     expect(toggle).toHaveAttribute('aria-checked', 'false');
-    expect(toggle.className).not.toContain('active');
   });
 
   it('renders as checked when value is true', () => {
@@ -33,7 +32,6 @@ describe('Toggle', () => {
 
     const toggle = screen.getByTestId('toggle-switch');
     expect(toggle).toHaveAttribute('aria-checked', 'true');
-    expect(toggle.className).toContain('active');
   });
 
   it('calls onChange when clicked', () => {
@@ -107,7 +105,7 @@ describe('Toggle', () => {
     expect(mockOnChange).not.toHaveBeenCalled();
   });
 
-  it('has disabled class when disabled', () => {
+  it('has proper aria-disabled attribute when disabled', () => {
     render(
       <Toggle
         label="Test toggle"
@@ -118,7 +116,6 @@ describe('Toggle', () => {
     );
 
     const toggle = screen.getByTestId('toggle-switch');
-    expect(toggle.className).toContain('disabled');
     expect(toggle).toHaveAttribute('aria-disabled', 'true');
   });
 

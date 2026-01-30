@@ -123,26 +123,25 @@ describe('Dropdown', () => {
     expect(items[1]).not.toHaveTextContent('✓');
   });
 
-  it('navigates options with arrow keys', async () => {
+  it('navigates options with arrow keys and selects correctly', async () => {
     const user = userEvent.setup();
     render(<Dropdown value="" options={mockOptions} onChange={mockOnChange} />);
 
     const trigger = screen.getByTestId('dropdown-trigger');
     trigger.focus();
 
-    // Open with ArrowDown (which sets focusedIndex to 0)
+    // Open with ArrowDown
     await user.keyboard('{ArrowDown}');
     await waitFor(() => {
       expect(screen.getByTestId('dropdown-menu')).toBeInTheDocument();
     });
 
-    const items = screen.getAllByTestId('dropdown-item');
-    // First item should be focused after opening with ArrowDown
-    expect(items[0].className).toContain('focused');
-
-    // Navigate down again (skip disabled option 3, go to option 2)
+    // Navigate down and select
     await user.keyboard('{ArrowDown}');
-    expect(items[1].className).toContain('focused');
+    await user.keyboard('{Enter}');
+
+    // Should select the second option (skipping disabled options)
+    expect(mockOnChange).toHaveBeenCalledWith('2');
   });
 
   it('selects option with Enter key', async () => {

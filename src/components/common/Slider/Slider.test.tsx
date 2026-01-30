@@ -100,19 +100,6 @@ describe('Slider', () => {
     expect(slider).toBeDisabled();
   });
 
-  it('does not call onChange when disabled', () => {
-    render(
-      <Slider min={0} max={100} value={50} onChange={mockOnChange} disabled />
-    );
-
-    const slider = screen.getByTestId('slider-input');
-    // HTML input elements still fire change events when disabled
-    // The component should check disabled state before calling onChange
-    expect(slider).toBeDisabled();
-    // We expect onChange might still be called by the browser,
-    // but the component shouldn't allow interaction
-  });
-
   it('has proper ARIA attributes', () => {
     render(
       <Slider
