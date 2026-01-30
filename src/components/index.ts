@@ -10,3 +10,9 @@ export * from './SettingsPanel';
 export * from './PresetManager';
 export * from './BlindEditor';
 export * from './ThemeToggle';
+
+// Layout components
+export * from './AppHeader';
+
+// Preset Management
+export * from './PresetManagement/PresetManagementModal';
