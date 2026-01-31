@@ -3,4 +3,4 @@ export { useAudioNotification } from './useAudioNotification';
 export { useKeyboardShortcuts } from './useKeyboardShortcuts';
 // フック層のエクスポート
 export { useTimer } from './useTimer';
-export { usePresets } from './usePresets';
+export { useStructures } from './useStructures';

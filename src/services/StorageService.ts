@@ -1,4 +1,4 @@
-import type { Settings, Preset, TournamentState } from '@/types';
+import type { Settings, Structure, TournamentState } from '@/types';
 import { STORAGE_KEYS } from '@/utils';
 
 /**
@@ -94,17 +94,17 @@ export const StorageService = {
   },
 
   /**
-   * プリセット一覧を保存
+   * ストラクチャー一覧を保存
    */
-  savePresets(presets: Preset[]): void {
-    this.set(STORAGE_KEYS.PRESETS, presets);
+  saveStructures(structures: Structure[]): void {
+    this.set(STORAGE_KEYS.STRUCTURES, structures);
   },
 
   /**
-   * プリセット一覧を読み込み
+   * ストラクチャー一覧を読み込み
    */
-  loadPresets(): Preset[] | null {
-    return this.get<Preset[]>(STORAGE_KEYS.PRESETS);
+  loadStructures(): Structure[] | null {
+    return this.get<Structure[]>(STORAGE_KEYS.STRUCTURES);
   },
 
   /**

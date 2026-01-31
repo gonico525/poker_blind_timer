@@ -114,11 +114,8 @@ export function VolumeControl({
         >
           <div className={styles.popoverContent}>
             <div className={styles.sliderSection}>
-              <label htmlFor="volume-slider" className={styles.label}>
-                音量
-              </label>
+              <span className={styles.label}>音量</span>
               <Slider
-                id="volume-slider"
                 min={0}
                 max={100}
                 step={1}
@@ -126,6 +123,7 @@ export function VolumeControl({
                 onChange={handleVolumeChange}
                 showValue={true}
                 disabled={!isSoundEnabled}
+                aria-label="音量"
               />
             </div>
 

@@ -3,7 +3,7 @@ import {
   useAudioNotification,
   useKeyboardShortcuts,
   useTimer,
-  usePresets,
+  useStructures,
 } from '@/hooks';
 import { useSettings } from '@/contexts/SettingsContext';
 import {
@@ -13,9 +13,9 @@ import {
   TimerControls,
   NextLevelInfo,
   BreakDisplay,
-  PresetManagementModal,
+  StructureManagementModal,
 } from '@/components';
-import type { PresetId } from '@/types';
+import type { StructureId } from '@/types';
 import './MainLayout.css';
 
 function MainLayout() {
@@ -23,25 +23,25 @@ function MainLayout() {
   useAudioNotification();
   useKeyboardShortcuts();
   const timer = useTimer();
-  const { presets, loadPreset, currentPresetId } = usePresets();
+  const { structures, loadStructure, currentStructureId } = useStructures();
   const { state: settingsState, dispatch: settingsDispatch } = useSettings();
 
   // UI状態
-  const [showPresetManagement, setShowPresetManagement] = useState(false);
+  const [showStructureManagement, setShowStructureManagement] = useState(false);
 
-  // プリセット選択ハンドラ
-  const handlePresetSelect = (presetId: PresetId) => {
-    loadPreset(presetId);
+  // ストラクチャー選択ハンドラ
+  const handleStructureSelect = (structureId: StructureId) => {
+    loadStructure(structureId);
   };
 
-  // プリセット管理モーダルを開く
-  const handleOpenPresetManagement = () => {
-    setShowPresetManagement(true);
+  // ストラクチャー管理モーダルを開く
+  const handleOpenStructureManagement = () => {
+    setShowStructureManagement(true);
   };
 
-  // プリセット管理モーダルを閉じる
-  const handleClosePresetManagement = () => {
-    setShowPresetManagement(false);
+  // ストラクチャー管理モーダルを閉じる
+  const handleCloseStructureManagement = () => {
+    setShowStructureManagement(false);
   };
 
   // テーマ変更ハンドラ
@@ -62,10 +62,10 @@ function MainLayout() {
   return (
     <div className="main-layout" data-testid="main-layout">
       <AppHeader
-        presets={presets}
-        currentPresetId={currentPresetId}
-        onPresetSelect={handlePresetSelect}
-        onPresetManage={handleOpenPresetManagement}
+        structures={structures}
+        currentStructureId={currentStructureId}
+        onStructureSelect={handleStructureSelect}
+        onStructureManage={handleOpenStructureManagement}
         volume={settingsState.settings.volume}
         isSoundEnabled={settingsState.settings.soundEnabled}
         onVolumeChange={handleVolumeChange}
@@ -115,10 +115,10 @@ function MainLayout() {
         </div>
       </main>
 
-      <PresetManagementModal
-        isOpen={showPresetManagement}
-        onClose={handleClosePresetManagement}
-        currentPresetId={currentPresetId}
+      <StructureManagementModal
+        isOpen={showStructureManagement}
+        onClose={handleCloseStructureManagement}
+        currentStructureId={currentStructureId}
       />
     </div>
   );

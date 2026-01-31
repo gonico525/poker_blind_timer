@@ -2,7 +2,7 @@
  * バリデーション関数
  */
 
-import type { BlindLevel, Preset, BreakConfig } from '@/types';
+import type { BlindLevel, Structure, BreakConfig } from '@/types';
 
 /**
  * ブラインドレベルのバリデーション
@@ -24,23 +24,24 @@ export function isValidBlindLevel(level: unknown): level is BlindLevel {
 }
 
 /**
- * プリセットのバリデーション
- * @param preset - 検証対象
+ * ストラクチャーのバリデーション
+ * @param structure - 検証対象
  * @returns 有効な場合true
  */
-export function isValidPreset(preset: unknown): preset is Preset {
-  if (typeof preset !== 'object' || preset === null) return false;
-  const p = preset as Record<string, unknown>;
+export function isValidStructure(structure: unknown): structure is Structure {
+  if (typeof structure !== 'object' || structure === null) return false;
+  const s = structure as Record<string, unknown>;
+  const validTypes = ['default', 'standard', 'turbo', 'deepstack', 'custom'];
   return (
-    typeof p.id === 'string' &&
-    typeof p.name === 'string' &&
-    typeof p.type === 'string' &&
-    (p.type === 'default' || p.type === 'custom') &&
-    Array.isArray(p.blindLevels) &&
-    p.blindLevels.every(isValidBlindLevel) &&
-    typeof p.levelDuration === 'number' &&
-    p.levelDuration > 0 &&
-    isValidBreakConfig(p.breakConfig)
+    typeof s.id === 'string' &&
+    typeof s.name === 'string' &&
+    typeof s.type === 'string' &&
+    validTypes.includes(s.type) &&
+    Array.isArray(s.blindLevels) &&
+    s.blindLevels.every(isValidBlindLevel) &&
+    typeof s.levelDuration === 'number' &&
+    s.levelDuration > 0 &&
+    isValidBreakConfig(s.breakConfig)
   );
 }
 
@@ -62,21 +63,21 @@ export function isValidBreakConfig(config: unknown): config is BreakConfig {
 }
 
 /**
- * プリセット名のバリデーション
- * @param name - プリセット名
+ * ストラクチャー名のバリデーション
+ * @param name - ストラクチャー名
  * @returns バリデーション結果
  */
-export function validatePresetName(name: string): {
+export function validateStructureName(name: string): {
   valid: boolean;
   error?: string;
 } {
   if (!name.trim()) {
-    return { valid: false, error: 'プリセット名を入力してください' };
+    return { valid: false, error: 'ストラクチャー名を入力してください' };
   }
   if (name.length > 50) {
     return {
       valid: false,
-      error: 'プリセット名は50文字以内で入力してください',
+      error: 'ストラクチャー名は50文字以内で入力してください',
     };
   }
   return { valid: true };

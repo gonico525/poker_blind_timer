@@ -5,13 +5,13 @@
 // ストレージキー
 export const STORAGE_KEYS = {
   SETTINGS: 'poker-timer-settings',
-  PRESETS: 'poker-timer-presets',
+  STRUCTURES: 'poker-timer-structures',
   TOURNAMENT_STATE: 'poker-timer-tournament',
 } as const;
 
 // 制限値
 export const LIMITS = {
-  MAX_PRESETS: 20,
+  MAX_STRUCTURES: 20,
   MAX_BLIND_LEVELS: 50,
   MIN_LEVEL_DURATION: 60, // 1分
   MAX_LEVEL_DURATION: 3600, // 60分

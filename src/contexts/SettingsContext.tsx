@@ -5,7 +5,7 @@ import type {
   SettingsContextValue,
 } from '@/types';
 import { StorageService } from '@/services/StorageService';
-import { mergeWithDefaultPresets } from '@/domain/models/Preset';
+import { mergeWithDefaultStructures } from '@/domain/models/Structure';
 import { DEFAULTS } from '@/utils';
 
 // Reducer
@@ -56,49 +56,49 @@ export function settingsReducer(
       };
     }
 
-    case 'ADD_PRESET': {
+    case 'ADD_STRUCTURE': {
       return {
         ...state,
-        presets: [...state.presets, action.payload.preset],
+        structures: [...state.structures, action.payload.structure],
       };
     }
 
-    case 'UPDATE_PRESET': {
-      const { preset } = action.payload;
-      const index = state.presets.findIndex((p) => p.id === preset.id);
+    case 'UPDATE_STRUCTURE': {
+      const { structure } = action.payload;
+      const index = state.structures.findIndex((s) => s.id === structure.id);
       if (index === -1) {
-        // Preset not found, return state unchanged
+        // Structure not found, return state unchanged
         return state;
       }
 
-      const newPresets = [...state.presets];
-      newPresets[index] = preset;
+      const newStructures = [...state.structures];
+      newStructures[index] = structure;
 
       return {
         ...state,
-        presets: newPresets,
+        structures: newStructures,
       };
     }
 
-    case 'DELETE_PRESET': {
-      const { presetId } = action.payload;
+    case 'DELETE_STRUCTURE': {
+      const { structureId } = action.payload;
       return {
         ...state,
-        presets: state.presets.filter((p) => p.id !== presetId),
+        structures: state.structures.filter((s) => s.id !== structureId),
       };
     }
 
-    case 'SET_PRESETS': {
+    case 'SET_STRUCTURES': {
       return {
         ...state,
-        presets: action.payload.presets,
+        structures: action.payload.structures,
       };
     }
 
-    case 'SET_CURRENT_PRESET': {
+    case 'SET_CURRENT_STRUCTURE': {
       return {
         ...state,
-        currentPresetId: action.payload.presetId,
+        currentStructureId: action.payload.structureId,
       };
     }
 
@@ -122,13 +122,13 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   const [state, dispatch] = useReducer(settingsReducer, null, () => {
     // Lazy initialization
     const savedSettings = StorageService.loadSettings();
-    const savedPresets = StorageService.loadPresets();
+    const savedStructures = StorageService.loadStructures();
 
-    // Merge with default presets
-    const presets = mergeWithDefaultPresets(savedPresets ?? []);
+    // Merge with default structures
+    const structures = mergeWithDefaultStructures(savedStructures ?? []);
 
-    // Find first default preset for current preset id
-    const defaultPreset = presets.find((p) => p.type === 'default');
+    // Find first default structure for current structure id
+    const defaultStructure = structures.find((s) => s.type === 'default');
 
     return {
       settings: savedSettings ?? {
@@ -137,8 +137,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         volume: DEFAULTS.VOLUME,
         keyboardShortcutsEnabled: true,
       },
-      presets,
-      currentPresetId: defaultPreset?.id ?? null,
+      structures,
+      currentStructureId: defaultStructure?.id ?? null,
     };
   });
 
@@ -152,12 +152,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     StorageService.saveSettings(state.settings);
   }, [state.settings]);
 
-  // Persist presets to localStorage
+  // Persist structures to localStorage
   useEffect(() => {
-    // Only save custom presets (filter out default presets)
-    const customPresets = state.presets.filter((p) => p.type === 'custom');
-    StorageService.savePresets(customPresets);
-  }, [state.presets]);
+    // Only save custom structures (filter out default structures)
+    const customStructures = state.structures.filter(
+      (s) => s.type === 'custom'
+    );
+    StorageService.saveStructures(customStructures);
+  }, [state.structures]);
 
   const contextValue: SettingsContextValue = {
     state,

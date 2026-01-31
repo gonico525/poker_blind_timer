@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
   isValidBlindLevel,
-  isValidPreset,
+  isValidStructure,
   isValidBreakConfig,
-  validatePresetName,
+  validateStructureName,
 } from './validation';
 
 describe('isValidBlindLevel', () => {
@@ -47,9 +47,9 @@ describe('isValidBlindLevel', () => {
   });
 });
 
-describe('isValidPreset', () => {
-  it('should return true for valid preset', () => {
-    const preset = {
+describe('isValidStructure', () => {
+  it('should return true for valid structure', () => {
+    const structure = {
       id: 'test-id',
       name: 'Test',
       type: 'custom' as const,
@@ -57,11 +57,11 @@ describe('isValidPreset', () => {
       levelDuration: 600,
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
     };
-    expect(isValidPreset(preset)).toBe(true);
+    expect(isValidStructure(structure)).toBe(true);
   });
 
-  it('should return false for preset with invalid blind levels', () => {
-    const preset = {
+  it('should return false for structure with invalid blind levels', () => {
+    const structure = {
       id: 'test-id',
       name: 'Test',
       type: 'custom' as const,
@@ -69,19 +69,19 @@ describe('isValidPreset', () => {
       levelDuration: 600,
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
     };
-    expect(isValidPreset(preset)).toBe(false);
+    expect(isValidStructure(structure)).toBe(false);
   });
 
   it('should return false for missing required fields', () => {
-    const preset = {
+    const structure = {
       id: 'test-id',
       blindLevels: [{ smallBlind: 100, bigBlind: 200, ante: 0 }],
     };
-    expect(isValidPreset(preset)).toBe(false);
+    expect(isValidStructure(structure)).toBe(false);
   });
 
   it('should return false for non-array blindLevels', () => {
-    const preset = {
+    const structure = {
       id: 'test-id',
       name: 'Test',
       type: 'custom' as const,
@@ -89,7 +89,7 @@ describe('isValidPreset', () => {
       levelDuration: 600,
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
     };
-    expect(isValidPreset(preset)).toBe(false);
+    expect(isValidStructure(structure)).toBe(false);
   });
 });
 
@@ -127,33 +127,33 @@ describe('isValidBreakConfig', () => {
   });
 });
 
-describe('validatePresetName', () => {
+describe('validateStructureName', () => {
   it('should return valid for proper name', () => {
-    expect(validatePresetName('My Preset')).toEqual({ valid: true });
-    expect(validatePresetName('Tournament')).toEqual({ valid: true });
+    expect(validateStructureName('My Structure')).toEqual({ valid: true });
+    expect(validateStructureName('Tournament')).toEqual({ valid: true });
   });
 
   it('should return error for empty name', () => {
-    expect(validatePresetName('')).toEqual({
+    expect(validateStructureName('')).toEqual({
       valid: false,
-      error: 'プリセット名を入力してください',
+      error: 'ストラクチャー名を入力してください',
     });
-    expect(validatePresetName('   ')).toEqual({
+    expect(validateStructureName('   ')).toEqual({
       valid: false,
-      error: 'プリセット名を入力してください',
+      error: 'ストラクチャー名を入力してください',
     });
   });
 
   it('should return error for name over 50 characters', () => {
     const longName = 'a'.repeat(51);
-    expect(validatePresetName(longName)).toEqual({
+    expect(validateStructureName(longName)).toEqual({
       valid: false,
-      error: 'プリセット名は50文字以内で入力してください',
+      error: 'ストラクチャー名は50文字以内で入力してください',
     });
   });
 
   it('should accept name with exactly 50 characters', () => {
     const maxName = 'a'.repeat(50);
-    expect(validatePresetName(maxName)).toEqual({ valid: true });
+    expect(validateStructureName(maxName)).toEqual({ valid: true });
   });
 });

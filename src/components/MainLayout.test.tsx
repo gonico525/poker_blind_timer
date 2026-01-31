@@ -25,8 +25,8 @@ vi.mock('@/hooks', () => ({
     prevLevel: vi.fn(),
     skipBreak: vi.fn(),
   })),
-  usePresets: vi.fn(() => ({
-    presets: [
+  useStructures: vi.fn(() => ({
+    structures: [
       {
         id: 'default-standard',
         name: 'Standard Tournament',
@@ -35,8 +35,8 @@ vi.mock('@/hooks', () => ({
         breakConfig: { enabled: false, frequency: 4, duration: 300 },
       },
     ],
-    currentPresetId: 'default-standard',
-    loadPreset: vi.fn(),
+    currentStructureId: 'default-standard',
+    loadStructure: vi.fn(),
   })),
 }));
 
@@ -53,13 +53,13 @@ vi.mock('@/contexts/SettingsContext', () => ({
   })),
 }));
 
-// PresetManagementModalをモック
+// StructureManagementModalをモック
 vi.mock('@/components', async () => {
   const actual = await vi.importActual('@/components');
   return {
     ...actual,
-    PresetManagementModal: ({ isOpen }: { isOpen: boolean }) =>
-      isOpen ? <div data-testid="preset-management-modal">Modal</div> : null,
+    StructureManagementModal: ({ isOpen }: { isOpen: boolean }) =>
+      isOpen ? <div data-testid="structure-management-modal">Modal</div> : null,
   };
 });
 
@@ -89,15 +89,17 @@ describe('MainLayout', () => {
     expect(screen.getByTestId('main-layout')).toBeInTheDocument();
   });
 
-  it('プリセット管理ボタンをクリックするとモーダルが開く', async () => {
+  it('ストラクチャー管理ボタンをクリックするとモーダルが開く', async () => {
     const user = userEvent.setup();
     render(<MainLayout />);
 
-    const manageButton = screen.getByRole('button', { name: 'プリセット管理' });
+    const manageButton = screen.getByRole('button', {
+      name: 'ストラクチャー管理',
+    });
     await user.click(manageButton);
 
-    // PresetManagementModalが開くことを確認
-    // (モーダルのテストはPresetManagementModal.test.tsxで行う)
+    // StructureManagementModalが開くことを確認
+    // (モーダルのテストはStructureManagementModal.test.tsxで行う)
   });
 
   it('useAudioNotificationフックが呼ばれる', async () => {
@@ -118,9 +120,9 @@ describe('MainLayout', () => {
     expect(useTimer).toHaveBeenCalled();
   });
 
-  it('usePresetsフックが呼ばれる', async () => {
-    const { usePresets } = await import('@/hooks');
+  it('useStructuresフックが呼ばれる', async () => {
+    const { useStructures } = await import('@/hooks');
     render(<MainLayout />);
-    expect(usePresets).toHaveBeenCalled();
+    expect(useStructures).toHaveBeenCalled();
   });
 });

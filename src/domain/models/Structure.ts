@@ -1,31 +1,32 @@
 /**
- * プリセット関連のドメインロジック
+ * ストラクチャー関連のドメインロジック
+ * ポーカートーナメントのブラインドストラクチャーを管理
  */
 
-import type { Preset, PresetId } from '@/types';
+import type { Structure, StructureId } from '@/types';
 
 /**
- * ユニークなプリセットIDを生成
- * @returns プリセットID
+ * ユニークなストラクチャーIDを生成
+ * @returns ストラクチャーID
  */
-export function generatePresetId(): PresetId {
-  return `preset-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+export function generateStructureId(): StructureId {
+  return `structure-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
 /**
- * デフォルトプリセットかどうかを判定
- * @param id - プリセットID
- * @returns デフォルトプリセットの場合true
+ * デフォルトストラクチャーかどうかを判定
+ * @param id - ストラクチャーID
+ * @returns デフォルトストラクチャーの場合true
  */
-export function isDefaultPreset(id: PresetId): boolean {
+export function isDefaultStructure(id: StructureId): boolean {
   return id.startsWith('default-');
 }
 
 /**
- * デフォルトプリセットを作成
- * @returns デフォルトプリセットの配列
+ * デフォルトストラクチャーを作成
+ * @returns デフォルトストラクチャーの配列
  */
-export function createDefaultPresets(): Preset[] {
+export function createDefaultStructures(): Structure[] {
   const now = Date.now();
   return [
     {
@@ -116,14 +117,19 @@ export function createDefaultPresets(): Preset[] {
 }
 
 /**
- * ユーザープリセットとデフォルトプリセットをマージ
- * @param userPresets - ユーザー定義プリセット
- * @returns マージされたプリセット配列
+ * ユーザーストラクチャーとデフォルトストラクチャーをマージ
+ * @param userStructures - ユーザー定義ストラクチャー
+ * @returns マージされたストラクチャー配列
  */
-export function mergeWithDefaultPresets(userPresets: Preset[]): Preset[] {
-  const defaults = createDefaultPresets();
-  const userPresetIds = new Set(userPresets.map((p) => p.id));
+export function mergeWithDefaultStructures(
+  userStructures: Structure[]
+): Structure[] {
+  const defaults = createDefaultStructures();
+  const userStructureIds = new Set(userStructures.map((s) => s.id));
 
-  // デフォルトプリセットのうち、ユーザープリセットに含まれていないものを追加
-  return [...defaults.filter((d) => !userPresetIds.has(d.id)), ...userPresets];
+  // デフォルトストラクチャーのうち、ユーザーストラクチャーに含まれていないものを追加
+  return [
+    ...defaults.filter((d) => !userStructureIds.has(d.id)),
+    ...userStructures,
+  ];
 }

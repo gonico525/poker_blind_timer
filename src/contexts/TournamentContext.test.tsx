@@ -184,9 +184,9 @@ describe('tournamentReducer', () => {
     });
   });
 
-  describe('LOAD_PRESET action', () => {
-    it('should load preset data', () => {
-      const preset = {
+  describe('LOAD_STRUCTURE action', () => {
+    it('should load structure data', () => {
+      const structure = {
         id: 'test',
         name: 'Test',
         type: 'custom' as const,
@@ -197,11 +197,11 @@ describe('tournamentReducer', () => {
         updatedAt: Date.now(),
       };
       const state = tournamentReducer(initialState, {
-        type: 'LOAD_PRESET',
-        payload: { preset },
+        type: 'LOAD_STRUCTURE',
+        payload: { structure },
       });
-      expect(state.blindLevels).toEqual(preset.blindLevels);
-      expect(state.breakConfig).toEqual(preset.breakConfig);
+      expect(state.blindLevels).toEqual(structure.blindLevels);
+      expect(state.breakConfig).toEqual(structure.breakConfig);
       expect(state.levelDuration).toBe(900);
       expect(state.currentLevel).toBe(0);
       expect(state.timer.status).toBe('idle');

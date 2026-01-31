@@ -5,14 +5,14 @@ describe('constants', () => {
   describe('STORAGE_KEYS', () => {
     it('should have all required keys', () => {
       expect(STORAGE_KEYS.SETTINGS).toBe('poker-timer-settings');
-      expect(STORAGE_KEYS.PRESETS).toBe('poker-timer-presets');
+      expect(STORAGE_KEYS.STRUCTURES).toBe('poker-timer-structures');
       expect(STORAGE_KEYS.TOURNAMENT_STATE).toBe('poker-timer-tournament');
     });
   });
 
   describe('LIMITS', () => {
     it('should have valid limit values', () => {
-      expect(LIMITS.MAX_PRESETS).toBeGreaterThan(0);
+      expect(LIMITS.MAX_STRUCTURES).toBeGreaterThan(0);
       expect(LIMITS.MIN_LEVEL_DURATION).toBeLessThan(LIMITS.MAX_LEVEL_DURATION);
       expect(LIMITS.MIN_BREAK_DURATION).toBeLessThan(LIMITS.MAX_BREAK_DURATION);
       expect(LIMITS.MIN_BREAK_FREQUENCY).toBeLessThan(
@@ -20,8 +20,8 @@ describe('constants', () => {
       );
     });
 
-    it('should have reasonable max presets limit', () => {
-      expect(LIMITS.MAX_PRESETS).toBe(20);
+    it('should have reasonable max structures limit', () => {
+      expect(LIMITS.MAX_STRUCTURES).toBe(20);
     });
 
     it('should have reasonable max blind levels limit', () => {

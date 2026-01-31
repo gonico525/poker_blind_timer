@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ImportExport } from './ImportExport';
-import type { Preset, PresetId } from '@/types';
+import type { Structure, StructureId } from '@/types';
 
-const mockPresets: Preset[] = [
+const mockStructures: Structure[] = [
   {
-    id: 'preset-1' as PresetId,
+    id: 'structure-1' as StructureId,
     name: 'Standard Tournament',
     type: 'standard',
     blindLevels: [
@@ -14,12 +14,12 @@ const mockPresets: Preset[] = [
       { smallBlind: 50, bigBlind: 100, ante: 0 },
     ],
     levelDuration: 600,
-    breakConfig: { enabled: false, frequency: 4, duration: 10 },
+    breakConfig: { enabled: false, frequency: 4, duration: 600 },
     createdAt: Date.now(),
     updatedAt: Date.now(),
   },
   {
-    id: 'preset-2' as PresetId,
+    id: 'structure-2' as StructureId,
     name: 'Turbo Tournament',
     type: 'turbo',
     blindLevels: [
@@ -27,7 +27,7 @@ const mockPresets: Preset[] = [
       { smallBlind: 100, bigBlind: 200, ante: 25 },
     ],
     levelDuration: 300,
-    breakConfig: { enabled: false, frequency: 4, duration: 10 },
+    breakConfig: { enabled: false, frequency: 4, duration: 600 },
     createdAt: Date.now(),
     updatedAt: Date.now(),
   },
@@ -39,7 +39,7 @@ const revokeObjectURLMock = vi.fn();
 
 describe('ImportExport', () => {
   const defaultProps = {
-    presets: mockPresets,
+    structures: mockStructures,
     onImport: vi.fn(),
   };
 
@@ -66,8 +66,8 @@ describe('ImportExport', () => {
       ).toBeInTheDocument();
     });
 
-    it('should disable export button when no presets', () => {
-      render(<ImportExport {...defaultProps} presets={[]} />);
+    it('should disable export button when no structures', () => {
+      render(<ImportExport {...defaultProps} structures={[]} />);
 
       const exportButton = screen.getByRole('button', {
         name: /エクスポート/i,
@@ -84,7 +84,7 @@ describe('ImportExport', () => {
   });
 
   describe('Export functionality', () => {
-    it('should export presets as JSON file', async () => {
+    it('should export structures as JSON file', async () => {
       const user = userEvent.setup();
       render(<ImportExport {...defaultProps} />);
 
@@ -111,7 +111,7 @@ describe('ImportExport', () => {
       });
     });
 
-    it('should include preset count in success message', async () => {
+    it('should include structure count in success message', async () => {
       const user = userEvent.setup();
       render(<ImportExport {...defaultProps} />);
 
@@ -150,9 +150,13 @@ describe('ImportExport', () => {
       const fileInput = screen.getByLabelText(
         /JSONファイルを選択/i
       ) as HTMLInputElement;
-      const file = new File([JSON.stringify(mockPresets)], 'presets.json', {
-        type: 'application/json',
-      });
+      const file = new File(
+        [JSON.stringify(mockStructures)],
+        'structures.json',
+        {
+          type: 'application/json',
+        }
+      );
 
       await user.upload(fileInput, file);
 
@@ -171,9 +175,13 @@ describe('ImportExport', () => {
       const fileInput = screen.getByLabelText(
         /JSONファイルを選択/i
       ) as HTMLInputElement;
-      const file = new File([JSON.stringify(mockPresets)], 'presets.json', {
-        type: 'application/json',
-      });
+      const file = new File(
+        [JSON.stringify(mockStructures)],
+        'structures.json',
+        {
+          type: 'application/json',
+        }
+      );
 
       await user.upload(fileInput, file);
 
@@ -192,7 +200,7 @@ describe('ImportExport', () => {
       const fileInput = screen.getByLabelText(
         /JSONファイルを選択/i
       ) as HTMLInputElement;
-      const file = new File(['invalid json'], 'presets.json', {
+      const file = new File(['invalid json'], 'structures.json', {
         type: 'application/json',
       });
 
@@ -215,7 +223,7 @@ describe('ImportExport', () => {
       ) as HTMLInputElement;
       const file = new File(
         [JSON.stringify({ not: 'an array' })],
-        'presets.json',
+        'structures.json',
         {
           type: 'application/json',
         }
@@ -237,10 +245,10 @@ describe('ImportExport', () => {
       render(<ImportExport {...defaultProps} />);
 
       expect(
-        screen.getByRole('button', { name: /プリセットをエクスポート/i })
+        screen.getByRole('button', { name: /ストラクチャーをエクスポート/i })
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /プリセットをインポート/i })
+        screen.getByRole('button', { name: /ストラクチャーをインポート/i })
       ).toBeInTheDocument();
     });
 
@@ -251,7 +259,7 @@ describe('ImportExport', () => {
       const fileInput = screen.getByLabelText(
         /JSONファイルを選択/i
       ) as HTMLInputElement;
-      const file = new File(['invalid json'], 'presets.json', {
+      const file = new File(['invalid json'], 'structures.json', {
         type: 'application/json',
       });
 

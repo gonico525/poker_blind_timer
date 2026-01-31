@@ -10,8 +10,8 @@ describe('settingsReducer', () => {
       volume: 0.7,
       keyboardShortcutsEnabled: true,
     },
-    presets: [],
-    currentPresetId: null,
+    structures: [],
+    currentStructureId: null,
   };
 
   describe('SET_THEME action', () => {
@@ -106,10 +106,10 @@ describe('settingsReducer', () => {
     });
   });
 
-  describe('Preset actions', () => {
-    const testPreset = {
+  describe('Structure actions', () => {
+    const testStructure = {
       id: 'test-1',
-      name: 'Test Preset',
+      name: 'Test Structure',
       type: 'custom' as const,
       blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
       levelDuration: 600,
@@ -118,104 +118,104 @@ describe('settingsReducer', () => {
       updatedAt: Date.now(),
     };
 
-    it('should add preset', () => {
+    it('should add structure', () => {
       const state = settingsReducer(initialState, {
-        type: 'ADD_PRESET',
-        payload: { preset: testPreset },
+        type: 'ADD_STRUCTURE',
+        payload: { structure: testStructure },
       });
-      expect(state.presets).toContainEqual(testPreset);
-      expect(state.presets.length).toBe(1);
+      expect(state.structures).toContainEqual(testStructure);
+      expect(state.structures.length).toBe(1);
     });
 
-    it('should update preset', () => {
-      const stateWithPreset: SettingsState = {
+    it('should update structure', () => {
+      const stateWithStructure: SettingsState = {
         ...initialState,
-        presets: [testPreset],
+        structures: [testStructure],
       };
-      const updatedPreset = {
-        ...testPreset,
-        name: 'Updated Preset',
+      const updatedStructure = {
+        ...testStructure,
+        name: 'Updated Structure',
       };
-      const state = settingsReducer(stateWithPreset, {
-        type: 'UPDATE_PRESET',
-        payload: { preset: updatedPreset },
+      const state = settingsReducer(stateWithStructure, {
+        type: 'UPDATE_STRUCTURE',
+        payload: { structure: updatedStructure },
       });
-      expect(state.presets[0].name).toBe('Updated Preset');
-      expect(state.presets.length).toBe(1);
+      expect(state.structures[0].name).toBe('Updated Structure');
+      expect(state.structures.length).toBe(1);
     });
 
-    it('should not update preset if id not found', () => {
-      const stateWithPreset: SettingsState = {
+    it('should not update structure if id not found', () => {
+      const stateWithStructure: SettingsState = {
         ...initialState,
-        presets: [testPreset],
+        structures: [testStructure],
       };
-      const unknownPreset = {
-        ...testPreset,
+      const unknownStructure = {
+        ...testStructure,
         id: 'unknown-id',
         name: 'Unknown',
       };
-      const state = settingsReducer(stateWithPreset, {
-        type: 'UPDATE_PRESET',
-        payload: { preset: unknownPreset },
+      const state = settingsReducer(stateWithStructure, {
+        type: 'UPDATE_STRUCTURE',
+        payload: { structure: unknownStructure },
       });
-      expect(state.presets[0].name).toBe('Test Preset');
+      expect(state.structures[0].name).toBe('Test Structure');
     });
 
-    it('should delete preset', () => {
-      const stateWithPreset: SettingsState = {
+    it('should delete structure', () => {
+      const stateWithStructure: SettingsState = {
         ...initialState,
-        presets: [testPreset],
+        structures: [testStructure],
       };
-      const state = settingsReducer(stateWithPreset, {
-        type: 'DELETE_PRESET',
-        payload: { presetId: 'test-1' },
+      const state = settingsReducer(stateWithStructure, {
+        type: 'DELETE_STRUCTURE',
+        payload: { structureId: 'test-1' },
       });
-      expect(state.presets).toHaveLength(0);
+      expect(state.structures).toHaveLength(0);
     });
 
-    it('should not delete preset if id not found', () => {
-      const stateWithPreset: SettingsState = {
+    it('should not delete structure if id not found', () => {
+      const stateWithStructure: SettingsState = {
         ...initialState,
-        presets: [testPreset],
+        structures: [testStructure],
       };
-      const state = settingsReducer(stateWithPreset, {
-        type: 'DELETE_PRESET',
-        payload: { presetId: 'unknown-id' },
+      const state = settingsReducer(stateWithStructure, {
+        type: 'DELETE_STRUCTURE',
+        payload: { structureId: 'unknown-id' },
       });
-      expect(state.presets).toHaveLength(1);
+      expect(state.structures).toHaveLength(1);
     });
 
-    it('should set presets', () => {
-      const presets = [
-        testPreset,
-        { ...testPreset, id: 'test-2', name: 'Test Preset 2' },
+    it('should set structures', () => {
+      const structures = [
+        testStructure,
+        { ...testStructure, id: 'test-2', name: 'Test Structure 2' },
       ];
       const state = settingsReducer(initialState, {
-        type: 'SET_PRESETS',
-        payload: { presets },
+        type: 'SET_STRUCTURES',
+        payload: { structures },
       });
-      expect(state.presets).toEqual(presets);
-      expect(state.presets.length).toBe(2);
+      expect(state.structures).toEqual(structures);
+      expect(state.structures.length).toBe(2);
     });
 
-    it('should set current preset id', () => {
+    it('should set current structure id', () => {
       const state = settingsReducer(initialState, {
-        type: 'SET_CURRENT_PRESET',
-        payload: { presetId: 'test-1' },
+        type: 'SET_CURRENT_STRUCTURE',
+        payload: { structureId: 'test-1' },
       });
-      expect(state.currentPresetId).toBe('test-1');
+      expect(state.currentStructureId).toBe('test-1');
     });
 
-    it('should set current preset id to null', () => {
+    it('should set current structure id to null', () => {
       const stateWithCurrent: SettingsState = {
         ...initialState,
-        currentPresetId: 'test-1',
+        currentStructureId: 'test-1',
       };
       const state = settingsReducer(stateWithCurrent, {
-        type: 'SET_CURRENT_PRESET',
-        payload: { presetId: null },
+        type: 'SET_CURRENT_STRUCTURE',
+        payload: { structureId: null },
       });
-      expect(state.currentPresetId).toBeNull();
+      expect(state.currentStructureId).toBeNull();
     });
   });
 });

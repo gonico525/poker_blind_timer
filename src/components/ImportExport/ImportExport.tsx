@@ -1,18 +1,18 @@
 import { useRef, useState } from 'react';
-import type { Preset } from '@/types';
-import { isValidPreset } from '@/utils/validation';
+import type { Structure } from '@/types';
+import { isValidStructure } from '@/utils/validation';
 import styles from './ImportExport.module.css';
 
 export interface ImportExportProps {
-  presets: Preset[];
-  onImport: (presets: Preset[]) => void;
+  structures: Structure[];
+  onImport: (structures: Structure[]) => void;
 }
 
 /**
  * ImportExport コンポーネント
  * データのインポート/エクスポート機能
  */
-export function ImportExport({ presets, onImport }: ImportExportProps) {
+export function ImportExport({ structures, onImport }: ImportExportProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -20,13 +20,13 @@ export function ImportExport({ presets, onImport }: ImportExportProps) {
   // エクスポート処理
   const handleExport = () => {
     try {
-      const data = JSON.stringify(presets, null, 2);
+      const data = JSON.stringify(structures, null, 2);
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
 
       const today = new Date();
       const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
-      const filename = `poker-presets-${dateStr}.json`;
+      const filename = `poker-structures-${dateStr}.json`;
 
       const link = document.createElement('a');
       link.href = url;
@@ -37,7 +37,9 @@ export function ImportExport({ presets, onImport }: ImportExportProps) {
 
       URL.revokeObjectURL(url);
 
-      setSuccess(`プリセットをエクスポートしました（${presets.length}件）`);
+      setSuccess(
+        `ストラクチャーをエクスポートしました（${structures.length}件）`
+      );
       setError(null);
 
       // 成功メッセージを3秒後に消す
@@ -68,39 +70,41 @@ export function ImportExport({ presets, onImport }: ImportExportProps) {
       const text = await file.text();
       const data = JSON.parse(text);
 
-      // データがプリセット配列かどうかをチェック
+      // データがストラクチャー配列かどうかをチェック
       if (!Array.isArray(data)) {
-        setError('無効なファイル形式です。プリセット配列が必要です。');
+        setError('無効なファイル形式です。ストラクチャー配列が必要です。');
         setSuccess(null);
         return;
       }
 
-      // 各プリセットをバリデーション
-      const validPresets: Preset[] = [];
+      // 各ストラクチャーをバリデーション
+      const validStructures: Structure[] = [];
       const invalidCount = data.length;
 
       for (const item of data) {
-        if (isValidPreset(item)) {
-          validPresets.push(item);
+        if (isValidStructure(item)) {
+          validStructures.push(item);
         }
       }
 
-      if (validPresets.length === 0) {
-        setError('有効なプリセットが見つかりませんでした');
+      if (validStructures.length === 0) {
+        setError('有効なストラクチャーが見つかりませんでした');
         setSuccess(null);
         return;
       }
 
-      const skippedCount = invalidCount - validPresets.length;
+      const skippedCount = invalidCount - validStructures.length;
 
-      onImport(validPresets);
+      onImport(validStructures);
 
       if (skippedCount > 0) {
         setSuccess(
-          `${validPresets.length}件のプリセットをインポートしました（${skippedCount}件をスキップ）`
+          `${validStructures.length}件のストラクチャーをインポートしました（${skippedCount}件をスキップ）`
         );
       } else {
-        setSuccess(`${validPresets.length}件のプリセットをインポートしました`);
+        setSuccess(
+          `${validStructures.length}件のストラクチャーをインポートしました`
+        );
       }
       setError(null);
 
@@ -123,8 +127,8 @@ export function ImportExport({ presets, onImport }: ImportExportProps) {
           type="button"
           onClick={handleExport}
           className={styles.button}
-          aria-label="プリセットをエクスポート"
-          disabled={presets.length === 0}
+          aria-label="ストラクチャーをエクスポート"
+          disabled={structures.length === 0}
         >
           <span className={styles.icon} aria-hidden="true">
             📤
@@ -136,7 +140,7 @@ export function ImportExport({ presets, onImport }: ImportExportProps) {
           type="button"
           onClick={handleImport}
           className={styles.button}
-          aria-label="プリセットをインポート"
+          aria-label="ストラクチャーをインポート"
         >
           <span className={styles.icon} aria-hidden="true">
             📥
