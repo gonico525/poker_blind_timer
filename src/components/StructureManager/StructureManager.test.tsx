@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PresetManager } from './PresetManager';
-import type { Preset } from '@/types';
+import { StructureManager } from './StructureManager';
+import type { Structure } from '@/types';
 
-describe('PresetManager', () => {
-  const mockPresets: Preset[] = [
+describe('StructureManager', () => {
+  const mockStructures: Structure[] = [
     {
       id: 'default-standard',
       name: 'Standard',
@@ -18,7 +18,7 @@ describe('PresetManager', () => {
     },
     {
       id: 'custom-1',
-      name: 'My Preset',
+      name: 'My Structure',
       type: 'custom',
       blindLevels: [],
       levelDuration: 600,
@@ -28,40 +28,45 @@ describe('PresetManager', () => {
     },
   ];
 
-  it('should display preset list', () => {
-    render(<PresetManager presets={mockPresets} />);
+  it('should display structure list', () => {
+    render(<StructureManager structures={mockStructures} />);
 
     expect(screen.getByText('Standard')).toBeInTheDocument();
-    expect(screen.getByText('My Preset')).toBeInTheDocument();
+    expect(screen.getByText('My Structure')).toBeInTheDocument();
   });
 
-  it('should highlight current preset', () => {
-    render(<PresetManager presets={mockPresets} currentPresetId="custom-1" />);
+  it('should highlight current structure', () => {
+    render(
+      <StructureManager
+        structures={mockStructures}
+        currentStructureId="custom-1"
+      />
+    );
 
     const customItem = screen
-      .getByText('My Preset')
-      .closest('[data-testid="preset-item"]');
+      .getByText('My Structure')
+      .closest('[data-testid="structure-item"]');
     // CSS Modulesはハッシュ付きクラス名を生成するため、クラス名に'selected'が含まれることを確認
     expect(customItem?.className).toMatch(/selected/);
   });
 
-  it('should call onLoad when preset is clicked', async () => {
+  it('should call onLoad when structure is clicked', async () => {
     const onLoad = vi.fn();
-    render(<PresetManager presets={mockPresets} onLoad={onLoad} />);
+    render(<StructureManager structures={mockStructures} onLoad={onLoad} />);
 
-    await userEvent.click(screen.getByText('My Preset'));
+    await userEvent.click(screen.getByText('My Structure'));
     expect(onLoad).toHaveBeenCalledWith('custom-1');
   });
 
-  it('should show edit/delete buttons only for custom presets', () => {
-    render(<PresetManager presets={mockPresets} />);
+  it('should show edit/delete buttons only for custom structures', () => {
+    render(<StructureManager structures={mockStructures} />);
 
     const standardItem = screen
       .getByText('Standard')
-      .closest('[data-testid="preset-item"]');
+      .closest('[data-testid="structure-item"]');
     const customItem = screen
-      .getByText('My Preset')
-      .closest('[data-testid="preset-item"]');
+      .getByText('My Structure')
+      .closest('[data-testid="structure-item"]');
 
     expect(
       standardItem?.querySelector('[data-testid="edit-button"]')
@@ -78,22 +83,24 @@ describe('PresetManager', () => {
     ).toBeInTheDocument();
   });
 
-  it('should show default badge for default presets', () => {
-    render(<PresetManager presets={mockPresets} />);
+  it('should show default badge for default structures', () => {
+    render(<StructureManager structures={mockStructures} />);
 
     const standardItem = screen
       .getByText('Standard')
-      .closest('[data-testid="preset-item"]');
+      .closest('[data-testid="structure-item"]');
     expect(standardItem?.textContent).toMatch(/デフォルト/);
   });
 
   it('should call onDelete when delete button is clicked', async () => {
     const onDelete = vi.fn();
-    render(<PresetManager presets={mockPresets} onDelete={onDelete} />);
+    render(
+      <StructureManager structures={mockStructures} onDelete={onDelete} />
+    );
 
     const customItem = screen
-      .getByText('My Preset')
-      .closest('[data-testid="preset-item"]');
+      .getByText('My Structure')
+      .closest('[data-testid="structure-item"]');
     const deleteButton = customItem?.querySelector(
       '[data-testid="delete-button"]'
     ) as HTMLElement;
@@ -104,11 +111,11 @@ describe('PresetManager', () => {
 
   it('should call onEdit when edit button is clicked', async () => {
     const onEdit = vi.fn();
-    render(<PresetManager presets={mockPresets} onEdit={onEdit} />);
+    render(<StructureManager structures={mockStructures} onEdit={onEdit} />);
 
     const customItem = screen
-      .getByText('My Preset')
-      .closest('[data-testid="preset-item"]');
+      .getByText('My Structure')
+      .closest('[data-testid="structure-item"]');
     const editButton = customItem?.querySelector(
       '[data-testid="edit-button"]'
     ) as HTMLElement;

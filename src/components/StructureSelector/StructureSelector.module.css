@@ -9,7 +9,7 @@
   min-width: 200px;
 }
 
-.currentPresetName {
+.currentStructureName {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   white-space: nowrap;
@@ -24,7 +24,7 @@
     min-width: 150px;
   }
 
-  .currentPresetName {
+  .currentStructureName {
     display: none;
   }
 }

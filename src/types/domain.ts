@@ -36,14 +36,14 @@ export interface BreakConfig {
 }
 
 /**
- * プリセットID型
+ * ストラクチャーID型
  */
-export type PresetId = string;
+export type StructureId = string;
 
 /**
- * プリセットタイプ
+ * ストラクチャータイプ
  */
-export type PresetType =
+export type StructureType =
   | 'default'
   | 'standard'
   | 'turbo'
@@ -51,12 +51,13 @@ export type PresetType =
   | 'custom';
 
 /**
- * プリセットエンティティ
+ * ストラクチャーエンティティ
+ * ポーカートーナメントのブラインドストラクチャーを定義
  */
-export interface Preset {
-  id: PresetId;
+export interface Structure {
+  id: StructureId;
   name: string;
-  type: PresetType;
+  type: StructureType;
   blindLevels: BlindLevel[];
   levelDuration: number;
   breakConfig: BreakConfig;

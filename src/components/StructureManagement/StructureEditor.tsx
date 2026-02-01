@@ -1,57 +1,59 @@
 import { useState, useEffect } from 'react';
-import type { Preset } from '@/types';
+import type { Structure } from '@/types';
 import { BlindEditor } from '@/components/BlindEditor/BlindEditor';
 import { NumberInput } from '@/components/common/NumberInput/NumberInput';
 import { Toggle } from '@/components/common/Toggle/Toggle';
 import { ImportExport } from '@/components/ImportExport/ImportExport';
-import styles from './PresetEditor.module.css';
+import styles from './StructureEditor.module.css';
 
-export interface PresetEditorProps {
-  preset: Preset | null;
-  onSave: (preset: Preset) => void;
-  onUse: (preset: Preset) => void;
-  onChange?: (preset: Preset) => void;
+export interface StructureEditorProps {
+  structure: Structure | null;
+  onSave: (structure: Structure) => void;
+  onUse: (structure: Structure) => void;
+  onChange?: (structure: Structure) => void;
   isDirty: boolean;
 }
 
 /**
- * PresetEditor コンポーネント
+ * StructureEditor コンポーネント
  * モーダル右側の編集エリア（常に編集可能）
  *
  * セクション:
- * 1. プリセット名
+ * 1. ストラクチャー名
  * 2. ブラインド構造編集（BlindEditor）
  * 3. トーナメント設定（レベル時間、休憩設定）
  * 4. データ管理（ImportExport）
- * 5. アクションボタン（保存、このプリセットを使う）
+ * 5. アクションボタン（保存、このストラクチャーを使う）
  */
-export function PresetEditor({
-  preset,
+export function StructureEditor({
+  structure,
   onSave,
   onUse,
   onChange,
   isDirty,
-}: PresetEditorProps) {
-  const [editedPreset, setEditedPreset] = useState<Preset | null>(preset);
+}: StructureEditorProps) {
+  const [editedStructure, setEditedStructure] = useState<Structure | null>(
+    structure
+  );
   const [nameError, setNameError] = useState<string | null>(null);
 
   useEffect(() => {
-    setEditedPreset(preset);
+    setEditedStructure(structure);
     setNameError(null);
-  }, [preset]);
+  }, [structure]);
 
-  // editedPresetの変更を親に通知
+  // editedStructureの変更を親に通知
   useEffect(() => {
-    if (editedPreset && onChange) {
-      onChange(editedPreset);
+    if (editedStructure && onChange) {
+      onChange(editedStructure);
     }
-  }, [editedPreset, onChange]);
+  }, [editedStructure, onChange]);
 
-  if (!editedPreset) {
+  if (!editedStructure) {
     return (
       <div className={styles.emptyState}>
         <p className={styles.emptyMessage}>
-          プリセットを選択するか、新規作成してください
+          ストラクチャーを選択するか、新規作成してください
         </p>
       </div>
     );
@@ -59,104 +61,105 @@ export function PresetEditor({
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
-    setEditedPreset({ ...editedPreset, name: newName });
+    setEditedStructure({ ...editedStructure, name: newName });
 
     if (newName.trim().length === 0) {
-      setNameError('プリセット名を入力してください');
+      setNameError('ストラクチャー名を入力してください');
     } else if (newName.length > 50) {
-      setNameError('プリセット名は50文字以内で入力してください');
+      setNameError('ストラクチャー名は50文字以内で入力してください');
     } else {
       setNameError(null);
     }
   };
 
   const handleBlindLevelsChange = (
-    blindLevels: typeof editedPreset.blindLevels
+    blindLevels: typeof editedStructure.blindLevels
   ) => {
-    setEditedPreset({ ...editedPreset, blindLevels });
+    setEditedStructure({ ...editedStructure, blindLevels });
   };
 
   const handleLevelDurationChange = (minutes: number) => {
-    setEditedPreset({ ...editedPreset, levelDuration: minutes * 60 });
+    setEditedStructure({ ...editedStructure, levelDuration: minutes * 60 });
   };
 
   const handleBreakEnabledChange = (enabled: boolean) => {
-    setEditedPreset({
-      ...editedPreset,
-      breakConfig: { ...editedPreset.breakConfig, enabled },
+    setEditedStructure({
+      ...editedStructure,
+      breakConfig: { ...editedStructure.breakConfig, enabled },
     });
   };
 
   const handleBreakFrequencyChange = (frequency: number) => {
-    setEditedPreset({
-      ...editedPreset,
-      breakConfig: { ...editedPreset.breakConfig, frequency },
+    setEditedStructure({
+      ...editedStructure,
+      breakConfig: { ...editedStructure.breakConfig, frequency },
     });
   };
 
   const handleBreakDurationChange = (minutes: number) => {
-    setEditedPreset({
-      ...editedPreset,
-      breakConfig: { ...editedPreset.breakConfig, duration: minutes },
+    setEditedStructure({
+      ...editedStructure,
+      breakConfig: { ...editedStructure.breakConfig, duration: minutes },
     });
   };
 
-  const handleImport = (importedPresets: Preset[]) => {
-    if (importedPresets.length > 0) {
-      // 最初のプリセットをロード
-      setEditedPreset(importedPresets[0]);
+  const handleImport = (importedStructures: Structure[]) => {
+    if (importedStructures.length > 0) {
+      // 最初のストラクチャーをロード
+      setEditedStructure(importedStructures[0]);
     }
   };
 
   const handleSave = () => {
-    if (!validatePreset()) return;
-    onSave(editedPreset);
+    if (!validateStructure()) return;
+    onSave(editedStructure);
   };
 
   const handleUse = () => {
-    if (!validatePreset()) return;
-    onUse(editedPreset);
+    if (!validateStructure()) return;
+    onUse(editedStructure);
   };
 
-  const validatePreset = (): boolean => {
-    if (editedPreset.name.trim().length === 0) {
-      setNameError('プリセット名を入力してください');
+  const validateStructure = (): boolean => {
+    if (editedStructure.name.trim().length === 0) {
+      setNameError('ストラクチャー名を入力してください');
       return false;
     }
 
-    if (editedPreset.name.length > 50) {
-      setNameError('プリセット名は50文字以内で入力してください');
+    if (editedStructure.name.length > 50) {
+      setNameError('ストラクチャー名は50文字以内で入力してください');
       return false;
     }
 
-    if (editedPreset.blindLevels.length === 0) {
+    if (editedStructure.blindLevels.length === 0) {
       return false;
     }
 
     return true;
   };
 
-  const canSave = isDirty && !nameError && editedPreset.blindLevels.length > 0;
+  const canSave =
+    isDirty && !nameError && editedStructure.blindLevels.length > 0;
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        {/* セクション1: プリセット名 */}
+        {/* セクション1: ストラクチャー名 */}
         <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>プリセット名</h3>
+          <h3 className={styles.sectionTitle}>ストラクチャー名</h3>
           <div className={styles.inputGroup}>
             <input
               type="text"
               className={[styles.nameInput, nameError && styles.error]
                 .filter(Boolean)
                 .join(' ')}
-              value={editedPreset.name}
+              value={editedStructure.name}
               onChange={handleNameChange}
-              placeholder="プリセット名を入力"
-              aria-label="プリセット名"
+              placeholder="ストラクチャー名を入力"
+              aria-label="ストラクチャー名"
               aria-invalid={!!nameError}
               aria-describedby={nameError ? 'name-error' : undefined}
-              data-testid="preset-name-input"
+              data-testid="structure-name-input"
             />
             {nameError && (
               <span
@@ -174,7 +177,7 @@ export function PresetEditor({
         {/* セクション2: ブラインド構造 */}
         <section className={styles.section}>
           <BlindEditor
-            blindLevels={editedPreset.blindLevels}
+            blindLevels={editedStructure.blindLevels}
             onChange={handleBlindLevelsChange}
           />
         </section>
@@ -185,7 +188,7 @@ export function PresetEditor({
           <div className={styles.settingsGrid}>
             <NumberInput
               label="レベル時間"
-              value={editedPreset.levelDuration / 60}
+              value={editedStructure.levelDuration / 60}
               min={1}
               max={60}
               onChange={handleLevelDurationChange}
@@ -195,16 +198,16 @@ export function PresetEditor({
 
             <Toggle
               label="休憩を有効にする"
-              value={editedPreset.breakConfig.enabled}
+              value={editedStructure.breakConfig.enabled}
               onChange={handleBreakEnabledChange}
               aria-label="休憩を有効にする"
             />
 
-            {editedPreset.breakConfig.enabled && (
+            {editedStructure.breakConfig.enabled && (
               <>
                 <NumberInput
                   label="休憩頻度"
-                  value={editedPreset.breakConfig.frequency}
+                  value={editedStructure.breakConfig.frequency}
                   min={1}
                   max={20}
                   onChange={handleBreakFrequencyChange}
@@ -214,7 +217,7 @@ export function PresetEditor({
 
                 <NumberInput
                   label="休憩時間"
-                  value={editedPreset.breakConfig.duration}
+                  value={editedStructure.breakConfig.duration}
                   min={1}
                   max={30}
                   onChange={handleBreakDurationChange}
@@ -229,7 +232,10 @@ export function PresetEditor({
         {/* セクション4: データ管理 */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>データ管理</h3>
-          <ImportExport presets={[editedPreset]} onImport={handleImport} />
+          <ImportExport
+            structures={[editedStructure]}
+            onImport={handleImport}
+          />
         </section>
       </div>
 
@@ -239,7 +245,7 @@ export function PresetEditor({
           className={styles.saveButton}
           onClick={handleSave}
           disabled={!canSave}
-          aria-label="プリセットを保存"
+          aria-label="ストラクチャーを保存"
           data-testid="save-button"
         >
           保存
@@ -247,11 +253,11 @@ export function PresetEditor({
         <button
           className={styles.useButton}
           onClick={handleUse}
-          disabled={editedPreset.blindLevels.length === 0}
-          aria-label="このプリセットを使う"
+          disabled={editedStructure.blindLevels.length === 0}
+          aria-label="このストラクチャーを使う"
           data-testid="use-button"
         >
-          このプリセットを使う
+          このストラクチャーを使う
         </button>
       </div>
     </div>

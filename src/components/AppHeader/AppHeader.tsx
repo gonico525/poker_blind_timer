@@ -1,16 +1,15 @@
-import { PresetSelector } from '@/components/PresetSelector';
+import { StructureSelector } from '@/components/StructureSelector';
 import { VolumeControl } from '@/components/VolumeControl';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import type { Preset, PresetId } from '@/types';
-import type { Theme } from '@/types/settings';
+import type { Structure, StructureId, Theme } from '@/types';
 import styles from './AppHeader.module.css';
 
 export interface AppHeaderProps {
-  // PresetSelector関連
-  presets: Preset[];
-  currentPresetId: PresetId | null;
-  onPresetSelect: (presetId: PresetId) => void;
-  onPresetManage: () => void;
+  // StructureSelector関連
+  structures: Structure[];
+  currentStructureId: StructureId | null;
+  onStructureSelect: (structureId: StructureId) => void;
+  onStructureManage: () => void;
 
   // VolumeControl関連
   volume: number;
@@ -29,21 +28,21 @@ export interface AppHeaderProps {
  *
  * 機能:
  * - アプリタイトル「🎰 Poker Blind Timer」
- * - PresetSelector 統合
+ * - StructureSelector 統合
  * - VolumeControl 統合
  * - ThemeToggle 統合
- * - [⚙ プリセット管理] ボタン
+ * - [⚙ ストラクチャー管理] ボタン
  *
  * レイアウト:
  * - 左側: タイトル
- * - 中央: PresetSelector
- * - 右側: VolumeControl, ThemeToggle, プリセット管理ボタン
+ * - 中央: StructureSelector
+ * - 右側: VolumeControl, ThemeToggle, ストラクチャー管理ボタン
  */
 export function AppHeader({
-  presets,
-  currentPresetId,
-  onPresetSelect,
-  onPresetManage,
+  structures,
+  currentStructureId,
+  onStructureSelect,
+  onStructureManage,
   volume,
   isSoundEnabled,
   onVolumeChange,
@@ -61,11 +60,11 @@ export function AppHeader({
       </div>
 
       <div className={styles.center}>
-        <PresetSelector
-          presets={presets}
-          currentPresetId={currentPresetId}
-          onSelect={onPresetSelect}
-          onManage={onPresetManage}
+        <StructureSelector
+          structures={structures}
+          currentStructureId={currentStructureId}
+          onSelect={onStructureSelect}
+          onManage={onStructureManage}
         />
       </div>
 
@@ -79,11 +78,11 @@ export function AppHeader({
         <ThemeToggle theme={theme} onChange={onThemeChange} />
         <button
           className={styles.manageButton}
-          onClick={onPresetManage}
-          aria-label="プリセット管理"
+          onClick={onStructureManage}
+          aria-label="ストラクチャー管理"
         >
           <span className={styles.manageIcon}>⚙</span>
-          <span className={styles.manageText}>プリセット管理</span>
+          <span className={styles.manageText}>ストラクチャー管理</span>
         </button>
       </div>
     </header>

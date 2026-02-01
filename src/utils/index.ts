@@ -12,9 +12,9 @@ export { formatBlindValue, formatBlindLevel } from './blindFormat';
 // バリデーション
 export {
   isValidBlindLevel,
-  isValidPreset,
+  isValidStructure,
   isValidBreakConfig,
-  validatePresetName,
+  validateStructureName,
 } from './validation';
 
 // 定数

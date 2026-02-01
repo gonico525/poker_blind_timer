@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PresetManagementModal } from './PresetManagementModal';
-import type { Preset, PresetId } from '@/types';
+import { StructureManagementModal } from './StructureManagementModal';
+import type { Structure, StructureId } from '@/types';
 
-// usePresetsのモック
-const mockPresets: Preset[] = [
+// useStructuresのモック
+const mockStructures: Structure[] = [
   {
-    id: 'default-standard' as PresetId,
+    id: 'default-standard' as StructureId,
     name: 'Standard',
     type: 'standard',
     blindLevels: [
@@ -20,7 +20,7 @@ const mockPresets: Preset[] = [
     updatedAt: Date.now(),
   },
   {
-    id: 'custom-1' as PresetId,
+    id: 'custom-1' as StructureId,
     name: 'Custom 1',
     type: 'custom',
     blindLevels: [
@@ -34,52 +34,52 @@ const mockPresets: Preset[] = [
   },
 ];
 
-const mockAddPreset = vi.fn();
-const mockUpdatePreset = vi.fn();
-const mockDeletePreset = vi.fn();
-const mockLoadPreset = vi.fn();
+const mockAddStructure = vi.fn();
+const mockUpdateStructure = vi.fn();
+const mockDeleteStructure = vi.fn();
+const mockLoadStructure = vi.fn();
 
-vi.mock('@/hooks/usePresets', () => ({
-  usePresets: () => ({
-    presets: mockPresets,
-    currentPresetId: 'default-standard' as PresetId,
-    addPreset: mockAddPreset,
-    updatePreset: mockUpdatePreset,
-    deletePreset: mockDeletePreset,
-    loadPreset: mockLoadPreset,
+vi.mock('@/hooks/useStructures', () => ({
+  useStructures: () => ({
+    structures: mockStructures,
+    currentStructureId: 'default-standard' as StructureId,
+    addStructure: mockAddStructure,
+    updateStructure: mockUpdateStructure,
+    deleteStructure: mockDeleteStructure,
+    loadStructure: mockLoadStructure,
   }),
 }));
 
-describe('PresetManagementModal', () => {
+describe('StructureManagementModal', () => {
   const defaultProps = {
     isOpen: true,
     onClose: vi.fn(),
-    currentPresetId: 'default-standard' as PresetId,
+    currentStructureId: 'default-standard' as StructureId,
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockAddPreset.mockImplementation((preset) => ({
-      ...preset,
-      id: 'new_preset_id' as PresetId,
+    mockAddStructure.mockImplementation((structure) => ({
+      ...structure,
+      id: 'new_structure_id' as StructureId,
       type: 'custom',
       createdAt: Date.now(),
       updatedAt: Date.now(),
     }));
   });
 
-  it('モーダルが開いた時、currentPresetIdのプリセットが選択される', () => {
-    render(<PresetManagementModal {...defaultProps} />);
+  it('モーダルが開いた時、currentStructureIdのストラクチャーが選択される', () => {
+    render(<StructureManagementModal {...defaultProps} />);
 
     expect(screen.getByText('Standard')).toBeInTheDocument();
-    expect(screen.getByTestId('preset-name-input')).toHaveValue('Standard');
+    expect(screen.getByTestId('structure-name-input')).toHaveValue('Standard');
   });
 
-  it('プリセット選択時、右側に表示される', async () => {
+  it('ストラクチャー選択時、右側に表示される', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    const items = screen.getAllByTestId('preset-item');
+    const items = screen.getAllByTestId('structure-item');
     const customItem = items.find((item) =>
       item.textContent?.includes('Custom 1')
     )!;
@@ -87,62 +87,64 @@ describe('PresetManagementModal', () => {
     await user.click(customItem);
 
     await waitFor(() => {
-      expect(screen.getByTestId('preset-name-input')).toHaveValue('Custom 1');
-    });
-  });
-
-  it('新規作成ボタンクリックで新しいプリセットが作成される', async () => {
-    const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
-
-    const createButton = screen.getByTestId('create-preset-button');
-    await user.click(createButton);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('preset-name-input')).toHaveValue(
-        '新しいプリセット'
+      expect(screen.getByTestId('structure-name-input')).toHaveValue(
+        'Custom 1'
       );
     });
   });
 
-  it('新規プリセットを保存するとaddPresetが呼ばれる', async () => {
+  it('新規作成ボタンクリックで新しいストラクチャーが作成される', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
+
+    const createButton = screen.getByTestId('create-structure-button');
+    await user.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('structure-name-input')).toHaveValue(
+        '新しいストラクチャー'
+      );
+    });
+  });
+
+  it('新規ストラクチャーを保存するとaddStructureが呼ばれる', async () => {
+    const user = userEvent.setup();
+    render(<StructureManagementModal {...defaultProps} />);
 
     // 新規作成
-    const createButton = screen.getByTestId('create-preset-button');
+    const createButton = screen.getByTestId('create-structure-button');
     await user.click(createButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId('preset-name-input')).toHaveValue(
-        '新しいプリセット'
+      expect(screen.getByTestId('structure-name-input')).toHaveValue(
+        '新しいストラクチャー'
       );
     });
 
-    // プリセット名を変更
-    const nameInput = screen.getByTestId('preset-name-input');
+    // ストラクチャー名を変更
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
-    await user.type(nameInput, 'My New Preset');
+    await user.type(nameInput, 'My New Structure');
 
     // 保存
     const saveButton = screen.getByTestId('save-button');
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(mockAddPreset).toHaveBeenCalledWith(
+      expect(mockAddStructure).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: 'My New Preset',
+          name: 'My New Structure',
         })
       );
     });
   });
 
-  it('既存プリセットを編集して保存するとupdatePresetが呼ばれる', async () => {
+  it('既存ストラクチャーを編集して保存するとupdateStructureが呼ばれる', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    // プリセット名を変更
-    const nameInput = screen.getByTestId('preset-name-input');
+    // ストラクチャー名を変更
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
     await user.type(nameInput, 'Updated Standard');
 
@@ -155,7 +157,7 @@ describe('PresetManagementModal', () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(mockUpdatePreset).toHaveBeenCalledWith(
+      expect(mockUpdateStructure).toHaveBeenCalledWith(
         'default-standard',
         expect.objectContaining({
           name: 'Updated Standard',
@@ -164,27 +166,27 @@ describe('PresetManagementModal', () => {
     });
   });
 
-  it('このプリセットを使うボタンクリックでloadPresetが呼ばれる', async () => {
+  it('このストラクチャーを使うボタンクリックでloadStructureが呼ばれる', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
-    render(<PresetManagementModal {...defaultProps} onClose={onClose} />);
+    render(<StructureManagementModal {...defaultProps} onClose={onClose} />);
 
     const useButton = screen.getByTestId('use-button');
     await user.click(useButton);
 
-    expect(mockLoadPreset).toHaveBeenCalledWith('default-standard');
+    expect(mockLoadStructure).toHaveBeenCalledWith('default-standard');
     expect(onClose).toHaveBeenCalled();
   });
 
   it('削除ボタンクリックで確認ダイアログが表示される', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    const deleteButtons = screen.getAllByTestId('delete-preset-button');
+    const deleteButtons = screen.getAllByTestId('delete-structure-button');
     await user.click(deleteButtons[0]);
 
     await waitFor(() => {
-      expect(screen.getByText('プリセットを削除')).toBeInTheDocument();
+      expect(screen.getByText('ストラクチャーを削除')).toBeInTheDocument();
       expect(
         screen.getByText(
           /「Custom 1」を削除しますか？この操作は取り消せません。/
@@ -193,57 +195,59 @@ describe('PresetManagementModal', () => {
     });
   });
 
-  it('削除確認でdeletePresetが呼ばれる', async () => {
+  it('削除確認でdeleteStructureが呼ばれる', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    const deleteButtons = screen.getAllByTestId('delete-preset-button');
+    const deleteButtons = screen.getAllByTestId('delete-structure-button');
     await user.click(deleteButtons[0]);
 
     await waitFor(() => {
-      expect(screen.getByText('プリセットを削除')).toBeInTheDocument();
+      expect(screen.getByText('ストラクチャーを削除')).toBeInTheDocument();
     });
 
     const confirmButton = screen.getByTestId('confirm-button');
     await user.click(confirmButton);
 
     await waitFor(() => {
-      expect(mockDeletePreset).toHaveBeenCalledWith('custom-1');
+      expect(mockDeleteStructure).toHaveBeenCalledWith('custom-1');
     });
   });
 
   it('削除キャンセルでダイアログが閉じる', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    const deleteButtons = screen.getAllByTestId('delete-preset-button');
+    const deleteButtons = screen.getAllByTestId('delete-structure-button');
     await user.click(deleteButtons[0]);
 
     await waitFor(() => {
-      expect(screen.getByText('プリセットを削除')).toBeInTheDocument();
+      expect(screen.getByText('ストラクチャーを削除')).toBeInTheDocument();
     });
 
     const cancelButton = screen.getByTestId('cancel-button');
     await user.click(cancelButton);
 
     await waitFor(() => {
-      expect(screen.queryByText('プリセットを削除')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('ストラクチャーを削除')
+      ).not.toBeInTheDocument();
     });
 
-    expect(mockDeletePreset).not.toHaveBeenCalled();
+    expect(mockDeleteStructure).not.toHaveBeenCalled();
   });
 
-  it('未保存の変更がある時、別プリセット選択で警告ダイアログが表示される', async () => {
+  it('未保存の変更がある時、別ストラクチャー選択で警告ダイアログが表示される', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    // プリセット名を変更（未保存）
-    const nameInput = screen.getByTestId('preset-name-input');
+    // ストラクチャー名を変更（未保存）
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
     await user.type(nameInput, 'Modified');
 
-    // 別のプリセットを選択
-    const items = screen.getAllByTestId('preset-item');
+    // 別のストラクチャーを選択
+    const items = screen.getAllByTestId('structure-item');
     const customItem = items.find((item) =>
       item.textContent?.includes('Custom 1')
     )!;
@@ -260,10 +264,10 @@ describe('PresetManagementModal', () => {
 
   it('未保存の変更がある時、モーダルを閉じると警告ダイアログが表示される', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    // プリセット名を変更（未保存）
-    const nameInput = screen.getByTestId('preset-name-input');
+    // ストラクチャー名を変更（未保存）
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
     await user.type(nameInput, 'Modified');
 
@@ -278,15 +282,15 @@ describe('PresetManagementModal', () => {
 
   it('未保存警告で「破棄」を選択すると変更が破棄される', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    // プリセット名を変更
-    const nameInput = screen.getByTestId('preset-name-input');
+    // ストラクチャー名を変更
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
     await user.type(nameInput, 'Modified');
 
-    // 別のプリセットを選択
-    const items = screen.getAllByTestId('preset-item');
+    // 別のストラクチャーを選択
+    const items = screen.getAllByTestId('structure-item');
     const customItem = items.find((item) =>
       item.textContent?.includes('Custom 1')
     )!;
@@ -302,21 +306,23 @@ describe('PresetManagementModal', () => {
     await user.click(confirmButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId('preset-name-input')).toHaveValue('Custom 1');
+      expect(screen.getByTestId('structure-name-input')).toHaveValue(
+        'Custom 1'
+      );
     });
   });
 
   it('未保存警告で「キャンセル」を選択すると変更が保持される', async () => {
     const user = userEvent.setup();
-    render(<PresetManagementModal {...defaultProps} />);
+    render(<StructureManagementModal {...defaultProps} />);
 
-    // プリセット名を変更
-    const nameInput = screen.getByTestId('preset-name-input');
+    // ストラクチャー名を変更
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
     await user.type(nameInput, 'Modified');
 
-    // 別のプリセットを選択
-    const items = screen.getAllByTestId('preset-item');
+    // 別のストラクチャーを選択
+    const items = screen.getAllByTestId('structure-item');
     const customItem = items.find((item) =>
       item.textContent?.includes('Custom 1')
     )!;
@@ -336,12 +342,12 @@ describe('PresetManagementModal', () => {
     });
 
     // 変更が保持されている
-    expect(screen.getByTestId('preset-name-input')).toHaveValue('Modified');
+    expect(screen.getByTestId('structure-name-input')).toHaveValue('Modified');
   });
 
   it('モーダルが閉じている時は何も表示されない', () => {
-    render(<PresetManagementModal {...defaultProps} isOpen={false} />);
+    render(<StructureManagementModal {...defaultProps} isOpen={false} />);
 
-    expect(screen.queryByText('プリセット管理')).not.toBeInTheDocument();
+    expect(screen.queryByText('ストラクチャー管理')).not.toBeInTheDocument();
   });
 });

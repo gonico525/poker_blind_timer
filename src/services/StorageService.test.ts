@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { StorageService } from './StorageService';
-import type { Settings, Preset, TournamentState } from '@/types';
+import type { Settings, Structure, TournamentState } from '@/types';
 
 describe('StorageService', () => {
   beforeEach(() => {
@@ -65,12 +65,12 @@ describe('StorageService', () => {
     });
   });
 
-  describe('presets storage', () => {
-    it('should save and load presets', () => {
-      const presets: Preset[] = [
+  describe('structures storage', () => {
+    it('should save and load structures', () => {
+      const structures: Structure[] = [
         {
           id: 'test-1',
-          name: 'Test Preset',
+          name: 'Test Structure',
           type: 'custom',
           blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
           levelDuration: 600,
@@ -79,12 +79,12 @@ describe('StorageService', () => {
           updatedAt: Date.now(),
         },
       ];
-      StorageService.savePresets(presets);
-      expect(StorageService.loadPresets()).toEqual(presets);
+      StorageService.saveStructures(structures);
+      expect(StorageService.loadStructures()).toEqual(structures);
     });
 
-    it('should return null for non-existent presets', () => {
-      expect(StorageService.loadPresets()).toBeNull();
+    it('should return null for non-existent structures', () => {
+      expect(StorageService.loadStructures()).toBeNull();
     });
   });
 

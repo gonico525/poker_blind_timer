@@ -2,10 +2,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AppHeader } from './AppHeader';
-import type { Preset } from '@/types';
+import type { Structure } from '@/types';
 
 describe('AppHeader', () => {
-  const mockPresets: Preset[] = [
+  const mockStructures: Structure[] = [
     {
       id: 'default-standard',
       name: 'Standard Tournament',
@@ -20,13 +20,13 @@ describe('AppHeader', () => {
       levelDuration: 300,
       breakConfig: { enabled: false, frequency: 4, duration: 300 },
     },
-  ] as Preset[];
+  ] as Structure[];
 
   const defaultProps = {
-    presets: mockPresets,
-    currentPresetId: 'default-standard',
-    onPresetSelect: vi.fn(),
-    onPresetManage: vi.fn(),
+    structures: mockStructures,
+    currentStructureId: 'default-standard',
+    onStructureSelect: vi.fn(),
+    onStructureManage: vi.fn(),
     volume: 0.7,
     isSoundEnabled: true,
     onVolumeChange: vi.fn(),
@@ -49,11 +49,11 @@ describe('AppHeader', () => {
     expect(screen.getByText('Poker Blind Timer')).toBeInTheDocument();
   });
 
-  it('PresetSelectorが表示される', () => {
+  it('StructureSelectorが表示される', () => {
     render(<AppHeader {...defaultProps} />);
 
-    // Dropdownコンポーネント内にプリセット選択が表示されることを確認
-    expect(screen.getByLabelText('プリセット選択')).toBeInTheDocument();
+    // Dropdownコンポーネント内にストラクチャー選択が表示されることを確認
+    expect(screen.getByLabelText('ストラクチャー選択')).toBeInTheDocument();
   });
 
   it('VolumeControlが表示される', () => {
@@ -72,32 +72,40 @@ describe('AppHeader', () => {
     expect(themeButton).toBeInTheDocument();
   });
 
-  it('プリセット管理ボタンが表示される', () => {
+  it('ストラクチャー管理ボタンが表示される', () => {
     render(<AppHeader {...defaultProps} />);
 
-    const manageButton = screen.getByRole('button', { name: 'プリセット管理' });
+    const manageButton = screen.getByRole('button', {
+      name: 'ストラクチャー管理',
+    });
     expect(manageButton).toBeInTheDocument();
     expect(manageButton).toHaveTextContent('⚙');
-    expect(manageButton).toHaveTextContent('プリセット管理');
+    expect(manageButton).toHaveTextContent('ストラクチャー管理');
   });
 
-  it('プリセット管理ボタンをクリックするとonPresetManageが呼ばれる', async () => {
+  it('ストラクチャー管理ボタンをクリックするとonStructureManageが呼ばれる', async () => {
     const user = userEvent.setup();
-    const onPresetManage = vi.fn();
+    const onStructureManage = vi.fn();
 
-    render(<AppHeader {...defaultProps} onPresetManage={onPresetManage} />);
+    render(
+      <AppHeader {...defaultProps} onStructureManage={onStructureManage} />
+    );
 
-    const manageButton = screen.getByRole('button', { name: 'プリセット管理' });
+    const manageButton = screen.getByRole('button', {
+      name: 'ストラクチャー管理',
+    });
     await user.click(manageButton);
 
-    expect(onPresetManage).toHaveBeenCalledTimes(1);
+    expect(onStructureManage).toHaveBeenCalledTimes(1);
   });
 
-  it('プリセット管理ボタンにアクセシビリティ属性が設定されている', () => {
+  it('ストラクチャー管理ボタンにアクセシビリティ属性が設定されている', () => {
     render(<AppHeader {...defaultProps} />);
 
-    const manageButton = screen.getByRole('button', { name: 'プリセット管理' });
-    expect(manageButton).toHaveAttribute('aria-label', 'プリセット管理');
+    const manageButton = screen.getByRole('button', {
+      name: 'ストラクチャー管理',
+    });
+    expect(manageButton).toHaveAttribute('aria-label', 'ストラクチャー管理');
   });
 
   it('ヘッダーのレイアウトが正しく設定されている', () => {
@@ -122,19 +130,19 @@ describe('AppHeader', () => {
     expect(screen.getByTestId('app-header')).toBeInTheDocument();
   });
 
-  it('現在のプリセットが選択されている', () => {
+  it('現在のストラクチャーが選択されている', () => {
     render(<AppHeader {...defaultProps} />);
 
-    // PresetSelectorが現在のプリセットを表示していることを確認
+    // StructureSelectorが現在のストラクチャーを表示していることを確認
     // (Dropdownコンポーネント内で選択されている)
-    const dropdown = screen.getByLabelText('プリセット選択');
+    const dropdown = screen.getByLabelText('ストラクチャー選択');
     expect(dropdown).toBeInTheDocument();
   });
 
-  it('currentPresetIdがnullの場合でもエラーなくレンダリングされる', () => {
+  it('currentStructureIdがnullの場合でもエラーなくレンダリングされる', () => {
     const props = {
       ...defaultProps,
-      currentPresetId: null,
+      currentStructureId: null,
     };
 
     render(<AppHeader {...props} />);

@@ -214,17 +214,17 @@ export function tournamentReducer(
       };
     }
 
-    case 'LOAD_PRESET': {
-      const { preset } = action.payload;
+    case 'LOAD_STRUCTURE': {
+      const { structure } = action.payload;
       return {
         ...state,
-        blindLevels: preset.blindLevels,
-        breakConfig: preset.breakConfig,
-        levelDuration: preset.levelDuration,
+        blindLevels: structure.blindLevels,
+        breakConfig: structure.breakConfig,
+        levelDuration: structure.levelDuration,
         currentLevel: 0,
         timer: {
           status: 'idle',
-          remainingTime: preset.levelDuration,
+          remainingTime: structure.levelDuration,
           elapsedTime: 0,
         },
         isOnBreak: false,

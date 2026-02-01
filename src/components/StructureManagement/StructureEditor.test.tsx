@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PresetEditor } from './PresetEditor';
-import type { Preset, PresetId } from '@/types';
+import { StructureEditor } from './StructureEditor';
+import type { Structure, StructureId } from '@/types';
 
-const createTestPreset = (overrides?: Partial<Preset>): Preset => ({
-  id: 'test_1' as PresetId,
-  name: 'Test Preset',
+const createTestStructure = (overrides?: Partial<Structure>): Structure => ({
+  id: 'test_1' as StructureId,
+  name: 'Test Structure',
   type: 'custom',
   blindLevels: [
     { smallBlind: 25, bigBlind: 50, ante: 0 },
@@ -23,71 +23,71 @@ const createTestPreset = (overrides?: Partial<Preset>): Preset => ({
   ...overrides,
 });
 
-describe('PresetEditor', () => {
+describe('StructureEditor', () => {
   const defaultProps = {
-    preset: createTestPreset(),
+    structure: createTestStructure(),
     onSave: vi.fn(),
     onUse: vi.fn(),
     isDirty: false,
   };
 
-  it('presetがnullの場合、空の状態メッセージが表示される', () => {
-    render(<PresetEditor {...defaultProps} preset={null} />);
+  it('structureがnullの場合、空の状態メッセージが表示される', () => {
+    render(<StructureEditor {...defaultProps} structure={null} />);
 
     expect(
-      screen.getByText('プリセットを選択するか、新規作成してください')
+      screen.getByText('ストラクチャーを選択するか、新規作成してください')
     ).toBeInTheDocument();
   });
 
-  it('プリセット名が正しく表示される', () => {
-    render(<PresetEditor {...defaultProps} />);
+  it('ストラクチャー名が正しく表示される', () => {
+    render(<StructureEditor {...defaultProps} />);
 
-    const nameInput = screen.getByTestId('preset-name-input');
-    expect(nameInput).toHaveValue('Test Preset');
+    const nameInput = screen.getByTestId('structure-name-input');
+    expect(nameInput).toHaveValue('Test Structure');
   });
 
-  it('プリセット名を変更できる', async () => {
+  it('ストラクチャー名を変更できる', async () => {
     const user = userEvent.setup();
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
-    const nameInput = screen.getByTestId('preset-name-input');
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
     await user.type(nameInput, 'New Name');
 
     expect(nameInput).toHaveValue('New Name');
   });
 
-  it('プリセット名が空の場合、エラーメッセージが表示される', async () => {
+  it('ストラクチャー名が空の場合、エラーメッセージが表示される', async () => {
     const user = userEvent.setup();
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
-    const nameInput = screen.getByTestId('preset-name-input');
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
 
     await waitFor(() => {
       expect(screen.getByTestId('name-error')).toHaveTextContent(
-        'プリセット名を入力してください'
+        'ストラクチャー名を入力してください'
       );
     });
   });
 
-  it('プリセット名が50文字を超える場合、エラーメッセージが表示される', async () => {
+  it('ストラクチャー名が50文字を超える場合、エラーメッセージが表示される', async () => {
     const user = userEvent.setup();
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
-    const nameInput = screen.getByTestId('preset-name-input');
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
     await user.type(nameInput, 'a'.repeat(51));
 
     await waitFor(() => {
       expect(screen.getByTestId('name-error')).toHaveTextContent(
-        'プリセット名は50文字以内で入力してください'
+        'ストラクチャー名は50文字以内で入力してください'
       );
     });
   });
 
   it('ブラインド構造が表示される', () => {
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
     // BlindEditorが表示されていることを確認
     expect(screen.getByText('ブラインド構造')).toBeInTheDocument();
@@ -95,7 +95,7 @@ describe('PresetEditor', () => {
   });
 
   it('レベル時間が分単位で表示される', () => {
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
     const levelDurationInput = screen.getAllByTestId('number-input')[0];
     expect(levelDurationInput).toHaveValue(10); // 600秒 / 60 = 10分
@@ -104,7 +104,9 @@ describe('PresetEditor', () => {
   it('レベル時間を変更すると秒単位で保存される', async () => {
     const user = userEvent.setup();
     const onSave = vi.fn();
-    render(<PresetEditor {...defaultProps} onSave={onSave} isDirty={true} />);
+    render(
+      <StructureEditor {...defaultProps} onSave={onSave} isDirty={true} />
+    );
 
     const incrementButton = screen.getAllByTestId('increment-button')[0];
     await user.click(incrementButton);
@@ -122,41 +124,41 @@ describe('PresetEditor', () => {
   });
 
   it('休憩設定トグルが表示される', () => {
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
     expect(screen.getByText('休憩を有効にする')).toBeInTheDocument();
   });
 
   it('休憩が無効な場合、休憩頻度・休憩時間が表示されない', () => {
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
     expect(screen.queryByText('休憩頻度')).not.toBeInTheDocument();
     expect(screen.queryByText('休憩時間')).not.toBeInTheDocument();
   });
 
   it('休憩が有効な場合、休憩頻度・休憩時間が表示される', () => {
-    const preset = createTestPreset({
+    const structure = createTestStructure({
       breakConfig: {
         enabled: true,
         frequency: 4,
         duration: 10,
       },
     });
-    render(<PresetEditor {...defaultProps} preset={preset} />);
+    render(<StructureEditor {...defaultProps} structure={structure} />);
 
     expect(screen.getByText('休憩頻度')).toBeInTheDocument();
     expect(screen.getByText('休憩時間')).toBeInTheDocument();
   });
 
   it('保存ボタンはisDirtyがfalseの時に無効化される', () => {
-    render(<PresetEditor {...defaultProps} isDirty={false} />);
+    render(<StructureEditor {...defaultProps} isDirty={false} />);
 
     const saveButton = screen.getByTestId('save-button');
     expect(saveButton).toBeDisabled();
   });
 
   it('保存ボタンはisDirtyがtrueの時に有効化される', () => {
-    render(<PresetEditor {...defaultProps} isDirty={true} />);
+    render(<StructureEditor {...defaultProps} isDirty={true} />);
 
     const saveButton = screen.getByTestId('save-button');
     expect(saveButton).not.toBeDisabled();
@@ -165,7 +167,9 @@ describe('PresetEditor', () => {
   it('保存ボタンクリックでonSaveが呼ばれる', async () => {
     const user = userEvent.setup();
     const onSave = vi.fn();
-    render(<PresetEditor {...defaultProps} onSave={onSave} isDirty={true} />);
+    render(
+      <StructureEditor {...defaultProps} onSave={onSave} isDirty={true} />
+    );
 
     const saveButton = screen.getByTestId('save-button');
     await user.click(saveButton);
@@ -173,10 +177,10 @@ describe('PresetEditor', () => {
     expect(onSave).toHaveBeenCalled();
   });
 
-  it('このプリセットを使うボタンクリックでonUseが呼ばれる', async () => {
+  it('このストラクチャーを使うボタンクリックでonUseが呼ばれる', async () => {
     const user = userEvent.setup();
     const onUse = vi.fn();
-    render(<PresetEditor {...defaultProps} onUse={onUse} />);
+    render(<StructureEditor {...defaultProps} onUse={onUse} />);
 
     const useButton = screen.getByTestId('use-button');
     await user.click(useButton);
@@ -184,11 +188,11 @@ describe('PresetEditor', () => {
     expect(onUse).toHaveBeenCalled();
   });
 
-  it('プリセット名が空の場合、保存ボタンが無効化される', async () => {
+  it('ストラクチャー名が空の場合、保存ボタンが無効化される', async () => {
     const user = userEvent.setup();
-    render(<PresetEditor {...defaultProps} isDirty={true} />);
+    render(<StructureEditor {...defaultProps} isDirty={true} />);
 
-    const nameInput = screen.getByTestId('preset-name-input');
+    const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
 
     await waitFor(() => {
@@ -197,18 +201,18 @@ describe('PresetEditor', () => {
     });
   });
 
-  it('プリセット変更時に内部状態が更新される', () => {
-    const { rerender } = render(<PresetEditor {...defaultProps} />);
+  it('ストラクチャー変更時に内部状態が更新される', () => {
+    const { rerender } = render(<StructureEditor {...defaultProps} />);
 
-    const newPreset = createTestPreset({ name: 'Updated Preset' });
-    rerender(<PresetEditor {...defaultProps} preset={newPreset} />);
+    const newStructure = createTestStructure({ name: 'Updated Structure' });
+    rerender(<StructureEditor {...defaultProps} structure={newStructure} />);
 
-    const nameInput = screen.getByTestId('preset-name-input');
-    expect(nameInput).toHaveValue('Updated Preset');
+    const nameInput = screen.getByTestId('structure-name-input');
+    expect(nameInput).toHaveValue('Updated Structure');
   });
 
   it('データ管理セクションが表示される', () => {
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
     expect(screen.getByText('データ管理')).toBeInTheDocument();
     expect(screen.getByText('エクスポート')).toBeInTheDocument();
@@ -217,7 +221,7 @@ describe('PresetEditor', () => {
 
   it('休憩トグルをオンにすると休憩設定が表示される', async () => {
     const user = userEvent.setup();
-    render(<PresetEditor {...defaultProps} />);
+    render(<StructureEditor {...defaultProps} />);
 
     const toggle = screen.getByTestId('toggle-switch');
     await user.click(toggle);
