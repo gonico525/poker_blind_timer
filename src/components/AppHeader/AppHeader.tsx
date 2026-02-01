@@ -53,10 +53,7 @@ export function AppHeader({
   return (
     <header className={styles.header} data-testid="app-header">
       <div className={styles.left}>
-        <h1 className={styles.title}>
-          <span className={styles.icon}>🎰</span>
-          <span className={styles.titleText}>Poker Blind Timer</span>
-        </h1>
+        <h1 className={styles.title}>Poker Blind Timer</h1>
       </div>
 
       <div className={styles.center}>
@@ -76,14 +73,6 @@ export function AppHeader({
           onSoundEnabledChange={onSoundEnabledChange}
         />
         <ThemeToggle theme={theme} onChange={onThemeChange} />
-        <button
-          className={styles.manageButton}
-          onClick={onStructureManage}
-          aria-label="ストラクチャー管理"
-        >
-          <span className={styles.manageIcon}>⚙</span>
-          <span className={styles.manageText}>ストラクチャー管理</span>
-        </button>
       </div>
     </header>
   );

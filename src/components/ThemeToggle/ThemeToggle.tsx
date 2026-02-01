@@ -17,7 +17,6 @@ export function ThemeToggle({ theme, onChange }: ThemeToggleProps) {
   };
 
   const themeLabel = theme === 'dark' ? 'ダークモード' : 'ライトモード';
-  const icon = theme === 'dark' ? '🌙' : '☀️';
 
   return (
     <button
@@ -26,8 +25,7 @@ export function ThemeToggle({ theme, onChange }: ThemeToggleProps) {
       aria-label={`テーマを切り替える（現在: ${themeLabel}）`}
       data-theme={theme}
     >
-      <span className={styles.icon}>{icon}</span>
-      <span className={styles.label}>{themeLabel}</span>
+      {themeLabel}
     </button>
   );
 }
