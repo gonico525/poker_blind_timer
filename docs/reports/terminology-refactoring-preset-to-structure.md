@@ -21,8 +21,8 @@
 
 | 項目           | 数値  |
 | -------------- | ----- |
-| 変更ファイル数 | 57    |
-| 追加行数       | 1,645 |
+| 変更ファイル数 | 62    |
+| 追加行数       | 2,821 |
 | 削除行数       | 2,643 |
 
 ### 用語マッピング
@@ -74,17 +74,11 @@
 - `src/contexts/TournamentContext.tsx` - アクション変更
 - `src/contexts/TournamentContext.test.tsx` - テスト更新
 
-#### コンポーネント（新規作成）
+#### コンポーネント（リネーム）
 
-- `src/components/StructureSelector/` - 全ファイル新規
-- `src/components/StructureManagement/` - 全ファイル新規
-- `src/components/StructureManager/` - 全ファイル新規
-
-#### コンポーネント（削除）
-
-- `src/components/PresetSelector/` - 全ファイル削除
-- `src/components/PresetManagement/` - 全ファイル削除
-- `src/components/PresetManager/` - 全ファイル削除
+- `src/components/PresetSelector/` → `src/components/StructureSelector/`
+- `src/components/PresetManagement/` → `src/components/StructureManagement/`
+- `src/components/PresetManager/` → `src/components/StructureManager/`
 
 #### コンポーネント（更新）
 
@@ -125,15 +119,26 @@
 ✓ tsc && vite build - 成功
 ```
 
-### 用語変更関連テスト（64件）
+### 全テスト結果
 
-```
-✓ src/utils/constants.test.ts (8 tests)
-✓ src/utils/validation.test.ts (17 tests)
-✓ src/contexts/SettingsContext.test.tsx (17 tests)
-✓ src/components/AppHeader/AppHeader.test.tsx (13 tests)
-✓ src/components/MainLayout.test.tsx (9 tests)
-```
+| 項目         | 数値 |
+| ------------ | ---- |
+| パス         | 481  |
+| 失敗（既存） | 11   |
+| 合計         | 492  |
+
+### Structure系コンポーネントテスト（復元・リネーム）
+
+元のPreset系テストファイルを復元し、用語を置換して再利用しました。
+
+| ファイル                          | テスト数 | 方法                      |
+| --------------------------------- | -------- | ------------------------- |
+| StructureEditor.test.tsx          | 19       | 復元 + sed置換            |
+| StructureList.test.tsx            | 15       | 復元 + sed置換            |
+| StructureManagementModal.test.tsx | 14       | 復元 + sed置換            |
+| StructureManager.test.tsx         | 7        | 復元 + sed置換            |
+| StructureSelector.test.tsx        | 13       | 復元 + sed置換 + 手動修正 |
+| **合計**                          | **68**   |                           |
 
 ### 既存の問題（今回の変更とは無関係）
 
@@ -143,7 +148,7 @@
 | -------------------------- | ------ | -------------------------- |
 | TournamentContext.test.tsx | 2      | ブレイク時の動作テスト     |
 | AudioService.test.ts       | 4      | オーディオ読み込みテスト   |
-| ImportExport.test.tsx      | 4      | ファイルアップロードテスト |
+| ImportExport.test.tsx      | 5      | ファイルアップロードテスト |
 
 ## UIテキスト変更
 
@@ -162,6 +167,28 @@
 - 「有効なプリセットが見つかりませんでした」→「有効なストラクチャーが見つかりませんでした」
 - 「プリセット名を入力してください」→「ストラクチャー名を入力してください」
 - 「プリセット名は50文字以内で入力してください」→「ストラクチャー名は50文字以内で入力してください」
+
+## 実施手順
+
+### テストファイルの復元方法
+
+```bash
+# 1. 元のテストファイルを復元
+git checkout 570c92b -- src/components/PresetManagement/*.test.tsx
+git checkout 570c92b -- src/components/PresetManager/*.test.tsx
+git checkout 570c92b -- src/components/PresetSelector/*.test.tsx
+
+# 2. ファイルをリネーム
+mv src/components/PresetManagement/PresetEditor.test.tsx \
+   src/components/StructureManagement/StructureEditor.test.tsx
+# ... 他のファイルも同様
+
+# 3. 用語を一括置換
+sed -i 's/Preset/Structure/g' src/components/Structure*/*.test.tsx
+sed -i 's/preset/structure/g' src/components/Structure*/*.test.tsx
+sed -i 's/プリセット/ストラクチャー/g' src/components/Structure*/*.test.tsx
+# ... 他の置換も同様
+```
 
 ## 関連ドキュメント
 
