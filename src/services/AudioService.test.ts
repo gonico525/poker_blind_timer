@@ -20,6 +20,7 @@ describe('AudioService', () => {
       load: ReturnType<typeof vi.fn>;
       private _volume = 1;
       private _currentTime = 0;
+      private listeners: Map<string, Set<EventListener>> = new Map();
 
       constructor() {
         this.play = vi.fn().mockResolvedValue(undefined);
@@ -34,6 +35,25 @@ describe('AudioService', () => {
           volume: this._volume,
           currentTime: this._currentTime,
         });
+      }
+
+      addEventListener(event: string, handler: EventListener) {
+        if (!this.listeners.has(event)) {
+          this.listeners.set(event, new Set());
+        }
+        this.listeners.get(event)!.add(handler);
+
+        // canplaythroughイベントを即座に発火させる（テスト用）
+        if (event === 'canplaythrough') {
+          setTimeout(() => handler(new Event('canplaythrough')), 0);
+        }
+      }
+
+      removeEventListener(event: string, handler: EventListener) {
+        const handlers = this.listeners.get(event);
+        if (handlers) {
+          handlers.delete(handler);
+        }
       }
 
       get volume() {

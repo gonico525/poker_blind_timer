@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { renderHook, act, cleanup } from '@testing-library/react';
 import { useStructures } from './useStructures';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TournamentProvider } from '@/contexts/TournamentContext';
@@ -18,6 +18,13 @@ const createWrapper =
 describe('useStructures', () => {
   beforeEach(() => {
     // Clear localStorage before each test
+    globalThis.localStorage.clear();
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    // Ensure cleanup after each test
+    cleanup();
     globalThis.localStorage.clear();
   });
 
@@ -124,7 +131,8 @@ describe('useStructures', () => {
 
       const updatedStructure = result.current.getStructure(addedStructure!.id);
       expect(updatedStructure?.name).toBe('Updated Name');
-      expect(updatedStructure?.updatedAt).toBeGreaterThan(
+      // 同一ミリ秒内で実行される可能性があるため、toBeGreaterThanOrEqualを使用
+      expect(updatedStructure?.updatedAt).toBeGreaterThanOrEqual(
         addedStructure!.updatedAt
       );
     });
