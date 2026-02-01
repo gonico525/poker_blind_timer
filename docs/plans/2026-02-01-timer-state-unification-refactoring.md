@@ -47,6 +47,7 @@
 | `src/types/domain.ts` | 型定義の削除 | `TournamentState`から`breakRemainingTime`を削除 |
 | `src/contexts/TournamentContext.tsx` | Reducer・Provider改修 | 全アクションから`breakRemainingTime`の代入行を削除 |
 | `src/hooks/useTimer.ts` | Hook戻り値の削除 | `breakRemainingTime`を返すプロパティを削除 |
+| `docs/specs/04-interface-definitions.md` | 仕様書の修正 | 初期値コード例と休憩開始フロー図から`breakRemainingTime`を削除 |
 | `src/contexts/TournamentContext.test.tsx` | テスト修正 | 初期状態・アサーション・テスト用の状態オブジェクトから削除・移行 |
 | `src/hooks/useTimer.test.ts` | テスト修正 | 初期状態・アサーションの削除・移行 |
 | `src/hooks/useAudioNotification.test.tsx` | テスト修正 | モック状態オブジェクトから削除 |
@@ -92,11 +93,23 @@ Reducerの各アクション・TournamentProviderの初期状態の中で`breakR
 戻り値オブジェクトから`breakRemainingTime: state.breakRemainingTime`を削除する。
 MainLayoutはこの戻り値の`remainingTime`（= `state.timer.remainingTime`）を休憩中にも使用しており、休憩中の残り時間の表示には影響しない。
 
-### Step 4. テストの変更
+### Step 4. 仕様書の変更
+
+**ファイル**: `docs/specs/04-interface-definitions.md`
+
+2箇所を変更する。
+
+**① 初期値コード例（§4直下のTournamentContext設計のコード例）**
+`TournamentState`の初期値を示すコード例で`breakRemainingTime: 0`を削除する。
+
+**② 休憩開始フロー図（レベル変更フローの状態遷移図）**
+休憩開始ボックス内の`(breakRemainingTime: duration)`を`(timer.remainingTime: duration)`に変更する。休憩開始時に`timer.remainingTime`が`breakConfig.duration`に設定されることを示す。
+
+### Step 5. テストの変更
 
 以下の各ファイルで変更が必要な内容を説明する。
 
-#### 4-A. `src/contexts/TournamentContext.test.tsx`
+#### 5-A. `src/contexts/TournamentContext.test.tsx`
 
 このファイルは`tournamentReducer`を単体テストしている。変更は以下の種類に分類される。
 
@@ -117,7 +130,7 @@ MainLayoutはこの戻り値の`remainingTime`（= `state.timer.remainingTime`�
 - 「should end break」→ `state.breakRemainingTime` の期待値チェック（削除。休憩終了は`isOnBreak: false`で確認済み）
 - 「should skip break」→ `state.breakRemainingTime` の期待値チェック（削除。`timer.remainingTime`がlevelDurationにリセットされることで確認）
 
-#### 4-B. `src/hooks/useTimer.test.ts`
+#### 5-B. `src/hooks/useTimer.test.ts`
 
 このファイルは`useTimer`フックを統合テストしている。
 
@@ -133,7 +146,7 @@ MainLayoutはこの戻り値の`remainingTime`（= `state.timer.remainingTime`�
 - 「should enter break mode at break frequency」→ `result.current.breakRemainingTime` の期待値チェックを `result.current.remainingTime` へ変更する。
 - 「should skip break when skipBreak is called」→ `result.current.breakRemainingTime` の期待値チェックを削除する。（休憩スキップ後の`remainingTime`はlevelDurationに戻るため、`result.current.remainingTime`で確認すればよい）
 
-#### 4-C. `src/hooks/useAudioNotification.test.tsx`
+#### 5-C. `src/hooks/useAudioNotification.test.tsx`
 
 このファイルのテストは`breakRemainingTime`の値を直接アサートしているわけでない。モック状態オブジェクトの構築・変更で使っているだけである。
 
@@ -148,11 +161,11 @@ MainLayoutはこの戻り値の`remainingTime`（= `state.timer.remainingTime`�
 
 > **確認点**: `useAudioNotification`自体は`breakRemainingTime`を参照していない（`isOnBreak`と`timer.remainingTime`のみ監視）。モック値の削除でテスト動作には影響しない。
 
-#### 4-D. `src/hooks/useKeyboardShortcuts.test.tsx`
+#### 5-D. `src/hooks/useKeyboardShortcuts.test.tsx`
 
 モック状態オブジェクトの`breakRemainingTime: 0`を削除する。実装側も`breakRemainingTime`を参照していないため、削除のみで十分。
 
-#### 4-E. `src/services/StorageService.test.ts`
+#### 5-E. `src/services/StorageService.test.ts`
 
 `TournamentState`オブジェクトを直接構築している2箇所で`breakRemainingTime: 0`を削除する。（「should save and load tournament state」・「should remove tournament state」の各テスト）
 
@@ -192,4 +205,4 @@ MainLayoutはこの戻り値の`remainingTime`（= `state.timer.remainingTime`�
 - `useKeyboardShortcuts`の実装（`breakRemainingTime`を参照していない）
 - `StorageService`の実装（型に依存するだけで特別なロジックなし）
 - `domain/models/Break.ts`（`shouldTakeBreak`・`getLevelsUntilBreak`は`breakRemainingTime`を使用していない）
-- 仕様書（`docs/specs/`）の更新（仕様書はタイマーの外部インターフェースを記述しており、内部の状態構造には言及していない）
+- `docs/specs/`内の`04-interface-definitions.md`以外の仕様書（`breakRemainingTime`への参照がないため変更不要）
