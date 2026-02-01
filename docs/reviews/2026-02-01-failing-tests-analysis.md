@@ -150,20 +150,28 @@ const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 1. `should not start during break` - 休憩中にSTARTアクションが状態を変更してしまう
 2. `should tick during break` - `breakRemainingTime`が減少しない
 
+### 仕様書との照合
+
+| 観点          | 仕様書                                          | 実装                            | テスト               |
+| ------------- | ----------------------------------------------- | ------------------------------- | -------------------- |
+| 休憩中のSTART | 明確な記載なし（`START_BREAK_TIMER`が別途存在） | `isOnBreak`をチェックしていない | 休憩中は無視を期待   |
+| 休憩中のTICK  | 「残り時間をカウントダウン」と明記              | `timer.remainingTime`を操作     | セットアップが不適切 |
+
 ### 根本原因
 
-**テストと実装の不一致**
-
-#### 問題1: STARTアクションの休憩チェック欠落
+#### 問題1: STARTアクションの休憩チェック欠落（実装のバグ）
 
 テストでは`isOnBreak: true`の時にSTARTアクションが無視されることを期待していますが、実装では`isOnBreak`をチェックしていません。
 
+ポーカートーナメントの実務観点からも、休憩中に通常の「開始」ボタンを押しても無視されるべきです（休憩タイマー開始には専用の`START_BREAK_TIMER`アクションが存在）。
+
 ```typescript
-// TournamentContext.tsx (現在のコード)
+// TournamentContext.tsx (現在のコード - バグ)
 case 'START': {
   if (state.timer.status === 'running') {
     return state;
   }
+  // isOnBreak のチェックが欠落している
   return {
     ...state,
     timer: { ...state.timer, status: 'running' },
@@ -171,13 +179,45 @@ case 'START': {
 }
 ```
 
-#### 問題2: 休憩中TICKのテストセットアップ誤り
+#### 問題2: 休憩中TICKのテストセットアップ誤り（テストのミス）
 
 テストでは`timer.remainingTime: 0`でセットアップしていますが、実装では`timer.remainingTime`をデクリメントし、それを`breakRemainingTime`に反映する設計になっています。テストのセットアップが実装の期待する初期状態と一致していません。
 
-### 修正方針
+### 設計上の課題（別途リファクタリング対象）
 
-**問題1の修正** (TournamentContext.tsx):
+現在の設計には以下の問題があります：
+
+```typescript
+// 現在の状態構造（二重管理）
+{
+  timer: {
+    remainingTime: number,  // ← レベルにも休憩にも使われる
+  },
+  breakRemainingTime: number,   // ← 休憩専用の残り時間（重複）
+  isOnBreak: boolean,
+}
+```
+
+**問題点**: `timer.remainingTime`と`breakRemainingTime`が二重管理になっており、混乱の原因となっている。
+
+**推奨設計**: ポーカートーナメントでは同時に動くタイマーは1つだけなので、統一タイマー設計が望ましい。
+
+```typescript
+// 推奨される設計（将来のリファクタリング）
+{
+  timer: {
+    remainingTime: number,  // 現在動作中のタイマー（レベルまたは休憩）
+  },
+  isOnBreak: boolean,  // これで何のタイマーかを判断
+  // breakRemainingTime は削除
+}
+```
+
+### 今回の修正方針（暫定対応）
+
+影響範囲を最小限にするため、現在の設計のまま動作するよう修正します。設計のリファクタリングは別タスクとして計画します。
+
+**問題1の修正** (TournamentContext.tsx - 実装を修正):
 
 ```typescript
 case 'START': {
@@ -192,7 +232,7 @@ case 'START': {
 }
 ```
 
-**問題2の修正** (テストファイル):
+**問題2の修正** (テストファイル - テストを修正):
 
 ```typescript
 it('should tick during break', () => {
@@ -270,6 +310,24 @@ it('should tick during break', () => {
 
 ## まとめ
 
-失敗しているテストの多くは**テスト環境のモック不足**または**テストと実装の不一致**が原因です。実際のアプリケーション機能自体は正常に動作している可能性が高いですが、TournamentContextについては実装の修正が必要な可能性があります。
+失敗しているテストの多くは**テスト環境のモック不足**または**テストと実装の不一致**が原因です。
 
-修正作業を行う際は、まずTournamentContextの動作を確認し、テストと実装のどちらを修正すべきかを判断することを推奨します。
+### 修正対象の整理
+
+| 問題                     | 直すべき対象 | 理由                                 |
+| ------------------------ | ------------ | ------------------------------------ |
+| AudioService モック不足  | テスト       | 実装は正常動作、モックが不完全       |
+| ImportExport File.text() | テスト       | JSDOM環境の制約、実ブラウザでは動作  |
+| TournamentContext START  | **実装**     | 仕様・実務観点から休憩中は無視すべき |
+| TournamentContext TICK   | テスト       | セットアップが実装の前提と不一致     |
+| useStructures 状態干渉   | テスト       | テスト分離の改善                     |
+| MainLayout 状態干渉      | テスト       | テスト分離の改善                     |
+
+### 別途リファクタリング計画
+
+TournamentContextの状態設計に課題があります（`timer.remainingTime`と`breakRemainingTime`の二重管理）。今回は暫定対応として現設計のまま修正し、以下を別タスクとして計画します：
+
+- **タスク**: タイマー状態の統一設計へのリファクタリング
+- **目的**: `breakRemainingTime`を削除し、`timer.remainingTime`に統一
+- **影響範囲**: TournamentContext、関連コンポーネント、テスト全般
+- **優先度**: 中（機能は動作するが、保守性に影響）
