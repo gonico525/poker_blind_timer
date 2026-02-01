@@ -83,7 +83,6 @@ export function useTimer() {
     elapsedTime: state.timer.elapsedTime,
     currentLevel: state.currentLevel,
     isOnBreak: state.isOnBreak,
-    breakRemainingTime: state.breakRemainingTime,
     levelsUntilBreak: getLevelsUntilBreak(
       state.currentLevel,
       state.breakConfig

@@ -51,7 +51,6 @@ export function tournamentReducer(
           return {
             ...state,
             isOnBreak: false,
-            breakRemainingTime: 0,
             timer: {
               status: 'running',
               remainingTime: state.levelDuration,
@@ -62,7 +61,6 @@ export function tournamentReducer(
 
         return {
           ...state,
-          breakRemainingTime: newRemainingTime,
           timer: {
             ...state.timer,
             remainingTime: newRemainingTime,
@@ -103,7 +101,6 @@ export function tournamentReducer(
             ...state,
             currentLevel: newLevel,
             isOnBreak: true,
-            breakRemainingTime: state.breakConfig.duration,
             timer: {
               status: 'running',
               remainingTime: state.breakConfig.duration,
@@ -155,7 +152,6 @@ export function tournamentReducer(
           ...state,
           currentLevel: newLevel,
           isOnBreak: true,
-          breakRemainingTime: state.breakConfig.duration,
           timer: {
             status: 'idle',
             remainingTime: state.breakConfig.duration,
@@ -228,7 +224,6 @@ export function tournamentReducer(
           elapsedTime: 0,
         },
         isOnBreak: false,
-        breakRemainingTime: 0,
       };
     }
 
@@ -278,7 +273,6 @@ export function tournamentReducer(
       return {
         ...state,
         isOnBreak: true,
-        breakRemainingTime: state.breakConfig.duration,
         timer: {
           status: 'idle',
           remainingTime: state.breakConfig.duration,
@@ -291,7 +285,6 @@ export function tournamentReducer(
       return {
         ...state,
         isOnBreak: false,
-        breakRemainingTime: 0,
       };
     }
 
@@ -305,7 +298,6 @@ export function tournamentReducer(
       return {
         ...state,
         isOnBreak: false,
-        breakRemainingTime: 0,
         timer: {
           status: 'idle',
           remainingTime: state.levelDuration,
@@ -351,7 +343,6 @@ export function TournamentProvider({
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
       levelDuration: 600,
       isOnBreak: false,
-      breakRemainingTime: 0,
     }
   );
 

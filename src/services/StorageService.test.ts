@@ -97,7 +97,6 @@ describe('StorageService', () => {
         breakConfig: { enabled: false, frequency: 4, duration: 600 },
         levelDuration: 600,
         isOnBreak: false,
-        breakRemainingTime: 0,
       };
       StorageService.saveTournamentState(state);
       expect(StorageService.loadTournamentState()).toEqual(state);
@@ -115,7 +114,6 @@ describe('StorageService', () => {
         breakConfig: { enabled: false, frequency: 4, duration: 600 },
         levelDuration: 600,
         isOnBreak: false,
-        breakRemainingTime: 0,
       };
       StorageService.saveTournamentState(state);
       StorageService.removeTournamentState();

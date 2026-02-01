@@ -16,7 +16,6 @@ describe('tournamentReducer', () => {
     breakConfig: { enabled: false, frequency: 4, duration: 600 },
     levelDuration: 600,
     isOnBreak: false,
-    breakRemainingTime: 0,
   };
 
   describe('START action', () => {
@@ -99,14 +98,12 @@ describe('tournamentReducer', () => {
         ...initialState,
         timer: {
           status: 'running' as const,
-          remainingTime: 300, // breakRemainingTimeと同じ値に設定
+          remainingTime: 300,
           elapsedTime: 0,
         },
         isOnBreak: true,
-        breakRemainingTime: 300,
       };
       const state = tournamentReducer(breakState, { type: 'TICK' });
-      expect(state.breakRemainingTime).toBe(299);
       expect(state.timer.remainingTime).toBe(299);
     });
   });
@@ -137,7 +134,7 @@ describe('tournamentReducer', () => {
       };
       const state = tournamentReducer(stateWithBreak, { type: 'NEXT_LEVEL' });
       expect(state.isOnBreak).toBe(true);
-      expect(state.breakRemainingTime).toBe(600);
+      expect(state.timer.remainingTime).toBe(600);
       expect(state.currentLevel).toBe(3);
     });
   });
@@ -178,7 +175,6 @@ describe('tournamentReducer', () => {
       const breakState = {
         ...initialState,
         isOnBreak: true,
-        breakRemainingTime: 300,
       };
       const state = tournamentReducer(breakState, { type: 'RESET' });
       expect(state).toBe(breakState);
@@ -288,7 +284,7 @@ describe('tournamentReducer', () => {
     it('should start break', () => {
       const state = tournamentReducer(initialState, { type: 'START_BREAK' });
       expect(state.isOnBreak).toBe(true);
-      expect(state.breakRemainingTime).toBe(initialState.breakConfig.duration);
+      expect(state.timer.remainingTime).toBe(initialState.breakConfig.duration);
       expect(state.timer.status).toBe('idle');
     });
 
@@ -296,29 +292,25 @@ describe('tournamentReducer', () => {
       const onBreakState = {
         ...initialState,
         isOnBreak: true,
-        breakRemainingTime: 100,
       };
       const state = tournamentReducer(onBreakState, { type: 'END_BREAK' });
       expect(state.isOnBreak).toBe(false);
-      expect(state.breakRemainingTime).toBe(0);
     });
 
     it('should skip break', () => {
       const onBreakState = {
         ...initialState,
         isOnBreak: true,
-        breakRemainingTime: 300,
       };
       const state = tournamentReducer(onBreakState, { type: 'SKIP_BREAK' });
       expect(state.isOnBreak).toBe(false);
-      expect(state.breakRemainingTime).toBe(0);
+      expect(state.timer.remainingTime).toBe(initialState.levelDuration);
     });
 
     it('should start break timer', () => {
       const onBreakState = {
         ...initialState,
         isOnBreak: true,
-        breakRemainingTime: 300,
       };
       const state = tournamentReducer(onBreakState, {
         type: 'START_BREAK_TIMER',
