@@ -561,7 +561,6 @@ function TournamentProvider({ children }: { children: React.ReactNode }) {
       breakConfig: defaultPreset?.breakConfig ?? DEFAULT_BREAK_CONFIG,
       levelDuration: defaultPreset?.levelDuration ?? DEFAULTS.LEVEL_DURATION,
       isOnBreak: false,
-      breakRemainingTime: 0,
     };
   });
 
@@ -680,7 +679,7 @@ if (confirmed) {
 ┌─────────┐  ┌──────────────────────────────────┐            │
 │次レベル │  │           休憩開始                │            │
 │ 準備    │  │  (isOnBreak: true)               │            │
-│         │  │  (breakRemainingTime: duration)  │            │
+│         │  │  (timer.remainingTime: duration) │            │
 │ idle状態│  │  (timer.status: idle)            │            │
 │ で待機  │  └──────────────────────────────────┘            │
 └─────────┘               │                                   │

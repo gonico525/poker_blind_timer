@@ -75,7 +75,6 @@ export interface TournamentState {
   breakConfig: BreakConfig;
   levelDuration: number;
   isOnBreak: boolean;
-  breakRemainingTime: number;
 }
 
 /**
