@@ -2,29 +2,15 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-2);
 }
 
 .dropdown {
   min-width: 200px;
 }
 
-.currentStructureName {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px;
-}
-
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
   .dropdown {
     min-width: 150px;
-  }
-
-  .currentStructureName {
-    display: none;
   }
 }

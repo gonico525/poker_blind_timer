@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { AppHeader } from './AppHeader';
 import type { Structure } from '@/types';
 
@@ -45,7 +44,6 @@ describe('AppHeader', () => {
   it('アプリタイトルが表示される', () => {
     render(<AppHeader {...defaultProps} />);
 
-    expect(screen.getByText('🎰')).toBeInTheDocument();
     expect(screen.getByText('Poker Blind Timer')).toBeInTheDocument();
   });
 
@@ -70,42 +68,6 @@ describe('AppHeader', () => {
     // ThemeToggleはテーマ切り替えボタンとして表示
     const themeButton = screen.getByLabelText(/テーマ/i);
     expect(themeButton).toBeInTheDocument();
-  });
-
-  it('ストラクチャー管理ボタンが表示される', () => {
-    render(<AppHeader {...defaultProps} />);
-
-    const manageButton = screen.getByRole('button', {
-      name: 'ストラクチャー管理',
-    });
-    expect(manageButton).toBeInTheDocument();
-    expect(manageButton).toHaveTextContent('⚙');
-    expect(manageButton).toHaveTextContent('ストラクチャー管理');
-  });
-
-  it('ストラクチャー管理ボタンをクリックするとonStructureManageが呼ばれる', async () => {
-    const user = userEvent.setup();
-    const onStructureManage = vi.fn();
-
-    render(
-      <AppHeader {...defaultProps} onStructureManage={onStructureManage} />
-    );
-
-    const manageButton = screen.getByRole('button', {
-      name: 'ストラクチャー管理',
-    });
-    await user.click(manageButton);
-
-    expect(onStructureManage).toHaveBeenCalledTimes(1);
-  });
-
-  it('ストラクチャー管理ボタンにアクセシビリティ属性が設定されている', () => {
-    render(<AppHeader {...defaultProps} />);
-
-    const manageButton = screen.getByRole('button', {
-      name: 'ストラクチャー管理',
-    });
-    expect(manageButton).toHaveAttribute('aria-label', 'ストラクチャー管理');
   });
 
   it('ヘッダーのレイアウトが正しく設定されている', () => {

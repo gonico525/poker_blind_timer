@@ -51,7 +51,6 @@ export function StructureSelector({
     }
   };
 
-  const currentStructure = structures.find((s) => s.id === currentStructureId);
   const currentValue = currentStructureId ?? '';
 
   return (
@@ -64,11 +63,6 @@ export function StructureSelector({
         aria-label="ストラクチャー選択"
         className={styles.dropdown}
       />
-      {currentStructure && (
-        <span className={styles.currentStructureName}>
-          {currentStructure.name}
-        </span>
-      )}
     </div>
   );
 }

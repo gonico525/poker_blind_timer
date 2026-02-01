@@ -28,25 +28,10 @@
   transform: scale(0.98);
 }
 
-.icon {
-  font-size: var(--font-size-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.label {
-  user-select: none;
-}
-
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
   .toggle {
     padding: var(--spacing-2) var(--spacing-3);
     font-size: var(--font-size-sm);
-  }
-
-  .icon {
-    font-size: var(--font-size-base);
   }
 }
