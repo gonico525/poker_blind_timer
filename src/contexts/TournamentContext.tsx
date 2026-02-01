@@ -13,8 +13,8 @@ export function tournamentReducer(
 ): TournamentState {
   switch (action.type) {
     case 'START': {
-      // 既に実行中は開始しない
-      if (state.timer.status === 'running') {
+      // 既に実行中、または休憩中は開始しない
+      if (state.timer.status === 'running' || state.isOnBreak) {
         return state;
       }
       return {

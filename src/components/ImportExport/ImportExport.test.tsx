@@ -48,6 +48,20 @@ describe('ImportExport', () => {
     global.URL.createObjectURL = createObjectURLMock;
     global.URL.revokeObjectURL = revokeObjectURLMock;
     createObjectURLMock.mockReturnValue('blob:mock-url');
+
+    // File.prototype.textをモック（JSDOM環境では正しく動作しないため）
+    // spyOnではなく直接プロパティを設定する
+    Object.defineProperty(File.prototype, 'text', {
+      configurable: true,
+      writable: true,
+      value: function (this: File): Promise<string> {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsText(this);
+        });
+      },
+    });
   });
 
   afterEach(() => {

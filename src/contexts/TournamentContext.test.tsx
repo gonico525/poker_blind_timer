@@ -99,14 +99,15 @@ describe('tournamentReducer', () => {
         ...initialState,
         timer: {
           status: 'running' as const,
-          remainingTime: 0,
-          elapsedTime: 600,
+          remainingTime: 300, // breakRemainingTimeと同じ値に設定
+          elapsedTime: 0,
         },
         isOnBreak: true,
         breakRemainingTime: 300,
       };
       const state = tournamentReducer(breakState, { type: 'TICK' });
       expect(state.breakRemainingTime).toBe(299);
+      expect(state.timer.remainingTime).toBe(299);
     });
   });
 

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import MainLayout from './MainLayout';
 
@@ -53,19 +53,40 @@ vi.mock('@/contexts/SettingsContext', () => ({
   })),
 }));
 
-// StructureManagementModalをモック
+// コンポーネントをモック
 vi.mock('@/components', async () => {
   const actual = await vi.importActual('@/components');
   return {
     ...actual,
     StructureManagementModal: ({ isOpen }: { isOpen: boolean }) =>
       isOpen ? <div data-testid="structure-management-modal">Modal</div> : null,
+    AppHeader: ({
+      onStructureManage,
+    }: {
+      onStructureManage: () => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [key: string]: any;
+    }) => (
+      <header data-testid="app-header">
+        <h1>Poker Blind Timer</h1>
+        <button
+          data-testid="structure-manage-button"
+          onClick={onStructureManage}
+        >
+          ストラクチャー管理
+        </button>
+      </header>
+    ),
   };
 });
 
 describe('MainLayout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it('メインレイアウトが正しくレンダリングされる', () => {
@@ -93,13 +114,16 @@ describe('MainLayout', () => {
     const user = userEvent.setup();
     render(<MainLayout />);
 
-    const manageButton = screen.getByRole('button', {
-      name: 'ストラクチャー管理',
-    });
+    // モックされたAppHeaderのボタンをクリック
+    const manageButton = screen.getByTestId('structure-manage-button');
     await user.click(manageButton);
 
     // StructureManagementModalが開くことを確認
-    // (モーダルのテストはStructureManagementModal.test.tsxで行う)
+    await waitFor(() => {
+      expect(
+        screen.getByTestId('structure-management-modal')
+      ).toBeInTheDocument();
+    });
   });
 
   it('useAudioNotificationフックが呼ばれる', async () => {
