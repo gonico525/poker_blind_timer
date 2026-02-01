@@ -14,7 +14,7 @@
 | Step 2 | Reducerの変更 | 完了 |
 | Step 3 | Hookの変更 | 完了 |
 | Step 4 | 仕様書の変更 | 完了 |
-| Step 5 | テストの変更 | 未実施 |
+| Step 5 | テストの変更 | 完了 |
 
 ---
 
@@ -87,16 +87,71 @@
 
 ---
 
-## Step 5: テストの変更（未実施）
+## Step 5: テストの変更
 
-以下が対応予定のファイルと変更の種類である。
+5ファイルを変更した。変更は「状態オブジェクトから削除」と「アサーションの移行」の2種類に分類される。
 
-| ファイル | 変更の種類 |
-|----------|-----------|
-| `src/contexts/TournamentContext.test.tsx` | 初期状態・テスト用オブジェクトから削除、アサーションを`timer.remainingTime`へ移行 |
-| `src/hooks/useTimer.test.ts` | 初期状態・テスト用オブジェクトから削除、アサーションを`remainingTime`へ移行 |
-| `src/hooks/useAudioNotification.test.tsx` | モック状態オブジェクトから削除（アサーション対象ではなかった） |
-| `src/hooks/useKeyboardShortcuts.test.tsx` | モック状態オブジェクトから削除 |
-| `src/services/StorageService.test.ts` | 状態オブジェクトから削除 |
+### 5-A. `src/contexts/TournamentContext.test.tsx`
 
-各ファイルの詳細は計画書の§4（Step 5）を参照のこと。
+**削除箇所（7件）**
+
+- `initialState`の定義から`breakRemainingTime: 0`を削除
+- 「should tick during break」のセットアップから`breakRemainingTime: 300`と冗長なコメントを削除
+- 「should not reset during break」のセットアップから`breakRemainingTime: 300`を削除
+- 「should end break」のセットアップから`breakRemainingTime: 100`を削除
+- 「should skip break」のセットアップから`breakRemainingTime: 300`を削除
+- 「should start break timer」のセットアップから`breakRemainingTime: 300`を削除
+
+**アサーション移行（4件）**
+
+| テスト | 変更前 | 変更後 |
+|--------|--------|--------|
+| should tick during break | `state.breakRemainingTime` を299で検証（`state.timer.remainingTime`の検証と重複） | `state.breakRemainingTime`側を削除（`state.timer.remainingTime`で検証済み） |
+| should trigger break when conditions are met | `state.breakRemainingTime` を600で検証 | `state.timer.remainingTime` を600で検証 |
+| should start break | `state.breakRemainingTime` を`breakConfig.duration`で検証 | `state.timer.remainingTime` を`breakConfig.duration`で検証 |
+| should end break | `state.breakRemainingTime` を0で検証 | 削除（`isOnBreak: false`で休憩終了を検証済み） |
+| should skip break | `state.breakRemainingTime` を0で検証 | `state.timer.remainingTime` を`levelDuration`で検証（タイマーが次レベルにリセットされたことを確認） |
+
+### 5-B. `src/hooks/useTimer.test.ts`
+
+**削除箇所（3件）**
+
+- `createWrapper`の`defaultState`から`breakRemainingTime: 0`を削除
+- 「should skip break when skipBreak is called」のinitialStateから`breakRemainingTime: 300`を削除
+- 「should start break timer when START_BREAK_TIMER is dispatched」のinitialStateから`breakRemainingTime: 300`を削除
+
+**アサーション移行（2件）**
+
+| テスト | 変更前 | 変更後 |
+|--------|--------|--------|
+| should enter break mode at break frequency | `result.current.breakRemainingTime` を300で検証 | `result.current.remainingTime` を300で検証 |
+| should skip break when skipBreak is called | `result.current.breakRemainingTime` を0で検証 | `result.current.remainingTime` を600で検証（levelDurationにリセットされたことを確認） |
+
+### 5-C. `src/hooks/useAudioNotification.test.tsx`
+
+`useAudioNotification`実装側は`breakRemainingTime`を参照していないため、モック値の削除のみで動作には影響しない。
+
+**削除箇所（5件）**
+
+- `beforeEach`の初期モック状態から`breakRemainingTime: 0`を削除
+- 「should play break start sound when entering break」から`mockTournamentState.breakRemainingTime = 300`を削除
+- 「should not play when exiting break」の休憩中セットアップと休憩終了時の変更行（計2行）を削除
+- 「should not play break start when sound is disabled」から`mockTournamentState.breakRemainingTime = 300`を削除
+
+### 5-D. `src/hooks/useKeyboardShortcuts.test.tsx`
+
+モック状態オブジェクトから`breakRemainingTime: 0`を削除（1件）。実装側も参照していないため削除のみで十分。
+
+### 5-E. `src/services/StorageService.test.ts`
+
+`TournamentState`オブジェクトを直接構築している2箇所で`breakRemainingTime: 0`を削除した。
+- 「should save and load tournament state」
+- 「should remove tournament state」
+
+---
+
+## 検証結果（全ステップ完了後）
+
+- **TypeScriptコンパイル**: `tsc --noEmit`で型エラー0件
+- **テスト**: 42テストファイル・489件全件合格
+- **`breakRemainingTime`の残存**: `src/`内で0件（実装・テスト双方とも無残存）

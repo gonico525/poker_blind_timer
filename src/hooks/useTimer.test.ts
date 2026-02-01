@@ -20,7 +20,6 @@ const createWrapper =
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
       levelDuration: 600,
       isOnBreak: false,
-      breakRemainingTime: 0,
     };
 
     return React.createElement(TournamentProvider, {
@@ -288,7 +287,7 @@ describe('useTimer', () => {
       });
 
       expect(result.current.isOnBreak).toBe(true);
-      expect(result.current.breakRemainingTime).toBe(300);
+      expect(result.current.remainingTime).toBe(300);
     });
 
     it('should skip break when skipBreak is called', () => {
@@ -297,7 +296,6 @@ describe('useTimer', () => {
           breakConfig: { enabled: true, frequency: 2, duration: 300 },
           currentLevel: 2,
           isOnBreak: true,
-          breakRemainingTime: 300,
         }),
       });
 
@@ -306,7 +304,7 @@ describe('useTimer', () => {
       });
 
       expect(result.current.isOnBreak).toBe(false);
-      expect(result.current.breakRemainingTime).toBe(0);
+      expect(result.current.remainingTime).toBe(600);
     });
 
     it('should return levelsUntilBreak', () => {
@@ -333,7 +331,6 @@ describe('useTimer', () => {
       const { result } = renderHook(() => useTimer(), {
         wrapper: createWrapper({
           isOnBreak: true,
-          breakRemainingTime: 300,
         }),
       });
 

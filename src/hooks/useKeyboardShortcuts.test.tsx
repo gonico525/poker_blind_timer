@@ -32,7 +32,6 @@ describe('useKeyboardShortcuts', () => {
       breakConfig: { enabled: true, frequency: 4, duration: 300 },
       levelDuration: 600,
       isOnBreak: false,
-      breakRemainingTime: 0,
     };
 
     mockDispatch = vi.fn();

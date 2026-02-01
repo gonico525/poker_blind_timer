@@ -33,7 +33,6 @@ describe('useAudioNotification', () => {
       breakConfig: { enabled: true, frequency: 4, duration: 300 },
       levelDuration: 600,
       isOnBreak: false,
-      breakRemainingTime: 0,
     };
 
     mockSettingsState = {
@@ -143,7 +142,6 @@ describe('useAudioNotification', () => {
 
       // 休憩開始
       mockTournamentState.isOnBreak = true;
-      mockTournamentState.breakRemainingTime = 300;
 
       rerender();
 
@@ -153,13 +151,11 @@ describe('useAudioNotification', () => {
     it('should not play when exiting break', () => {
       // 休憩中の状態で開始
       mockTournamentState.isOnBreak = true;
-      mockTournamentState.breakRemainingTime = 300;
 
       const { rerender } = renderHook(() => useAudioNotification());
 
       // 休憩終了
       mockTournamentState.isOnBreak = false;
-      mockTournamentState.breakRemainingTime = 0;
 
       rerender();
 
@@ -174,7 +170,6 @@ describe('useAudioNotification', () => {
 
       // 休憩開始
       mockTournamentState.isOnBreak = true;
-      mockTournamentState.breakRemainingTime = 300;
 
       rerender();
 
