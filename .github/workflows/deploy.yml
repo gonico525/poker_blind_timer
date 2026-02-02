@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [claude/poker-blind-timer-BL5Jf]
+    branches: [main]
   workflow_dispatch:  # 手動実行を許可
 
 permissions:
