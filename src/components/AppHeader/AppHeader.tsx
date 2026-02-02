@@ -3,6 +3,7 @@ import { VolumeControl } from '@/components/VolumeControl';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import type { Structure, StructureId, Theme } from '@/types';
 import styles from './AppHeader.module.css';
+import logo from '@/assets/logo.png';
 
 export interface AppHeaderProps {
   // StructureSelector関連
@@ -53,6 +54,7 @@ export function AppHeader({
   return (
     <header className={styles.header} data-testid="app-header">
       <div className={styles.left}>
+        <img src={logo} alt="Logo" className={styles.logo} />
         <h1 className={styles.title}>Poker Blind Timer</h1>
       </div>
 
