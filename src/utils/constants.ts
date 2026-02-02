@@ -31,7 +31,7 @@ export const DEFAULTS = {
 
 // 音声ファイルパス
 export const AUDIO_FILES = {
-  LEVEL_CHANGE: '/sounds/level-change.mp3',
-  WARNING_1MIN: '/sounds/warning-1min.mp3',
-  BREAK_START: '/sounds/break-start.mp3',
+  LEVEL_CHANGE: `${import.meta.env.BASE_URL}sounds/level-change.mp3`,
+  WARNING_1MIN: `${import.meta.env.BASE_URL}sounds/warning-1min.mp3`,
+  BREAK_START: `${import.meta.env.BASE_URL}sounds/break-start.mp3`,
 } as const;
