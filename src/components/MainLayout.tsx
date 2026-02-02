@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   useAudioNotification,
   useKeyboardShortcuts,
@@ -25,6 +25,15 @@ function MainLayout() {
   const timer = useTimer();
   const { structures, loadStructure, currentStructureId } = useStructures();
   const { state: settingsState, dispatch: settingsDispatch } = useSettings();
+
+  // 初期ストラクチャーの読み込み
+  const hasLoadedInitial = useRef(false);
+  useEffect(() => {
+    if (!hasLoadedInitial.current && currentStructureId) {
+      hasLoadedInitial.current = true;
+      loadStructure(currentStructureId);
+    }
+  }, [currentStructureId, loadStructure]);
 
   // UI状態
   const [showStructureManagement, setShowStructureManagement] = useState(false);
