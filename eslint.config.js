@@ -21,16 +21,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
-        {
-          allowConstantExport: true,
-          allowExportNames: [
-            'useNotification',
-            'useSettings',
-            'useTournament',
-            'settingsReducer',
-            'tournamentReducer',
-          ],
-        },
+        { allowConstantExport: true },
       ],
       '@typescript-eslint/no-unused-vars': [
         'error',
