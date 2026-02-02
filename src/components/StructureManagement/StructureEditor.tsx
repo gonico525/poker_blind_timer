@@ -99,7 +99,7 @@ export function StructureEditor({
   const handleBreakDurationChange = (minutes: number) => {
     setEditedStructure({
       ...editedStructure,
-      breakConfig: { ...editedStructure.breakConfig, duration: minutes },
+      breakConfig: { ...editedStructure.breakConfig, duration: minutes * 60 },
     });
   };
 
@@ -217,7 +217,7 @@ export function StructureEditor({
 
                 <NumberInput
                   label="休憩時間"
-                  value={editedStructure.breakConfig.duration}
+                  value={editedStructure.breakConfig.duration / 60}
                   min={1}
                   max={30}
                   onChange={handleBreakDurationChange}

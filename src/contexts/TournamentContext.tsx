@@ -13,8 +13,8 @@ export function tournamentReducer(
 ): TournamentState {
   switch (action.type) {
     case 'START': {
-      // 既に実行中、または休憩中は開始しない
-      if (state.timer.status === 'running' || state.isOnBreak) {
+      // 既に実行中であれば開始しない
+      if (state.timer.status === 'running') {
         return state;
       }
       return {
@@ -195,16 +195,13 @@ export function tournamentReducer(
     }
 
     case 'RESET': {
-      // 休憩中はリセットしない
-      if (state.isOnBreak) {
-        return state;
-      }
-
       return {
         ...state,
         timer: {
           status: 'idle',
-          remainingTime: state.levelDuration,
+          remainingTime: state.isOnBreak
+            ? state.breakConfig.duration
+            : state.levelDuration,
           elapsedTime: 0,
         },
       };

@@ -33,13 +33,27 @@ describe('tournamentReducer', () => {
       expect(state).toBe(runningState);
     });
 
-    it('should not start during break', () => {
-      const breakState = {
+    it('should start during break when idle', () => {
+      const breakState: TournamentState = {
         ...initialState,
         isOnBreak: true,
+        timer: { status: 'idle', remainingTime: 600, elapsedTime: 0 },
       };
       const state = tournamentReducer(breakState, { type: 'START' });
-      expect(state).toBe(breakState);
+      expect(state.timer.status).toBe('running');
+      expect(state.isOnBreak).toBe(true);
+    });
+
+    it('should resume during break when paused', () => {
+      const pausedBreakState: TournamentState = {
+        ...initialState,
+        isOnBreak: true,
+        timer: { status: 'paused', remainingTime: 300, elapsedTime: 300 },
+      };
+      const state = tournamentReducer(pausedBreakState, { type: 'START' });
+      expect(state.timer.status).toBe('running');
+      expect(state.timer.remainingTime).toBe(300);
+      expect(state.isOnBreak).toBe(true);
     });
   });
 
@@ -171,13 +185,18 @@ describe('tournamentReducer', () => {
       expect(newState.timer.status).toBe('idle');
     });
 
-    it('should not reset during break', () => {
-      const breakState = {
+    it('should reset break timer during break', () => {
+      const breakState: TournamentState = {
         ...initialState,
         isOnBreak: true,
+        breakConfig: { enabled: true, frequency: 4, duration: 600 },
+        timer: { status: 'running', remainingTime: 200, elapsedTime: 400 },
       };
       const state = tournamentReducer(breakState, { type: 'RESET' });
-      expect(state).toBe(breakState);
+      expect(state.timer.status).toBe('idle');
+      expect(state.timer.remainingTime).toBe(600);
+      expect(state.timer.elapsedTime).toBe(0);
+      expect(state.isOnBreak).toBe(true);
     });
   });
 
