@@ -14,6 +14,14 @@
 
 現在の仕様では「PCブラウザのみ」「最小解像度1280x720px」と定義されており、モバイル対応は「優先度：低（将来的に検討）」とされています。PWA対応が完了した今、モバイルでの利用ニーズに応えるため本対応を計画します。
 
+### 1.3 実装方針
+
+**仕様書先行の開発プロセス:**
+
+1. **Phase 1 で仕様書を先に更新**し、モバイル対応の設計基準を確定する
+2. 更新された仕様書（requirements.md, 03-design-system.md）と本計画書を**正として**実装を進める
+3. 実装時に仕様との乖離が発生した場合は、仕様書を更新してから実装を継続する
+
 ---
 
 ## 2. 現状分析
@@ -95,16 +103,21 @@
 
 ### 3.1 基本方針
 
-1. **Mobile-First ではなく、既存PCデザインからの拡張**
+1. **仕様書先行**
+   - Phase 1 で仕様書（requirements.md, 03-design-system.md）を更新
+   - 更新された仕様書を正として実装を進行
+
+2. **Mobile-First ではなく、既存PCデザインからの拡張**
    - 既存の1280px+向けデザインを維持
    - 768px未満向けのスタイルを追加・強化
 
-2. **段階的対応**
-   - Phase 1: クリティカルなUIコンポーネントのモバイル対応
-   - Phase 2: タッチ操作の最適化
-   - Phase 3: UXの洗練
+3. **段階的対応**
+   - Phase 1: 仕様書更新
+   - Phase 2: コアUIのモバイル対応
+   - Phase 3: モーダル・設定画面対応
+   - Phase 4: タッチ操作最適化
 
-3. **既存コードへの影響最小化**
+4. **既存コードへの影響最小化**
    - 新しいメディアクエリの追加
    - 既存スタイルの上書きは最小限
 
@@ -133,22 +146,142 @@
 
 ## 4. 実装計画
 
-### Phase 1: コアUI対応（優先度: 高）
+### Phase 1: 仕様書更新（優先度: 最高）
 
-タイマー画面の基本的なモバイル対応を実現します。
+**実装に先立ち、仕様書を更新してモバイル対応の設計基準を確定します。**
 
-#### 4.1.1 AppHeader のモバイル対応
+#### 4.1.1 requirements.md の更新
 
-**現状の問題:**
-- 3カラムレイアウト（ロゴ・セレクタ・設定）が狭い画面で破綻
-- ストラクチャセレクタが操作しにくい
+**更新箇所:**
+
+1. **対応プラットフォームの変更**
+```diff
+- プラットフォーム: PCブラウザのみ (モバイルは対象外)
++ プラットフォーム: モダンブラウザ（PC、タブレット、スマートフォン）
+```
+
+2. **非機能要件のレスポンシブ対応セクション更新**
+```diff
+  3.1.3 レスポンシブデザイン
+- - PC画面サイズに最適化
++ - PC・タブレット・スマートフォンに対応
+  - フルスクリーン表示対応
+- - 最小解像度: 1280x720px
++ - 最小画面幅: 320px（スマートフォン）
++ - 推奨解像度: 1280x720px以上（PC）
+```
+
+3. **将来拡張からモバイル対応を削除**
+```diff
+  8.2 優先度：低（将来的に検討）
+- - モバイル対応
+  - マルチデバイス同期
+```
+
+**ファイル:** `docs/urs/requirements.md`
+
+#### 4.1.2 03-design-system.md の更新
+
+**追加・更新内容:**
+
+1. **解像度サポートの更新**
+```diff
+  ### 解像度サポート
+- - 最小解像度: 1280x720px (HD)
++ - 最小画面幅: 320px（スマートフォン）
++ - 最小解像度（PC）: 1280x720px (HD)
+  - 推奨解像度: 1920x1080px (Full HD)
+  - 大画面対応: 2560x1440px以上
+```
+
+2. **モバイル向けブレークポイントの明示**
+
+| ブレークポイント | 対象デバイス | 用途 |
+|-----------------|-------------|------|
+| 320px〜374px | 小型スマートフォン | 最小サポート |
+| 375px〜639px | 標準スマートフォン | モバイル基準 |
+| 640px〜767px | タブレット縦 | タブレット対応 |
+| 768px〜1023px | タブレット横 | タブレット対応 |
+| 1024px〜1279px | ノートPC | PC対応 |
+| 1280px〜1919px | デスクトップ | PC基準 |
+| 1920px+ | 大型ディスプレイ | 拡張対応 |
+
+3. **タッチ操作ガイドラインの追加**
+
+```markdown
+### タッチ操作ガイドライン
+
+#### タップターゲットサイズ
+- 最小サイズ: 44×44px（WCAG 2.1準拠）
+- 推奨サイズ: 48×48px
+- ターゲット間の間隔: 8px以上
+
+#### タッチフィードバック
+- ホバー効果: タッチデバイスでは無効化（@media (hover: none)）
+- アクティブ状態: タップ時にスケール縮小（0.98）と透明度変化
+
+#### 入力フィールド
+- フォントサイズ: 16px以上（iOSズーム防止）
+- 高さ: 44px以上
+```
+
+4. **モバイル向けフォントサイズの追加**
+
+| 要素 | PC (1280px+) | タブレット (768px-1279px) | スマホ (< 640px) |
+|------|-------------|-------------------------|-----------------|
+| タイマー | 120px | 96px | clamp(48px, 15vw, 72px) |
+| ブラインド | 48px | 36px | 24px |
+| レベル番号 | 36px | 28px | 20px |
+| 本文 | 16px | 16px | 14px |
+
+5. **モバイルレイアウトパターンの追加**
+
+```markdown
+### モバイルレイアウトパターン
+
+#### ヘッダー（< 640px）
+- 2行レイアウト: 上段にロゴ＋設定、下段にストラクチャセレクタ
+- タイトルテキストは非表示（ロゴのみ）
+
+#### モーダル（< 640px）
+- フルスクリーン表示
+- border-radius: 0
+- 閉じるボタン: 44×44px
+
+#### 2カラムレイアウト（< 640px）
+- 1カラムに変更（縦積み）
+- サイドバー: 上部に配置、高さ40vh
+- コンテンツ: 下部に配置、高さ60vh
+```
+
+**ファイル:** `docs/specs/03-design-system.md`
+
+#### 4.1.3 Phase 1 完了条件
+
+- [ ] requirements.md のプラットフォーム定義更新
+- [ ] requirements.md のレスポンシブ要件更新
+- [ ] 03-design-system.md の解像度サポート更新
+- [ ] 03-design-system.md にタッチ操作ガイドライン追加
+- [ ] 03-design-system.md にモバイルフォントサイズ追加
+- [ ] 03-design-system.md にモバイルレイアウトパターン追加
+- [ ] レビュー完了
+
+---
+
+### Phase 2: コアUI対応（優先度: 高）
+
+**Phase 1 で更新された仕様書を正として、タイマー画面の基本的なモバイル対応を実装します。**
+
+#### 4.2.1 AppHeader のモバイル対応
+
+**仕様書参照:** 03-design-system.md「モバイルレイアウトパターン > ヘッダー」
 
 **対応内容:**
 ```css
 @media (max-width: 639px) {
   .header {
     flex-wrap: wrap;
-    /* または2行レイアウト */
+    /* 2行レイアウト */
   }
   .title { display: none; } /* ロゴのみ表示 */
   .center { width: 100%; order: 2; }
@@ -157,10 +290,9 @@
 
 **ファイル:** `src/components/AppHeader/AppHeader.module.css`
 
-#### 4.1.2 TimerDisplay のモバイル最適化
+#### 4.2.2 TimerDisplay のモバイル最適化
 
-**現状の問題:**
-- 72px（768px未満）は375pxスマホでは適切だが、320pxでは大きすぎる
+**仕様書参照:** 03-design-system.md「モバイル向けフォントサイズ > タイマー」
 
 **対応内容:**
 ```css
@@ -179,10 +311,9 @@
 
 **ファイル:** `src/components/TimerDisplay/TimerDisplay.module.css`
 
-#### 4.1.3 BlindInfo のモバイル最適化
+#### 4.2.3 BlindInfo のモバイル最適化
 
-**現状の問題:**
-- SB/BB/Ante が横並びで読みにくい
+**仕様書参照:** 03-design-system.md「モバイル向けフォントサイズ > ブラインド」
 
 **対応内容:**
 ```css
@@ -201,17 +332,15 @@
 
 **ファイル:** `src/components/BlindInfo/BlindInfo.module.css`
 
-#### 4.1.4 TimerControls のモバイル最適化
+#### 4.2.4 TimerControls のモバイル最適化
 
-**現状の問題:**
-- ボタンのタッチターゲットが小さい
-- 縦並びになるが間隔が狭い
+**仕様書参照:** 03-design-system.md「タッチ操作ガイドライン > タップターゲットサイズ」
 
 **対応内容:**
 ```css
 @media (max-width: 639px) {
   .button {
-    min-height: 48px; /* タッチターゲット拡大 */
+    min-height: 48px; /* 推奨タッチターゲット */
     font-size: var(--font-size-base);
     padding: var(--spacing-3) var(--spacing-4);
   }
@@ -223,10 +352,7 @@
 
 **ファイル:** `src/components/TimerControls/TimerControls.module.css`
 
-#### 4.1.5 NextLevelInfo のモバイル対応
-
-**現状の問題:**
-- 情報量が多く横幅に収まらない
+#### 4.2.5 NextLevelInfo のモバイル対応
 
 **対応内容:**
 ```css
@@ -242,15 +368,39 @@
 
 **ファイル:** `src/components/NextLevelInfo/NextLevelInfo.module.css`
 
+#### 4.2.6 BreakDisplay のモバイル対応
+
+**対応内容:**
+```css
+@media (max-width: 639px) {
+  .breakTitle {
+    font-size: var(--font-size-h2);
+  }
+}
+```
+
+**ファイル:** `src/components/BreakDisplay/BreakDisplay.module.css`
+
+#### 4.2.7 Phase 2 完了条件
+
+- [ ] AppHeader.module.css のモバイル対応
+- [ ] TimerDisplay.module.css のモバイル対応
+- [ ] BlindInfo.module.css のモバイル対応
+- [ ] TimerControls.module.css のモバイル対応
+- [ ] NextLevelInfo.module.css のモバイル対応
+- [ ] BreakDisplay.module.css のモバイル対応
+- [ ] タイマー画面がスマホで正常表示されることを確認
+- [ ] 既存PC表示に影響がないことを確認
+
 ---
 
-### Phase 2: モーダル・設定画面対応（優先度: 中）
+### Phase 3: モーダル・設定画面対応（優先度: 中）
 
-#### 4.2.1 Modal のモバイル対応
+**Phase 1 で更新された仕様書を正として、モーダルと設定画面のモバイル対応を実装します。**
 
-**現状の問題:**
-- width: 95%（768px未満）は適切だが、高さが画面をはみ出す場合あり
-- 閉じるボタンが小さい
+#### 4.3.1 Modal のモバイル対応
+
+**仕様書参照:** 03-design-system.md「モバイルレイアウトパターン > モーダル」
 
 **対応内容:**
 ```css
@@ -270,11 +420,9 @@
 
 **ファイル:** `src/components/common/Modal/Modal.module.css`
 
-#### 4.2.2 StructureManagementModal の対応
+#### 4.3.2 StructureManagementModal の対応
 
-**現状の問題:**
-- 2カラムレイアウトが破綻
-- サイドバーとコンテンツの切り替えが困難
+**仕様書参照:** 03-design-system.md「モバイルレイアウトパターン > 2カラムレイアウト」
 
 **対応内容:**
 ```css
@@ -295,19 +443,17 @@
 
 **ファイル:** `src/components/StructureManagement/StructureManagementModal.module.css`
 
-#### 4.2.3 BlindEditor のモバイル対応
-
-**現状の問題:**
-- テーブル形式が狭い画面で使いにくい
-- 入力フィールドが小さい
+#### 4.3.3 BlindEditor のモバイル対応
 
 **対応内容:**
-- カード形式への変更またはスクロール可能なテーブル
+- テーブルを横スクロール可能に
 - 入力フィールドのタッチターゲット拡大
 
 **ファイル:** `src/components/BlindEditor/BlindEditor.module.css`
 
-#### 4.2.4 NumberInput のタッチ対応
+#### 4.3.4 NumberInput のタッチ対応
+
+**仕様書参照:** 03-design-system.md「タッチ操作ガイドライン > 入力フィールド」
 
 **対応内容:**
 ```css
@@ -325,11 +471,36 @@
 
 **ファイル:** `src/components/common/NumberInput/NumberInput.module.css`
 
+#### 4.3.5 その他コンポーネント
+
+以下のコンポーネントも同様にモバイル対応を実施：
+
+- `StructureList.module.css` - リスト項目タッチ対応
+- `StructureEditor.module.css` - フォーム最適化
+- `Dropdown.module.css` - タッチ操作対応
+- `Toggle.module.css` - タッチターゲット拡大
+- `Slider.module.css` - スライダー操作改善
+- `VolumeControl.module.css` - タッチ操作対応
+
+#### 4.3.6 Phase 3 完了条件
+
+- [ ] Modal.module.css のモバイル対応
+- [ ] StructureManagementModal.module.css のモバイル対応
+- [ ] BlindEditor.module.css のモバイル対応
+- [ ] NumberInput.module.css のモバイル対応
+- [ ] その他コンポーネントのモバイル対応
+- [ ] すべてのモーダルがスマホで正常動作することを確認
+- [ ] 既存PC表示に影響がないことを確認
+
 ---
 
-### Phase 3: タッチ操作最適化（優先度: 中）
+### Phase 4: タッチ操作最適化（優先度: 中）
 
-#### 4.3.1 ホバー効果のタッチ対応
+**Phase 1 で更新された仕様書を正として、タッチ操作の最適化を実装します。**
+
+#### 4.4.1 ホバー効果のタッチ対応
+
+**仕様書参照:** 03-design-system.md「タッチ操作ガイドライン > タッチフィードバック」
 
 **対応内容:**
 ```css
@@ -353,9 +524,10 @@
 **対象ファイル:**
 - `src/components/TimerControls/TimerControls.module.css`
 - `src/components/common/Modal/Modal.module.css`
+- `src/components/common/Button/Button.module.css`
 - その他ボタンを含むコンポーネント
 
-#### 4.3.2 スクロール動作の最適化
+#### 4.4.2 スクロール動作の最適化
 
 **対応内容:**
 ```css
@@ -366,54 +538,45 @@
 }
 ```
 
----
+#### 4.4.3 Phase 4 完了条件
 
-### Phase 4: 仕様書更新（優先度: 低）
-
-#### 4.4.1 requirements.md の更新
-
-```diff
-- プラットフォーム: PCブラウザのみ (モバイルは対象外)
-+ プラットフォーム: モダンブラウザ（PC、タブレット、スマートフォン）
-```
-
-#### 4.4.2 03-design-system.md の更新
-
-- モバイル向けブレークポイントの追加
-- タッチ操作ガイドラインの追加
-- 最小解像度の見直し
+- [ ] すべてのボタンにタッチフィードバック追加
+- [ ] ホバー効果のタッチデバイス対応
+- [ ] スクロール動作の最適化
+- [ ] 実機テストでタッチ操作が快適であることを確認
 
 ---
 
 ## 5. 影響を受けるファイル一覧
 
-### CSSファイル（変更）
+### 仕様書（Phase 1）
+
+| ファイル | 変更内容 |
+|---------|---------|
+| `docs/urs/requirements.md` | プラットフォーム・レスポンシブ要件更新 |
+| `docs/specs/03-design-system.md` | モバイル対応セクション追加 |
+
+### CSSファイル（Phase 2〜4）
 
 | ファイル | Phase | 変更内容 |
 |---------|-------|---------|
-| `AppHeader.module.css` | 1 | モバイルレイアウト追加 |
-| `TimerDisplay.module.css` | 1 | フォントサイズ調整 |
-| `BlindInfo.module.css` | 1 | 縦並びレイアウト追加 |
-| `TimerControls.module.css` | 1 | タッチターゲット拡大 |
-| `NextLevelInfo.module.css` | 1 | コンパクトレイアウト |
-| `Modal.module.css` | 2 | フルスクリーンモーダル |
-| `StructureManagementModal.module.css` | 2 | 1カラムレイアウト |
-| `BlindEditor.module.css` | 2 | テーブル最適化 |
-| `NumberInput.module.css` | 2 | 入力フィールド拡大 |
-| `StructureList.module.css` | 2 | リスト項目タッチ対応 |
-| `StructureEditor.module.css` | 2 | フォーム最適化 |
-| `Dropdown.module.css` | 2 | タッチ操作対応 |
-| `Toggle.module.css` | 2 | タッチターゲット拡大 |
-| `Slider.module.css` | 2 | スライダー操作改善 |
-| `BreakDisplay.module.css` | 1 | フォントサイズ調整 |
-| `VolumeControl.module.css` | 2 | タッチ操作対応 |
-
-### 仕様書（更新）
-
-| ファイル | Phase | 変更内容 |
-|---------|-------|---------|
-| `docs/urs/requirements.md` | 4 | 対応プラットフォーム更新 |
-| `docs/specs/03-design-system.md` | 4 | モバイル対応セクション追加 |
+| `AppHeader.module.css` | 2 | モバイルレイアウト追加 |
+| `TimerDisplay.module.css` | 2 | フォントサイズ調整 |
+| `BlindInfo.module.css` | 2 | 縦並びレイアウト追加 |
+| `TimerControls.module.css` | 2, 4 | タッチターゲット拡大、タッチフィードバック |
+| `NextLevelInfo.module.css` | 2 | コンパクトレイアウト |
+| `BreakDisplay.module.css` | 2 | フォントサイズ調整 |
+| `Modal.module.css` | 3, 4 | フルスクリーンモーダル、タッチフィードバック |
+| `StructureManagementModal.module.css` | 3 | 1カラムレイアウト |
+| `BlindEditor.module.css` | 3 | テーブル最適化 |
+| `NumberInput.module.css` | 3 | 入力フィールド拡大 |
+| `StructureList.module.css` | 3 | リスト項目タッチ対応 |
+| `StructureEditor.module.css` | 3 | フォーム最適化 |
+| `Dropdown.module.css` | 3 | タッチ操作対応 |
+| `Toggle.module.css` | 3 | タッチターゲット拡大 |
+| `Slider.module.css` | 3 | スライダー操作改善 |
+| `VolumeControl.module.css` | 3 | タッチ操作対応 |
+| `Button.module.css` | 4 | タッチフィードバック |
 
 ---
 
@@ -455,12 +618,12 @@
 
 ## 7. 実装スケジュール
 
-| Phase | 内容 | 工数目安 |
-|-------|------|---------|
-| Phase 1 | コアUI対応 | CSSファイル6個の修正 |
-| Phase 2 | モーダル・設定画面対応 | CSSファイル10個の修正 |
-| Phase 3 | タッチ操作最適化 | 既存CSSへのメディアクエリ追加 |
-| Phase 4 | 仕様書更新 | ドキュメント2件の更新 |
+| Phase | 内容 | 成果物 |
+|-------|------|--------|
+| Phase 1 | 仕様書更新 | requirements.md, 03-design-system.md |
+| Phase 2 | コアUI対応 | CSSファイル6個の修正 |
+| Phase 3 | モーダル・設定画面対応 | CSSファイル10個の修正 |
+| Phase 4 | タッチ操作最適化 | 既存CSSへのメディアクエリ追加 |
 
 ---
 
@@ -474,6 +637,7 @@
 | iOS Safari固有の問題 | 中 | `-webkit-` プレフィックス、実機テスト |
 | タッチとマウスの両対応 | 低 | `@media (hover: none)` で分岐 |
 | フォントサイズによるズーム | 低 | 入力フィールドは16px以上に設定 |
+| 仕様と実装の乖離 | 中 | 実装前に仕様書を更新、レビュー実施 |
 
 ### 8.2 ロールバック計画
 
@@ -484,10 +648,11 @@
 
 ## 9. 完了条件
 
-1. Phase 1〜3 のすべてのCSSファイル修正が完了
-2. テスト計画の全項目をパス
-3. 既存のPC表示に影響がないことを確認
-4. ビルド・lint・テストがすべて通過
+1. Phase 1 の仕様書更新が完了し、レビュー承認済み
+2. Phase 2〜4 のすべてのCSSファイル修正が完了
+3. テスト計画の全項目をパス
+4. 既存のPC表示に影響がないことを確認
+5. ビルド・lint・テストがすべて通過
 
 ---
 
@@ -511,3 +676,4 @@
 | バージョン | 日付 | 変更内容 | 作成者 |
 |-----------|------|---------|--------|
 | 1.0 | 2026-02-03 | 初版作成 | AI Design Architect |
+| 1.1 | 2026-02-03 | Phase順序変更（仕様書更新をPhase 1に移動）| AI Design Architect |
