@@ -147,7 +147,7 @@
   transform: translateY(0);
 }
 
-/* レスポンシブ対応 */
+/* レスポンシブ対応 - Tablet Portrait (640px - 767px) */
 @media (max-width: 767px) {
   .controls {
     padding: var(--spacing-4);
@@ -166,6 +166,38 @@
   .mainButtons .button,
   .levelButtons .button {
     width: 100%;
+  }
+}
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .controls {
+    padding: var(--spacing-3);
+    gap: var(--spacing-2);
+  }
+
+  .button {
+    min-height: 48px; /* 推奨タッチターゲット */
+    font-size: var(--font-size-base);
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .mainButtons,
+  .levelButtons {
+    gap: var(--spacing-2);
+  }
+}
+
+/* タッチデバイス対応 */
+@media (hover: none) {
+  .button:hover:not(:disabled) {
+    transform: none;
+    box-shadow: var(--shadow-md);
+  }
+
+  .button:active:not(:disabled) {
+    transform: scale(0.98);
+    opacity: 0.9;
   }
 }
 

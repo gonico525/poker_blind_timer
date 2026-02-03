@@ -256,7 +256,7 @@
   }
 }
 
-/* Tablet Portrait / Mobile (< 768px) */
+/* Tablet Portrait (640px - 767px) */
 @media (max-width: 767px) {
   .timer {
     font-size: var(--font-size-display-md);
@@ -282,6 +282,48 @@
 
   .pausedIndicator {
     font-size: var(--font-size-sm);
+  }
+}
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .timer {
+    font-size: clamp(48px, 15vw, 72px);
+  }
+
+  .label {
+    font-size: var(--font-size-sm);
+  }
+
+  .elapsed {
+    font-size: var(--font-size-h6);
+  }
+
+  .elapsedLabel {
+    font-size: var(--font-size-xs);
+  }
+
+  .breakIndicator {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-2) var(--spacing-3);
+    top: calc(-1 * var(--spacing-10));
+  }
+
+  .pausedIndicator {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-1) var(--spacing-4);
+    bottom: calc(-1 * var(--spacing-8));
+  }
+}
+
+/* Small Mobile (< 375px) - 小型スマートフォン */
+@media (max-width: 374px) {
+  .timer {
+    font-size: 48px;
+  }
+
+  .elapsed {
+    font-size: var(--font-size-base);
   }
 }
 

@@ -64,3 +64,36 @@
     max-width: 300px;
   }
 }
+
+/* Mobile (< 640px) - 2行レイアウト */
+@media (max-width: 639px) {
+  .header {
+    flex-wrap: wrap;
+    padding: var(--spacing-2) var(--spacing-3);
+    gap: var(--spacing-2);
+  }
+
+  /* 上段: ロゴ + 設定ボタン */
+  .left {
+    order: 1;
+    flex: 1;
+  }
+
+  .title {
+    display: none; /* テキストタイトル非表示 */
+  }
+
+  .right {
+    order: 2;
+    gap: var(--spacing-2);
+  }
+
+  /* 下段: ストラクチャセレクタ */
+  .center {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    justify-content: stretch;
+    margin-top: var(--spacing-1);
+  }
+}
