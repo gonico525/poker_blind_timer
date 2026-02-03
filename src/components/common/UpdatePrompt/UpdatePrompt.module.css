@@ -1,0 +1,64 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.prompt {
+  background-color: #1a1a2e;
+  border: 2px solid #16213e;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.message {
+  color: #eee;
+  font-size: 16px;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.updateButton,
+.closeButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.updateButton {
+  background-color: #0f3460;
+  color: #fff;
+}
+
+.updateButton:hover {
+  background-color: #16213e;
+}
+
+.closeButton {
+  background-color: #2a2a3e;
+  color: #eee;
+}
+
+.closeButton:hover {
+  background-color: #3a3a4e;
+}
