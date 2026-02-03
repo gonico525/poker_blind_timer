@@ -22,7 +22,7 @@
   background-color: var(--color-bg-primary);
 }
 
-/* レスポンシブ対応: 小さい画面では縦並び */
+/* レスポンシブ対応: タブレット (640px - 768px) */
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -38,5 +38,21 @@
 
   .main {
     height: 60%;
+  }
+}
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .sidebar {
+    height: auto;
+    max-height: 35vh;
+    min-height: 120px;
+  }
+
+  .main {
+    flex: 1;
+    height: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }

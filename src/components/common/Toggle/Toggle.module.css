@@ -69,3 +69,39 @@
     transition: none;
   }
 }
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .container {
+    min-height: 44px;
+  }
+
+  .switch {
+    width: 52px;
+    height: 28px;
+  }
+
+  .thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .switch.active .thumb {
+    transform: translateX(24px);
+  }
+}
+
+/* Touch device support */
+@media (hover: none) {
+  .switch:hover:not(.disabled) {
+    background-color: var(--color-border);
+  }
+
+  .switch.active:hover:not(.disabled) {
+    background-color: var(--color-accent);
+  }
+
+  .switch:active:not(.disabled) {
+    transform: scale(0.95);
+  }
+}

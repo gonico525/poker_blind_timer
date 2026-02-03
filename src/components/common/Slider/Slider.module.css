@@ -111,3 +111,48 @@
     transition: none;
   }
 }
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .sliderContainer {
+    min-height: 44px;
+  }
+
+  .slider {
+    height: 8px;
+  }
+
+  .slider::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .value {
+    min-width: 36px;
+    font-size: var(--font-size-sm, 14px);
+  }
+}
+
+/* Touch device support */
+@media (hover: none) {
+  .slider::-webkit-slider-thumb:hover {
+    transform: none;
+  }
+
+  .slider::-moz-range-thumb:hover {
+    transform: none;
+  }
+
+  .slider:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+
+  .slider:active::-moz-range-thumb {
+    transform: scale(1.15);
+  }
+}
