@@ -7,6 +7,7 @@ import { KeyboardService } from '@/services/KeyboardService';
 import LoadingScreen from '@/components/LoadingScreen';
 import ErrorScreen from '@/components/ErrorScreen';
 import MainLayout from '@/components/MainLayout';
+import { UpdatePrompt } from '@/components/common/UpdatePrompt';
 import './App.css';
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
       <TournamentProvider>
         <NotificationProvider>
           <MainLayout />
+          <UpdatePrompt />
         </NotificationProvider>
       </TournamentProvider>
     </SettingsProvider>
