@@ -124,3 +124,33 @@
     transition: none;
   }
 }
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .input {
+    min-height: 44px;
+    padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+    font-size: 16px; /* iOS zoom prevention */
+  }
+
+  .buttons {
+    gap: 1px;
+  }
+
+  .incrementButton,
+  .decrementButton {
+    width: 36px;
+    height: 21px;
+    font-size: 12px;
+  }
+}
+
+/* Touch device support */
+@media (hover: none) {
+  .incrementButton:active:not(:disabled),
+  .decrementButton:active:not(:disabled) {
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
+    transform: scale(0.95);
+  }
+}

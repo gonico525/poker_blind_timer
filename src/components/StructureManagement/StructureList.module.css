@@ -120,3 +120,83 @@
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+/* Accessibility: Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .deleteButton,
+  .createButton {
+    transition: none;
+  }
+}
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .container {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .list {
+    padding: var(--spacing-2);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .item {
+    min-height: 44px;
+    padding: var(--spacing-2) var(--spacing-3);
+    margin-bottom: var(--spacing-1);
+  }
+
+  .name {
+    font-size: var(--font-size-sm);
+  }
+
+  .deleteButton {
+    min-height: 36px;
+    min-width: 44px;
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+
+  .createButton {
+    min-height: 44px;
+    margin: var(--spacing-3);
+    padding: var(--spacing-2) var(--spacing-3);
+  }
+}
+
+/* Touch device support */
+@media (hover: none) {
+  .item:hover {
+    background-color: transparent;
+    border-color: transparent;
+  }
+
+  .item:active {
+    background-color: var(--color-bg-hover);
+  }
+
+  .item.selected:hover {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-accent);
+  }
+
+  .deleteButton:hover {
+    transform: none;
+  }
+
+  .deleteButton:active {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+
+  .createButton:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .createButton:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}

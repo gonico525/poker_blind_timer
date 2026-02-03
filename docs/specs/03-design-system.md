@@ -283,11 +283,25 @@
 }
 ```
 
-### 6.3 最小解像度
+### 6.3 解像度サポート
 
 プロジェクト要件：
-- **最小解像度**: 1280x720px
+- **最小画面幅**: 320px（スマートフォン）
+- **最小解像度（PC）**: 1280x720px (HD)
 - **推奨解像度**: 1920x1080px (フルHD)
+- **大画面対応**: 2560x1440px以上
+
+### 6.4 デバイス別ブレークポイント
+
+| ブレークポイント | 対象デバイス | 用途 |
+|-----------------|-------------|------|
+| 320px〜374px | 小型スマートフォン | 最小サポート |
+| 375px〜639px | 標準スマートフォン | モバイル基準 |
+| 640px〜767px | タブレット縦 | タブレット対応 |
+| 768px〜1023px | タブレット横 | タブレット対応 |
+| 1024px〜1279px | ノートPC | PC対応 |
+| 1280px〜1919px | デスクトップ | PC基準 |
+| 1920px+ | 大型ディスプレイ | 拡張対応 |
 
 ## 7. コンポーネントスタイル
 
@@ -752,7 +766,7 @@
   }
 }
 
-/* Small (< 768px) - タブレット縦（最小サポート外） */
+/* Small (640px - 767px) - タブレット縦 */
 @media (max-width: 767px) {
   .timer-display {
     font-size: 72px;
@@ -761,6 +775,285 @@
   .blind-info {
     font-size: 28px;
     flex-direction: column;
+  }
+}
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .timer-display {
+    font-size: clamp(48px, 15vw, 72px);
+  }
+
+  .blind-info {
+    font-size: 24px;
+    flex-direction: column;
+  }
+}
+
+/* Small Mobile (< 375px) - 小型スマートフォン */
+@media (max-width: 374px) {
+  .timer-display {
+    font-size: 48px;
+  }
+
+  .blind-info {
+    font-size: 20px;
+  }
+}
+```
+
+### 13.2 デバイス別フォントサイズ
+
+| 要素 | PC (1280px+) | タブレット (768px-1279px) | スマホ (< 640px) | 小型スマホ (< 375px) |
+|------|-------------|--------------------------|-----------------|-------------------|
+| タイマー | 120px | 96px | clamp(48px, 15vw, 72px) | 48px |
+| ブラインド | 48px | 36px | 24px | 20px |
+| レベル番号 | 36px | 28px | 20px | 18px |
+| 本文 | 16px | 16px | 14px | 14px |
+| 補助テキスト | 14px | 14px | 12px | 12px |
+
+### 13.3 タッチ操作ガイドライン
+
+#### 13.3.1 タップターゲットサイズ
+
+タッチデバイスでの操作性を確保するため、以下のサイズガイドラインに従います。
+
+| 項目 | サイズ | 説明 |
+|------|-------|------|
+| 最小サイズ | 44×44px | WCAG 2.1準拠の最小タップターゲット |
+| 推奨サイズ | 48×48px | 快適な操作のための推奨サイズ |
+| ターゲット間隔 | 8px以上 | 誤タップ防止のための間隔 |
+
+```css
+/* タッチターゲットの最小サイズ */
+@media (max-width: 639px) {
+  .button,
+  .icon-button,
+  .input {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 推奨サイズ */
+  .button-primary,
+  .button-accent {
+    min-height: 48px;
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+}
+```
+
+#### 13.3.2 タッチフィードバック
+
+タッチデバイスではホバー効果が機能しないため、代替のフィードバックを提供します。
+
+```css
+/* タッチデバイスではホバー効果を無効化 */
+@media (hover: none) {
+  .button:hover {
+    background-color: inherit;
+    transform: none;
+  }
+}
+
+/* タッチ時のアクティブ状態を強調 */
+@media (hover: none) {
+  .button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+    transition: transform 0.1s ease, opacity 0.1s ease;
+  }
+}
+```
+
+#### 13.3.3 入力フィールド
+
+モバイルデバイスでの入力体験を最適化します。
+
+```css
+@media (max-width: 639px) {
+  .input,
+  .select {
+    /* iOSでのズーム防止（16px未満でズームが発生） */
+    font-size: 16px;
+    min-height: 44px;
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  /* 数値入力のボタン */
+  .number-input-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+```
+
+#### 13.3.4 スクロール動作
+
+```css
+/* iOS のスムーズスクロール */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* スクロール可能なエリアの視覚的ヒント */
+.scrollable {
+  scrollbar-width: thin;
+}
+
+@media (max-width: 639px) {
+  .scrollable::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+```
+
+### 13.4 モバイルレイアウトパターン
+
+#### 13.4.1 ヘッダー（< 640px）
+
+```css
+/* モバイルヘッダー: 2行レイアウト */
+@media (max-width: 639px) {
+  .header {
+    flex-wrap: wrap;
+    padding: var(--spacing-2) var(--spacing-3);
+  }
+
+  /* 上段: ロゴ + 設定ボタン */
+  .header-left {
+    order: 1;
+    flex: 1;
+  }
+
+  .header-title {
+    display: none; /* テキストタイトル非表示 */
+  }
+
+  .header-right {
+    order: 2;
+  }
+
+  /* 下段: ストラクチャセレクタ */
+  .header-center {
+    order: 3;
+    width: 100%;
+    margin-top: var(--spacing-2);
+  }
+}
+```
+
+#### 13.4.2 モーダル（< 640px）
+
+```css
+/* モバイルモーダル: フルスクリーン */
+@media (max-width: 639px) {
+  .modal {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    max-width: 100%;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .modal-header {
+    padding: var(--spacing-3) var(--spacing-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .modal-close-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .modal-body {
+    padding: var(--spacing-4);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-footer {
+    padding: var(--spacing-3) var(--spacing-4);
+    border-top: 1px solid var(--color-border);
+  }
+}
+```
+
+#### 13.4.3 2カラムレイアウト（< 640px）
+
+```css
+/* モバイル: 2カラム → 1カラム（縦積み） */
+@media (max-width: 639px) {
+  .two-column-layout {
+    flex-direction: column;
+  }
+
+  /* サイドバー: 上部に配置 */
+  .sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* コンテンツ: 下部に配置 */
+  .content {
+    width: 100%;
+    height: 60vh;
+    overflow-y: auto;
+  }
+}
+```
+
+#### 13.4.4 タイマーコントロール（< 640px）
+
+```css
+@media (max-width: 639px) {
+  .timer-controls {
+    flex-direction: column;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+  }
+
+  .control-button {
+    width: 100%;
+    min-height: 48px;
+    font-size: var(--font-size-base);
+  }
+
+  .level-buttons {
+    display: flex;
+    gap: var(--spacing-2);
+  }
+
+  .level-buttons .button {
+    flex: 1;
+    min-height: 44px;
+  }
+}
+```
+
+#### 13.4.5 ブラインド情報（< 640px）
+
+```css
+@media (max-width: 639px) {
+  .blind-info {
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  .blind-separator {
+    display: none;
+  }
+
+  .blind-labels {
+    flex-direction: column;
+    gap: var(--spacing-1);
+    font-size: var(--font-size-xs);
   }
 }
 ```
@@ -837,8 +1130,10 @@ input:focus-visible {
 3. **スペーシング**: 一貫したスペーシングスケール
 4. **コンポーネントスタイル**: 再利用可能なスタイル定義
 5. **アニメーション**: スムーズなトランジション
-6. **レスポンシブ**: PC最適化（最小1280x720px）
-7. **アクセシビリティ**: WCAG 2.1準拠
+6. **レスポンシブ**: PC・タブレット・スマートフォン対応（最小320px〜）
+7. **タッチ操作**: WCAG 2.1準拠のタップターゲットサイズ、タッチフィードバック
+8. **モバイルレイアウト**: フルスクリーンモーダル、2行ヘッダー、1カラム変換
+9. **アクセシビリティ**: WCAG 2.1準拠
 
 ---
 
@@ -855,3 +1150,4 @@ input:focus-visible {
 | バージョン | 日付 | 変更内容 | 作成者 |
 |-----------|------|---------|--------|
 | 1.0 | 2026-01-26 | 初版作成 | AI Design System Architect |
+| 1.1 | 2026-02-03 | モバイル対応: 解像度サポート拡張（最小320px）、デバイス別ブレークポイント追加、タッチ操作ガイドライン追加、モバイルレイアウトパターン追加 | AI Design Architect |

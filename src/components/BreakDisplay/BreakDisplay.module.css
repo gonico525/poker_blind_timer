@@ -191,7 +191,7 @@
   }
 }
 
-/* Tablet Portrait / Mobile (< 768px) */
+/* Tablet Portrait (640px - 767px) */
 @media (max-width: 767px) {
   .breakDisplay {
     gap: var(--spacing-6);
@@ -216,6 +216,67 @@
   .skipButton {
     font-size: var(--font-size-sm);
     padding: var(--spacing-2) var(--spacing-6);
+  }
+}
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .breakDisplay {
+    gap: var(--spacing-4);
+  }
+
+  .breakHeader {
+    gap: var(--spacing-2);
+  }
+
+  .breakTitle {
+    font-size: var(--font-size-h3);
+    letter-spacing: 0.15em;
+  }
+
+  .breakMessage {
+    font-size: var(--font-size-sm);
+  }
+
+  .breakTimer {
+    gap: var(--spacing-2);
+  }
+
+  .breakTime {
+    font-size: clamp(48px, 15vw, 72px);
+  }
+
+  .breakLabel {
+    font-size: var(--font-size-xs);
+  }
+
+  .skipButton {
+    min-height: 48px; /* タッチターゲット */
+    font-size: var(--font-size-base);
+    padding: var(--spacing-3) var(--spacing-6);
+  }
+}
+
+/* Small Mobile (< 375px) - 小型スマートフォン */
+@media (max-width: 374px) {
+  .breakTitle {
+    font-size: var(--font-size-h4);
+  }
+
+  .breakTime {
+    font-size: 48px;
+  }
+}
+
+/* タッチデバイス対応 */
+@media (hover: none) {
+  .skipButton:hover {
+    transform: none;
+  }
+
+  .skipButton:active {
+    transform: scale(0.98);
+    opacity: 0.9;
   }
 }
 

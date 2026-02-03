@@ -126,7 +126,7 @@
   }
 }
 
-/* Tablet Portrait / Mobile (< 768px) */
+/* Tablet Portrait (640px - 767px) */
 @media (max-width: 767px) {
   .levelNumber {
     font-size: var(--font-size-h4);
@@ -148,5 +148,46 @@
 
   .blindsWrapper {
     gap: var(--spacing-1);
+  }
+}
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .blindInfo {
+    gap: var(--spacing-1);
+  }
+
+  .levelNumber {
+    font-size: var(--font-size-h5);
+  }
+
+  .blinds {
+    font-size: var(--font-size-h4);
+    gap: var(--spacing-2);
+  }
+
+  .blindLabels {
+    font-size: var(--font-size-xs);
+    gap: var(--spacing-3);
+  }
+
+  .separator {
+    margin: 0 calc(-1 * var(--spacing-1));
+  }
+}
+
+/* Small Mobile (< 375px) - 小型スマートフォン */
+@media (max-width: 374px) {
+  .levelNumber {
+    font-size: var(--font-size-h6);
+  }
+
+  .blinds {
+    font-size: var(--font-size-h5);
+    gap: var(--spacing-1);
+  }
+
+  .blindLabels {
+    gap: var(--spacing-2);
   }
 }

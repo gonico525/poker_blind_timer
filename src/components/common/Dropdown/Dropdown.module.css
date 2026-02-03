@@ -132,3 +132,33 @@
     transition: none;
   }
 }
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .trigger {
+    min-height: 44px;
+    padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+    font-size: 16px; /* iOS zoom prevention */
+  }
+
+  .menu {
+    max-height: 50vh;
+  }
+
+  .item {
+    min-height: 44px;
+    padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+  }
+}
+
+/* Touch device support */
+@media (hover: none) {
+  .trigger:active {
+    background-color: var(--color-bg-hover);
+    transform: scale(0.99);
+  }
+
+  .item:active {
+    background-color: var(--color-bg-hover);
+  }
+}

@@ -152,7 +152,7 @@
   outline-offset: 2px;
 }
 
-/* レスポンシブ対応 */
+/* レスポンシブ対応 - タブレット */
 @media (max-width: 768px) {
   .headerRow,
   .row {
@@ -168,5 +168,97 @@
   .deleteButton {
     font-size: var(--font-size-xs);
     padding: var(--spacing-1) var(--spacing-2);
+  }
+}
+
+/* Mobile (< 640px) - スマートフォン */
+@media (max-width: 639px) {
+  .container {
+    gap: var(--spacing-3);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-2);
+    padding-bottom: var(--spacing-2);
+  }
+
+  .title {
+    font-size: var(--font-size-base);
+    text-align: center;
+  }
+
+  .addButton {
+    width: 100%;
+    min-height: 44px;
+    font-size: var(--font-size-base);
+  }
+
+  .list {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 calc(-1 * var(--spacing-3));
+    padding: 0 var(--spacing-3);
+  }
+
+  .headerRow,
+  .row {
+    min-width: 360px;
+    grid-template-columns: 45px 1fr 1fr 1fr 60px;
+    gap: var(--spacing-2);
+  }
+
+  .headerRow {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+
+  .row {
+    padding: var(--spacing-2);
+  }
+
+  .levelNum {
+    font-size: var(--font-size-sm);
+  }
+
+  .input {
+    min-height: 36px;
+    padding: var(--spacing-1) var(--spacing-2);
+    font-size: 16px; /* iOS zoom prevention */
+  }
+
+  .deleteButton {
+    min-height: 36px;
+    min-width: 44px;
+    padding: var(--spacing-1);
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* Small Mobile (< 375px) */
+@media (max-width: 374px) {
+  .headerRow,
+  .row {
+    min-width: 320px;
+    grid-template-columns: 40px 1fr 1fr 1fr 50px;
+  }
+}
+
+/* Touch device support */
+@media (hover: none) {
+  .addButton:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  .row:hover {
+    border-color: var(--color-border);
+    box-shadow: none;
+  }
+
+  .deleteButton:active:not(:disabled) {
+    background: var(--color-error);
+    color: var(--color-text-inverse);
   }
 }
