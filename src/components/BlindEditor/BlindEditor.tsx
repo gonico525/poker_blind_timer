@@ -64,11 +64,7 @@ export function BlindEditor({ blindLevels, onChange }: BlindEditorProps) {
         </div>
 
         {blindLevels.map((level, index) => (
-          <div
-            key={index}
-            className={styles.row}
-            data-testid="blind-level-row"
-          >
+          <div key={index} className={styles.row} data-testid="blind-level-row">
             <span className={styles.levelNum}>{index + 1}</span>
 
             <input
