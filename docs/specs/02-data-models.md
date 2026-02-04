@@ -40,9 +40,9 @@ Settings (Entity)
  * イミュータブルなデータ構造
  */
 export interface BlindLevel {
-  readonly smallBlind: number;  // スモールブラインド（正の整数）
-  readonly bigBlind: number;    // ビッグブラインド（正の整数、SB以上）
-  readonly ante: number;        // アンティ（0以上の整数）
+  readonly smallBlind: number; // スモールブラインド（正の整数）
+  readonly bigBlind: number; // ビッグブラインド（正の整数、SB以上）
+  readonly ante: number; // アンティ（0以上の整数）
 }
 
 /**
@@ -76,18 +76,18 @@ export function formatBlindLevel(level: BlindLevel): string {
  * 休憩設定
  */
 export interface BreakConfig {
-  readonly enabled: boolean;    // 休憩機能の有効/無効
-  readonly frequency: number;   // 休憩頻度（Xレベルごと、1-10）
-  readonly duration: number;    // 休憩時間（分、5-30）
+  readonly enabled: boolean; // 休憩機能の有効/無効
+  readonly frequency: number; // 休憩頻度（Xレベルごと、1-10）
+  readonly duration: number; // 休憩時間（分、5-30）
 }
 
 /**
  * デフォルト休憩設定
  */
 export const DEFAULT_BREAK_CONFIG: BreakConfig = {
-  enabled: false,     // デフォルトは無効
-  frequency: 4,       // 4レベルごと
-  duration: 10,       // 10分
+  enabled: false, // デフォルトは無効
+  frequency: 4, // 4レベルごと
+  duration: 10, // 10分
 };
 
 /**
@@ -121,10 +121,10 @@ export type TimerStatus = 'idle' | 'running' | 'paused';
  */
 export interface Timer {
   status: TimerStatus;
-  remainingTime: number;  // 残り時間（秒）
-  elapsedTime: number;    // 経過時間（秒）
+  remainingTime: number; // 残り時間（秒）
+  elapsedTime: number; // 経過時間（秒）
   startTime: number | null; // 開始時刻（Date.now()）
-  pausedAt: number | null;  // 一時停止時刻（Date.now()）
+  pausedAt: number | null; // 一時停止時刻（Date.now()）
 }
 
 /**
@@ -149,27 +149,25 @@ export function createInitialTimer(levelDuration: number): Timer {
  */
 export interface Tournament {
   // レベル情報
-  currentLevel: number;           // 現在のレベル（0-indexed）
-  blindLevels: BlindLevel[];      // ブラインドレベル配列
-  levelDuration: number;          // レベル時間（秒）
+  currentLevel: number; // 現在のレベル（0-indexed）
+  blindLevels: BlindLevel[]; // ブラインドレベル配列
+  levelDuration: number; // レベル時間（秒）
 
   // タイマー
   timer: Timer;
 
   // 休憩
   breakConfig: BreakConfig;
-  isBreak: boolean;               // 現在休憩中か
+  isBreak: boolean; // 現在休憩中か
 
   // プリセット参照
-  activePresetId: string | null;  // アクティブなプリセットID
+  activePresetId: string | null; // アクティブなプリセットID
 }
 
 /**
  * 次の休憩までのレベル数を計算
  */
-export function getLevelsUntilNextBreak(
-  tournament: Tournament
-): number | null {
+export function getLevelsUntilNextBreak(tournament: Tournament): number | null {
   if (!tournament.breakConfig.enabled) return null;
   if (tournament.isBreak) return 0;
 
@@ -216,10 +214,10 @@ export interface Preset {
   name: string;
   type: PresetType;
   blindLevels: BlindLevel[];
-  levelDuration: number;      // 秒
+  levelDuration: number; // 秒
   breakConfig: BreakConfig;
-  createdAt: number;          // タイムスタンプ
-  updatedAt: number;          // タイムスタンプ
+  createdAt: number; // タイムスタンプ
+  updatedAt: number; // タイムスタンプ
 }
 
 /**
@@ -290,106 +288,164 @@ export type TournamentEvent =
 
 ## 4. デフォルトプリセット
 
-### 4.1 スタンダードトーナメント
-
-```typescript
-export const STANDARD_PRESET: Preset = {
-  id: 'preset_default_standard' as PresetId,
-  name: 'スタンダード',
-  type: 'standard',
-  levelDuration: 15 * 60, // 15分
-  breakConfig: {
-    enabled: false,
-    frequency: 4,
-    duration: 10,
-  },
-  blindLevels: [
-    { smallBlind: 25, bigBlind: 50, ante: 0 },
-    { smallBlind: 50, bigBlind: 100, ante: 0 },
-    { smallBlind: 75, bigBlind: 150, ante: 25 },
-    { smallBlind: 100, bigBlind: 200, ante: 25 },
-    { smallBlind: 150, bigBlind: 300, ante: 50 },
-    { smallBlind: 200, bigBlind: 400, ante: 50 },
-    { smallBlind: 300, bigBlind: 600, ante: 100 },
-    { smallBlind: 500, bigBlind: 1000, ante: 100 },
-    { smallBlind: 800, bigBlind: 1600, ante: 200 },
-    { smallBlind: 1200, bigBlind: 2400, ante: 300 },
-  ],
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-};
-```
-
-### 4.2 ターボトーナメント
-
-```typescript
-export const TURBO_PRESET: Preset = {
-  id: 'preset_default_turbo' as PresetId,
-  name: 'ターボ',
-  type: 'turbo',
-  levelDuration: 10 * 60, // 10分
-  breakConfig: {
-    enabled: false,
-    frequency: 4,
-    duration: 10,
-  },
-  blindLevels: [
-    { smallBlind: 50, bigBlind: 100, ante: 0 },
-    { smallBlind: 100, bigBlind: 200, ante: 25 },
-    { smallBlind: 200, bigBlind: 400, ante: 50 },
-    { smallBlind: 300, bigBlind: 600, ante: 100 },
-    { smallBlind: 500, bigBlind: 1000, ante: 100 },
-    { smallBlind: 800, bigBlind: 1600, ante: 200 },
-    { smallBlind: 1200, bigBlind: 2400, ante: 300 },
-    { smallBlind: 2000, bigBlind: 4000, ante: 500 },
-    { smallBlind: 3000, bigBlind: 6000, ante: 1000 },
-    { smallBlind: 5000, bigBlind: 10000, ante: 1500 },
-  ],
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-};
-```
-
-### 4.3 ディープスタックトーナメント
+### 4.1 ディープスタックトーナメント
 
 ```typescript
 export const DEEPSTACK_PRESET: Preset = {
   id: 'preset_default_deepstack' as PresetId,
-  name: 'ディープスタック',
+  name: 'Deepstack (30min/50k Start)',
   type: 'deepstack',
-  levelDuration: 20 * 60, // 20分
+  levelDuration: 30 * 60, // 30分
   breakConfig: {
-    enabled: false,
+    enabled: true,
     frequency: 4,
-    duration: 10,
+    duration: 600, // 10分
   },
   blindLevels: [
-    { smallBlind: 25, bigBlind: 50, ante: 0 },
-    { smallBlind: 50, bigBlind: 75, ante: 0 },
-    { smallBlind: 50, bigBlind: 100, ante: 0 },
-    { smallBlind: 75, bigBlind: 150, ante: 25 },
-    { smallBlind: 100, bigBlind: 200, ante: 25 },
-    { smallBlind: 150, bigBlind: 300, ante: 50 },
-    { smallBlind: 200, bigBlind: 400, ante: 50 },
-    { smallBlind: 300, bigBlind: 600, ante: 100 },
-    { smallBlind: 400, bigBlind: 800, ante: 100 },
-    { smallBlind: 600, bigBlind: 1200, ante: 150 },
+    { smallBlind: 100, bigBlind: 200, ante: 200 },
+    { smallBlind: 200, bigBlind: 300, ante: 300 },
+    { smallBlind: 200, bigBlind: 400, ante: 400 },
+    { smallBlind: 300, bigBlind: 500, ante: 500 },
+    { smallBlind: 300, bigBlind: 600, ante: 600 },
+    { smallBlind: 400, bigBlind: 800, ante: 800 },
+    { smallBlind: 500, bigBlind: 1000, ante: 1000 },
+    { smallBlind: 600, bigBlind: 1200, ante: 1200 },
+    { smallBlind: 1000, bigBlind: 1500, ante: 1500 },
+    { smallBlind: 1000, bigBlind: 2000, ante: 2000 },
+    { smallBlind: 1500, bigBlind: 3000, ante: 3000 },
+    { smallBlind: 2000, bigBlind: 4000, ante: 4000 },
+    { smallBlind: 3000, bigBlind: 5000, ante: 5000 },
+    { smallBlind: 3000, bigBlind: 6000, ante: 6000 },
+    { smallBlind: 4000, bigBlind: 8000, ante: 8000 },
+    { smallBlind: 5000, bigBlind: 10000, ante: 10000 },
+    { smallBlind: 6000, bigBlind: 12000, ante: 12000 },
+    { smallBlind: 10000, bigBlind: 15000, ante: 15000 },
+    { smallBlind: 10000, bigBlind: 20000, ante: 20000 },
+    { smallBlind: 15000, bigBlind: 30000, ante: 30000 },
+    { smallBlind: 20000, bigBlind: 40000, ante: 40000 },
+    { smallBlind: 30000, bigBlind: 60000, ante: 60000 },
+    { smallBlind: 40000, bigBlind: 80000, ante: 80000 },
+    { smallBlind: 50000, bigBlind: 100000, ante: 100000 },
   ],
   createdAt: Date.now(),
   updatedAt: Date.now(),
 };
 ```
 
-### 4.4 デフォルトプリセット配列
+### 4.2 スタンダードトーナメント
+
+```typescript
+export const STANDARD_PRESET: Preset = {
+  id: 'preset_default_standard' as PresetId,
+  name: 'Standard (20min/30k Start)',
+  type: 'standard',
+  levelDuration: 20 * 60, // 20分
+  breakConfig: {
+    enabled: true,
+    frequency: 4,
+    duration: 600, // 10分
+  },
+  blindLevels: [
+    { smallBlind: 100, bigBlind: 200, ante: 200 },
+    { smallBlind: 200, bigBlind: 400, ante: 400 },
+    { smallBlind: 300, bigBlind: 600, ante: 600 },
+    { smallBlind: 400, bigBlind: 800, ante: 800 },
+    { smallBlind: 500, bigBlind: 1000, ante: 1000 },
+    { smallBlind: 600, bigBlind: 1200, ante: 1200 },
+    { smallBlind: 1000, bigBlind: 2000, ante: 2000 },
+    { smallBlind: 1500, bigBlind: 3000, ante: 3000 },
+    { smallBlind: 2000, bigBlind: 4000, ante: 4000 },
+    { smallBlind: 3000, bigBlind: 6000, ante: 6000 },
+    { smallBlind: 4000, bigBlind: 8000, ante: 8000 },
+    { smallBlind: 5000, bigBlind: 10000, ante: 10000 },
+    { smallBlind: 6000, bigBlind: 12000, ante: 12000 },
+    { smallBlind: 10000, bigBlind: 20000, ante: 20000 },
+    { smallBlind: 15000, bigBlind: 30000, ante: 30000 },
+    { smallBlind: 20000, bigBlind: 40000, ante: 40000 },
+    { smallBlind: 30000, bigBlind: 60000, ante: 60000 },
+  ],
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+};
+```
+
+### 4.3 ターボトーナメント
+
+```typescript
+export const TURBO_PRESET: Preset = {
+  id: 'preset_default_turbo' as PresetId,
+  name: 'Turbo (15min/25k Start)',
+  type: 'turbo',
+  levelDuration: 15 * 60, // 15分
+  breakConfig: {
+    enabled: true,
+    frequency: 5,
+    duration: 600, // 10分
+  },
+  blindLevels: [
+    { smallBlind: 100, bigBlind: 200, ante: 200 },
+    { smallBlind: 200, bigBlind: 400, ante: 400 },
+    { smallBlind: 300, bigBlind: 600, ante: 600 },
+    { smallBlind: 500, bigBlind: 1000, ante: 1000 },
+    { smallBlind: 700, bigBlind: 1500, ante: 1500 },
+    { smallBlind: 1000, bigBlind: 2000, ante: 2000 },
+    { smallBlind: 1500, bigBlind: 3000, ante: 3000 },
+    { smallBlind: 2000, bigBlind: 4000, ante: 4000 },
+    { smallBlind: 3000, bigBlind: 6000, ante: 6000 },
+    { smallBlind: 5000, bigBlind: 10000, ante: 10000 },
+    { smallBlind: 7000, bigBlind: 15000, ante: 15000 },
+    { smallBlind: 10000, bigBlind: 20000, ante: 20000 },
+    { smallBlind: 15000, bigBlind: 30000, ante: 30000 },
+    { smallBlind: 20000, bigBlind: 40000, ante: 40000 },
+  ],
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+};
+```
+
+### 4.4 ハイパーターボトーナメント
+
+```typescript
+export const HYPER_TURBO_PRESET: Preset = {
+  id: 'preset_default_hyperturbo' as PresetId,
+  name: 'Hyper Turbo (10min/20k Start)',
+  type: 'custom',
+  levelDuration: 10 * 60, // 10分
+  breakConfig: {
+    enabled: false,
+    frequency: 6,
+    duration: 300, // 5分
+  },
+  blindLevels: [
+    { smallBlind: 100, bigBlind: 200, ante: 200 },
+    { smallBlind: 200, bigBlind: 400, ante: 400 },
+    { smallBlind: 400, bigBlind: 800, ante: 800 },
+    { smallBlind: 600, bigBlind: 1200, ante: 1200 },
+    { smallBlind: 1000, bigBlind: 2000, ante: 2000 },
+    { smallBlind: 1500, bigBlind: 3000, ante: 3000 },
+    { smallBlind: 2500, bigBlind: 5000, ante: 5000 },
+    { smallBlind: 4000, bigBlind: 8000, ante: 8000 },
+    { smallBlind: 6000, bigBlind: 12000, ante: 12000 },
+    { smallBlind: 10000, bigBlind: 20000, ante: 20000 },
+    { smallBlind: 15000, bigBlind: 30000, ante: 30000 },
+    { smallBlind: 25000, bigBlind: 50000, ante: 50000 },
+  ],
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+};
+```
+
+### 4.5 デフォルトプリセット配列
 
 ```typescript
 /**
  * すべてのデフォルトプリセット
  */
 export const DEFAULT_PRESETS: Preset[] = [
+  DEEPSTACK_PRESET,
   STANDARD_PRESET,
   TURBO_PRESET,
-  DEEPSTACK_PRESET,
+  HYPER_TURBO_PRESET,
 ];
 
 /**
@@ -697,9 +753,11 @@ export function isImportedPreset(data: unknown): data is Preset {
 /**
  * インポートデータのバリデーション
  */
-export function validateImportData(
-  json: string
-): { valid: boolean; preset?: Preset; error?: string } {
+export function validateImportData(json: string): {
+  valid: boolean;
+  preset?: Preset;
+  error?: string;
+} {
   try {
     const data = JSON.parse(json);
 
@@ -841,15 +899,11 @@ if (timer.status === 'running') { ... }
 ### 9.3 Type Guards の活用
 
 ```typescript
-export function isBreakLevel(
-  tournament: Tournament
-): boolean {
+export function isBreakLevel(tournament: Tournament): boolean {
   return tournament.isBreak;
 }
 
-export function hasNextLevel(
-  tournament: Tournament
-): boolean {
+export function hasNextLevel(tournament: Tournament): boolean {
   return tournament.currentLevel < tournament.blindLevels.length - 1;
 }
 ```
@@ -859,7 +913,7 @@ export function hasNextLevel(
 本データモデル仕様では以下を定義しました：
 
 1. **型定義**: すべてのドメインモデルのTypeScript型
-2. **デフォルトデータ**: 3つのプリセット（スタンダード、ターボ、ディープスタック）
+2. **デフォルトデータ**: 4つのプリセット（ディープスタック、スタンダード、ターボ、ハイパーターボ）
 3. **localStorage スキーマ**: データ永続化の形式
 4. **バリデーション**: 入力とインポートデータの検証
 5. **ユーティリティ**: 時間・数値フォーマット関数
@@ -876,6 +930,6 @@ export function hasNextLevel(
 
 ## 改訂履歴
 
-| バージョン | 日付 | 変更内容 | 作成者 |
-|-----------|------|---------|--------|
-| 1.0 | 2026-01-26 | 初版作成 | AI System Architect |
+| バージョン | 日付       | 変更内容 | 作成者              |
+| ---------- | ---------- | -------- | ------------------- |
+| 1.0        | 2026-01-26 | 初版作成 | AI System Architect |

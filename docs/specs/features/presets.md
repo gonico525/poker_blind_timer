@@ -17,11 +17,12 @@
 
 ### 2.2 デフォルトプリセット
 
-システムに組み込まれた3つのプリセット：
+システムに組み込まれた4つのプリセット：
 
-1. **スタンダード**: 15分レベル、10レベル
-2. **ターボ**: 10分レベル、10レベル
-3. **ディープスタック**: 20分レベル、10レベル
+1. **Deepstack (30min/50k Start)**: 30分レベル、24レベル、休憩有効（4レベルごと）
+2. **Standard (20min/30k Start)**: 20分レベル、17レベル、休憩有効（4レベルごと）
+3. **Turbo (15min/25k Start)**: 15分レベル、14レベル、休憩有効（5レベルごと）
+4. **Hyper Turbo (10min/20k Start)**: 10分レベル、12レベル、休憩無効
 
 詳細は [02-data-models.md](../02-data-models.md#4-デフォルトプリセット) を参照。
 
@@ -41,7 +42,7 @@ export interface Preset {
   name: string;
   type: PresetType;
   blindLevels: BlindLevel[];
-  levelDuration: number;      // 秒
+  levelDuration: number; // 秒
   breakConfig: BreakConfig;
   createdAt: number;
   updatedAt: number;
@@ -69,66 +70,81 @@ export function usePresets() {
   }, [presets]);
 
   // プリセット取得（ID指定）
-  const getPreset = useCallback((id: PresetId): Preset | undefined => {
-    return presets.find((p) => p.id === id);
-  }, [presets]);
+  const getPreset = useCallback(
+    (id: PresetId): Preset | undefined => {
+      return presets.find((p) => p.id === id);
+    },
+    [presets]
+  );
 
   // プリセット追加
-  const addPreset = useCallback((preset: Omit<Preset, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newPreset: Preset = {
-      ...preset,
-      id: generatePresetId(),
-      type: 'custom',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
+  const addPreset = useCallback(
+    (preset: Omit<Preset, 'id' | 'createdAt' | 'updatedAt'>) => {
+      const newPreset: Preset = {
+        ...preset,
+        id: generatePresetId(),
+        type: 'custom',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
 
-    dispatch({ type: 'ADD_PRESET', payload: newPreset });
-    return newPreset;
-  }, [dispatch]);
+      dispatch({ type: 'ADD_PRESET', payload: newPreset });
+      return newPreset;
+    },
+    [dispatch]
+  );
 
   // プリセット更新
-  const updatePreset = useCallback((id: PresetId, updates: Partial<Preset>) => {
-    const existing = presets.find((p) => p.id === id);
-    if (!existing) {
-      throw new Error(`Preset not found: ${id}`);
-    }
+  const updatePreset = useCallback(
+    (id: PresetId, updates: Partial<Preset>) => {
+      const existing = presets.find((p) => p.id === id);
+      if (!existing) {
+        throw new Error(`Preset not found: ${id}`);
+      }
 
-    // デフォルトプリセットは編集不可
-    if (isDefaultPreset(id)) {
-      throw new Error('Default presets cannot be modified');
-    }
+      // デフォルトプリセットは編集不可
+      if (isDefaultPreset(id)) {
+        throw new Error('Default presets cannot be modified');
+      }
 
-    const updatedPreset: Preset = {
-      ...existing,
-      ...updates,
-      id, // IDは変更不可
-      updatedAt: Date.now(),
-    };
+      const updatedPreset: Preset = {
+        ...existing,
+        ...updates,
+        id, // IDは変更不可
+        updatedAt: Date.now(),
+      };
 
-    dispatch({ type: 'UPDATE_PRESET', payload: updatedPreset });
-  }, [presets, dispatch]);
+      dispatch({ type: 'UPDATE_PRESET', payload: updatedPreset });
+    },
+    [presets, dispatch]
+  );
 
   // プリセット削除
-  const deletePreset = useCallback((id: PresetId) => {
-    // デフォルトプリセットは削除不可
-    if (isDefaultPreset(id)) {
-      throw new Error('Default presets cannot be deleted');
-    }
+  const deletePreset = useCallback(
+    (id: PresetId) => {
+      // デフォルトプリセットは削除不可
+      if (isDefaultPreset(id)) {
+        throw new Error('Default presets cannot be deleted');
+      }
 
-    dispatch({ type: 'DELETE_PRESET', payload: { id } });
-  }, [dispatch]);
+      dispatch({ type: 'DELETE_PRESET', payload: { id } });
+    },
+    [dispatch]
+  );
 
   // プリセット読み込み（トーナメントに適用）
-  const loadPreset = useCallback((id: PresetId) => {
-    const preset = getPreset(id);
-    if (!preset) {
-      throw new Error(`Preset not found: ${id}`);
-    }
+  const loadPreset = useCallback(
+    (id: PresetId) => {
+      const preset = getPreset(id);
+      if (!preset) {
+        throw new Error(`Preset not found: ${id}`);
+      }
 
-    // TournamentContextに通知
-    dispatch({ type: 'LOAD_PRESET', payload: { preset } });
-  }, [getPreset, dispatch]);
+      // TournamentContextに通知
+      dispatch({ type: 'LOAD_PRESET', payload: { preset } });
+    },
+    [getPreset, dispatch]
+  );
 
   return {
     presets,
@@ -472,7 +488,10 @@ type SettingsAction =
   | { type: 'DELETE_PRESET'; payload: { id: PresetId } }
   | { type: 'LOAD_PRESETS'; payload: Preset[] };
 
-function settingsReducer(state: SettingsState, action: SettingsAction): SettingsState {
+function settingsReducer(
+  state: SettingsState,
+  action: SettingsAction
+): SettingsState {
   switch (action.type) {
     case 'ADD_PRESET': {
       // 上限チェック
@@ -611,7 +630,9 @@ try {
   addPreset(newPreset);
 } catch (error) {
   if (error.message.includes('上限')) {
-    alert('プリセットの保存上限に達しています。不要なプリセットを削除してください。');
+    alert(
+      'プリセットの保存上限に達しています。不要なプリセットを削除してください。'
+    );
   } else {
     alert('プリセットの保存に失敗しました');
   }
@@ -674,6 +695,6 @@ describe('Preset', () => {
 
 ## 改訂履歴
 
-| バージョン | 日付 | 変更内容 | 作成者 |
-|-----------|------|---------|--------|
-| 1.0 | 2026-01-26 | 初版作成 | AI System Architect |
+| バージョン | 日付       | 変更内容 | 作成者              |
+| ---------- | ---------- | -------- | ------------------- |
+| 1.0        | 2026-01-26 | 初版作成 | AI System Architect |

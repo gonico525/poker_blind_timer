@@ -5,36 +5,49 @@ import {
 } from './Structure';
 
 describe('createDefaultStructures', () => {
-  it('should create 3 default structures', () => {
+  it('should create 4 default structures', () => {
     const structures = createDefaultStructures();
-    expect(structures).toHaveLength(3);
+    expect(structures).toHaveLength(4);
+  });
+
+  it('should create deepstack structure', () => {
+    const structures = createDefaultStructures();
+    const deep = structures.find((s) => s.id === 'default-deepstack');
+    expect(deep).toBeDefined();
+    expect(deep?.name).toBe('Deepstack (30min/50k Start)');
+    expect(deep?.type).toBe('default');
+    expect(deep?.blindLevels.length).toBe(24);
+    expect(deep?.levelDuration).toBe(1800); // 30分
   });
 
   it('should create standard structure', () => {
     const structures = createDefaultStructures();
     const standard = structures.find((s) => s.id === 'default-standard');
     expect(standard).toBeDefined();
-    expect(standard?.name).toBe('スタンダード');
+    expect(standard?.name).toBe('Standard (20min/30k Start)');
     expect(standard?.type).toBe('default');
-    expect(standard?.blindLevels.length).toBeGreaterThan(0);
-    expect(standard?.levelDuration).toBe(600); // 10分
+    expect(standard?.blindLevels.length).toBe(17);
+    expect(standard?.levelDuration).toBe(1200); // 20分
   });
 
   it('should create turbo structure', () => {
     const structures = createDefaultStructures();
     const turbo = structures.find((s) => s.id === 'default-turbo');
     expect(turbo).toBeDefined();
-    expect(turbo?.name).toBe('ターボ');
+    expect(turbo?.name).toBe('Turbo (15min/25k Start)');
     expect(turbo?.type).toBe('default');
-    expect(turbo?.levelDuration).toBe(300); // 5分
+    expect(turbo?.blindLevels.length).toBe(14);
+    expect(turbo?.levelDuration).toBe(900); // 15分
   });
 
-  it('should create deep stack structure', () => {
+  it('should create hyper turbo structure', () => {
     const structures = createDefaultStructures();
-    const deep = structures.find((s) => s.id === 'default-deepstack');
-    expect(deep).toBeDefined();
-    expect(deep?.name).toBe('ディープスタック');
-    expect(deep?.type).toBe('default');
+    const hyper = structures.find((s) => s.id === 'default-hyperturbo');
+    expect(hyper).toBeDefined();
+    expect(hyper?.name).toBe('Hyper Turbo (10min/20k Start)');
+    expect(hyper?.type).toBe('default');
+    expect(hyper?.blindLevels.length).toBe(12);
+    expect(hyper?.levelDuration).toBe(600); // 10分
   });
 
   it('should have valid blind structures', () => {
@@ -66,9 +79,10 @@ describe('mergeWithDefaultStructures', () => {
     ];
     const merged = mergeWithDefaultStructures(userStructures);
 
+    expect(merged.some((s) => s.id === 'default-deepstack')).toBe(true);
     expect(merged.some((s) => s.id === 'default-standard')).toBe(true);
     expect(merged.some((s) => s.id === 'default-turbo')).toBe(true);
-    expect(merged.some((s) => s.id === 'default-deepstack')).toBe(true);
+    expect(merged.some((s) => s.id === 'default-hyperturbo')).toBe(true);
     expect(merged.some((s) => s.id === 'user-1')).toBe(true);
   });
 
@@ -117,7 +131,7 @@ describe('mergeWithDefaultStructures', () => {
 
   it('should handle empty user structures', () => {
     const merged = mergeWithDefaultStructures([]);
-    expect(merged).toHaveLength(3); // Only defaults
+    expect(merged).toHaveLength(4); // Only defaults
     expect(merged.some((s) => s.id === 'default-standard')).toBe(true);
   });
 });
