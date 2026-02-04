@@ -41,6 +41,8 @@ describe('ErrorScreen', () => {
 
   it('should not display retry button when onRetry is not provided', () => {
     render(<ErrorScreen message="エラー" />);
-    expect(screen.queryByRole('button', { name: /再試行/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /再試行/i })
+    ).not.toBeInTheDocument();
   });
 });
