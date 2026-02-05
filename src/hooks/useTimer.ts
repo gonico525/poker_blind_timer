@@ -76,6 +76,20 @@ export function useTimer() {
     };
   }, [state.timer.status, dispatch]);
 
+  // バックグラウンドから復帰時の同期処理
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && state.timer.status === 'running') {
+        dispatch({ type: 'SYNC_TIMER' });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [state.timer.status, dispatch]);
+
   return {
     // 状態
     status: state.timer.status,

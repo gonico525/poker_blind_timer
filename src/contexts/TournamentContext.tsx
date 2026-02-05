@@ -18,9 +18,34 @@ export function tournamentReducer(
       if (state.timer.status === 'running') {
         return state;
       }
+
+      const now = Date.now();
+
+      // 一時停止からの再開の場合、startTimeを調整
+      if (state.timer.status === 'paused' && state.timer.pausedAt) {
+        const pauseDuration = now - state.timer.pausedAt;
+        const adjustedStartTime =
+          (state.timer.startTime || now) + pauseDuration;
+        return {
+          ...state,
+          timer: {
+            ...state.timer,
+            status: 'running',
+            startTime: adjustedStartTime,
+            pausedAt: null,
+          },
+        };
+      }
+
+      // 新規開始の場合
       return {
         ...state,
-        timer: { ...state.timer, status: 'running' },
+        timer: {
+          ...state.timer,
+          status: 'running',
+          startTime: now,
+          pausedAt: null,
+        },
       };
     }
 
@@ -31,7 +56,11 @@ export function tournamentReducer(
       }
       return {
         ...state,
-        timer: { ...state.timer, status: 'paused' },
+        timer: {
+          ...state.timer,
+          status: 'paused',
+          pausedAt: Date.now(),
+        },
       };
     }
 
@@ -41,14 +70,34 @@ export function tournamentReducer(
         return state;
       }
 
-      // 休憩中の場合、タイマーをカウントダウン
-      if (state.isOnBreak) {
-        const newRemainingTime = Math.max(0, state.timer.remainingTime - 1);
-        const newElapsedTime =
-          state.timer.elapsedTime + (newRemainingTime > 0 ? 1 : 0);
+      // タイムスタンプベースの時間計算
+      const now = Date.now();
+      const { startTime } = state.timer;
 
-        // 休憩タイマーが0になったら、休憩を終了して次のレベルに進む（自動進行のためタイマーは継続）
-        if (newRemainingTime === 0 && state.timer.remainingTime > 0) {
+      // 休憩中の場合
+      if (state.isOnBreak) {
+        const duration = state.breakConfig.duration;
+        let newRemainingTime: number;
+        let newElapsedTime: number;
+
+        if (startTime) {
+          // タイムスタンプベースで計算
+          const actualElapsed = (now - startTime) / 1000;
+          newRemainingTime = Math.max(0, duration - actualElapsed);
+          newElapsedTime = Math.min(actualElapsed, duration);
+        } else {
+          // フォールバック: 従来の固定デクリメント
+          newRemainingTime = Math.max(0, state.timer.remainingTime - 1);
+          newElapsedTime =
+            state.timer.elapsedTime + (newRemainingTime > 0 ? 1 : 0);
+        }
+
+        // 表示用に整数化（ただし内部計算は小数点以下を保持）
+        const displayRemaining = Math.ceil(newRemainingTime);
+        const prevDisplayRemaining = Math.ceil(state.timer.remainingTime);
+
+        // 休憩タイマーが0になったら、休憩を終了して次のレベルに進む
+        if (displayRemaining === 0 && prevDisplayRemaining > 0) {
           return {
             ...state,
             isOnBreak: false,
@@ -56,6 +105,8 @@ export function tournamentReducer(
               status: 'running',
               remainingTime: state.levelDuration,
               elapsedTime: 0,
+              startTime: Date.now(),
+              pausedAt: null,
             },
           };
         }
@@ -64,19 +115,37 @@ export function tournamentReducer(
           ...state,
           timer: {
             ...state.timer,
-            remainingTime: newRemainingTime,
-            elapsedTime: newElapsedTime,
+            remainingTime: displayRemaining,
+            elapsedTime: Math.floor(newElapsedTime),
           },
         };
       }
 
-      // 通常のタイマーをカウントダウン
-      const newRemainingTime = Math.max(0, state.timer.remainingTime - 1);
-      const newElapsedTime =
-        state.timer.elapsedTime + (newRemainingTime > 0 ? 1 : 0);
+      // 通常のタイマー計算
+      const duration = state.isOnBreak
+        ? state.breakConfig.duration
+        : state.levelDuration;
+      let newRemainingTime: number;
+      let newElapsedTime: number;
+
+      if (startTime) {
+        // タイムスタンプベースで計算
+        const actualElapsed = (now - startTime) / 1000;
+        newRemainingTime = Math.max(0, duration - actualElapsed);
+        newElapsedTime = Math.min(actualElapsed, duration);
+      } else {
+        // フォールバック: 従来の固定デクリメント
+        newRemainingTime = Math.max(0, state.timer.remainingTime - 1);
+        newElapsedTime =
+          state.timer.elapsedTime + (newRemainingTime > 0 ? 1 : 0);
+      }
+
+      // 表示用に整数化
+      const displayRemaining = Math.ceil(newRemainingTime);
+      const prevDisplayRemaining = Math.ceil(state.timer.remainingTime);
 
       // タイマーが0になったら、次のレベルに自動進行
-      if (newRemainingTime === 0 && state.timer.remainingTime > 0) {
+      if (displayRemaining === 0 && prevDisplayRemaining > 0) {
         // 最後のレベルの場合はタイマーを停止するのみ
         if (state.currentLevel >= state.blindLevels.length - 1) {
           return {
@@ -84,7 +153,9 @@ export function tournamentReducer(
             timer: {
               status: 'idle',
               remainingTime: 0,
-              elapsedTime: state.timer.elapsedTime + 1,
+              elapsedTime: Math.floor(newElapsedTime),
+              startTime: null,
+              pausedAt: null,
             },
           };
         }
@@ -106,6 +177,8 @@ export function tournamentReducer(
               status: 'running',
               remainingTime: state.breakConfig.duration,
               elapsedTime: 0,
+              startTime: Date.now(),
+              pausedAt: null,
             },
           };
         }
@@ -118,6 +191,8 @@ export function tournamentReducer(
             status: 'running',
             remainingTime: state.levelDuration,
             elapsedTime: 0,
+            startTime: Date.now(),
+            pausedAt: null,
           },
         };
       }
@@ -126,8 +201,8 @@ export function tournamentReducer(
         ...state,
         timer: {
           ...state.timer,
-          remainingTime: newRemainingTime,
-          elapsedTime: newElapsedTime,
+          remainingTime: displayRemaining,
+          elapsedTime: Math.floor(newElapsedTime),
         },
       };
     }
@@ -157,6 +232,8 @@ export function tournamentReducer(
             status: 'idle',
             remainingTime: state.breakConfig.duration,
             elapsedTime: 0,
+            startTime: null,
+            pausedAt: null,
           },
         };
       }
@@ -169,6 +246,8 @@ export function tournamentReducer(
           status: 'idle',
           remainingTime: state.levelDuration,
           elapsedTime: 0,
+          startTime: null,
+          pausedAt: null,
         },
       };
     }
@@ -191,6 +270,8 @@ export function tournamentReducer(
           status: 'idle',
           remainingTime: state.levelDuration,
           elapsedTime: 0,
+          startTime: null,
+          pausedAt: null,
         },
       };
     }
@@ -204,6 +285,8 @@ export function tournamentReducer(
             ? state.breakConfig.duration
             : state.levelDuration,
           elapsedTime: 0,
+          startTime: null,
+          pausedAt: null,
         },
       };
     }
@@ -220,6 +303,8 @@ export function tournamentReducer(
           status: 'idle',
           remainingTime: structure.levelDuration,
           elapsedTime: 0,
+          startTime: null,
+          pausedAt: null,
         },
         isOnBreak: false,
       };
@@ -241,6 +326,8 @@ export function tournamentReducer(
               status: 'idle',
               remainingTime: state.levelDuration,
               elapsedTime: 0,
+              startTime: null,
+              pausedAt: null,
             }
           : state.timer,
       };
@@ -275,6 +362,8 @@ export function tournamentReducer(
           status: 'idle',
           remainingTime: state.breakConfig.duration,
           elapsedTime: 0,
+          startTime: null,
+          pausedAt: null,
         },
       };
     }
@@ -300,6 +389,8 @@ export function tournamentReducer(
           status: 'idle',
           remainingTime: state.levelDuration,
           elapsedTime: 0,
+          startTime: null,
+          pausedAt: null,
         },
       };
     }
@@ -307,7 +398,105 @@ export function tournamentReducer(
     case 'START_BREAK_TIMER': {
       return {
         ...state,
-        timer: { ...state.timer, status: 'running' },
+        timer: {
+          ...state.timer,
+          status: 'running',
+          startTime: Date.now(),
+          pausedAt: null,
+        },
+      };
+    }
+
+    case 'SYNC_TIMER': {
+      // バックグラウンドから復帰時に実時間に基づいて再計算
+      if (!state.timer.startTime || state.timer.status !== 'running') {
+        return state;
+      }
+
+      const now = Date.now();
+      const duration = state.isOnBreak
+        ? state.breakConfig.duration
+        : state.levelDuration;
+      const actualElapsed = (now - state.timer.startTime) / 1000;
+      const newRemainingTime = Math.max(0, duration - actualElapsed);
+
+      // 表示用に整数化
+      const displayRemaining = Math.ceil(newRemainingTime);
+      const prevDisplayRemaining = Math.ceil(state.timer.remainingTime);
+
+      // タイマーが0になっていた場合、自動進行を処理
+      if (displayRemaining === 0 && prevDisplayRemaining > 0) {
+        // 休憩中の場合
+        if (state.isOnBreak) {
+          return {
+            ...state,
+            isOnBreak: false,
+            timer: {
+              status: 'running',
+              remainingTime: state.levelDuration,
+              elapsedTime: 0,
+              startTime: Date.now(),
+              pausedAt: null,
+            },
+          };
+        }
+
+        // 最後のレベルの場合はタイマーを停止
+        if (state.currentLevel >= state.blindLevels.length - 1) {
+          return {
+            ...state,
+            timer: {
+              status: 'idle',
+              remainingTime: 0,
+              elapsedTime: Math.floor(actualElapsed),
+              startTime: null,
+              pausedAt: null,
+            },
+          };
+        }
+
+        // 休憩判定（現在のレベル終了後に休憩を取るか）
+        const takeBreak = shouldTakeBreak(
+          state.currentLevel,
+          state.breakConfig
+        );
+        const newLevel = state.currentLevel + 1;
+
+        if (takeBreak) {
+          return {
+            ...state,
+            currentLevel: newLevel,
+            isOnBreak: true,
+            timer: {
+              status: 'running',
+              remainingTime: state.breakConfig.duration,
+              elapsedTime: 0,
+              startTime: Date.now(),
+              pausedAt: null,
+            },
+          };
+        }
+
+        return {
+          ...state,
+          currentLevel: newLevel,
+          timer: {
+            status: 'running',
+            remainingTime: state.levelDuration,
+            elapsedTime: 0,
+            startTime: Date.now(),
+            pausedAt: null,
+          },
+        };
+      }
+
+      return {
+        ...state,
+        timer: {
+          ...state.timer,
+          remainingTime: displayRemaining,
+          elapsedTime: Math.floor(Math.min(actualElapsed, duration)),
+        },
       };
     }
 
@@ -335,7 +524,13 @@ export function TournamentProvider({
   const [state, dispatch] = useReducer(
     tournamentReducer,
     providedInitialState ?? {
-      timer: { status: 'idle', remainingTime: 600, elapsedTime: 0 },
+      timer: {
+        status: 'idle',
+        remainingTime: 600,
+        elapsedTime: 0,
+        startTime: null,
+        pausedAt: null,
+      },
       currentLevel: 0,
       blindLevels: [],
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
