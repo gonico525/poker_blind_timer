@@ -10,7 +10,13 @@ const createWrapper =
   (initialState?: Partial<TournamentState>) =>
   ({ children }: { children: React.ReactNode }) => {
     const defaultState: TournamentState = {
-      timer: { status: 'idle', remainingTime: 600, elapsedTime: 0 },
+      timer: {
+        status: 'idle',
+        remainingTime: 600,
+        elapsedTime: 0,
+        startTime: null,
+        pausedAt: null,
+      },
       currentLevel: 0,
       blindLevels: [
         { smallBlind: 25, bigBlind: 50, ante: 0 },

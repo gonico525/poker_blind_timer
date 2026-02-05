@@ -24,6 +24,8 @@ export interface Timer {
   status: TimerStatus;
   remainingTime: number;
   elapsedTime: number;
+  startTime: number | null; // 開始時刻（Date.now()）
+  pausedAt: number | null; // 一時停止時刻（Date.now()）
 }
 
 /**

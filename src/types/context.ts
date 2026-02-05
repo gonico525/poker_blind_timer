@@ -20,6 +20,7 @@ export type TournamentAction =
   | { type: 'PAUSE' }
   | { type: 'RESET' }
   | { type: 'TICK' }
+  | { type: 'SYNC_TIMER' }
   | { type: 'NEXT_LEVEL' }
   | { type: 'PREV_LEVEL' }
   | { type: 'START_BREAK' }

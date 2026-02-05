@@ -4,7 +4,13 @@ import { tournamentReducer } from './TournamentContext';
 
 describe('tournamentReducer', () => {
   const initialState: TournamentState = {
-    timer: { status: 'idle', remainingTime: 600, elapsedTime: 0 },
+    timer: {
+      status: 'idle',
+      remainingTime: 600,
+      elapsedTime: 0,
+      startTime: null,
+      pausedAt: null,
+    },
     currentLevel: 0,
     blindLevels: [
       { smallBlind: 25, bigBlind: 50, ante: 0 },
@@ -37,7 +43,13 @@ describe('tournamentReducer', () => {
       const breakState: TournamentState = {
         ...initialState,
         isOnBreak: true,
-        timer: { status: 'idle', remainingTime: 600, elapsedTime: 0 },
+        timer: {
+          status: 'idle',
+          remainingTime: 600,
+          elapsedTime: 0,
+          startTime: null,
+          pausedAt: null,
+        },
       };
       const state = tournamentReducer(breakState, { type: 'START' });
       expect(state.timer.status).toBe('running');
@@ -45,10 +57,17 @@ describe('tournamentReducer', () => {
     });
 
     it('should resume during break when paused', () => {
+      const now = Date.now();
       const pausedBreakState: TournamentState = {
         ...initialState,
         isOnBreak: true,
-        timer: { status: 'paused', remainingTime: 300, elapsedTime: 300 },
+        timer: {
+          status: 'paused',
+          remainingTime: 300,
+          elapsedTime: 300,
+          startTime: now - 300000,
+          pausedAt: now,
+        },
       };
       const state = tournamentReducer(pausedBreakState, { type: 'START' });
       expect(state.timer.status).toBe('running');
@@ -74,13 +93,32 @@ describe('tournamentReducer', () => {
   });
 
   describe('TICK action', () => {
-    it('should decrement remainingTime by 1', () => {
-      const runningState = {
+    it('should decrement remainingTime based on timestamp', () => {
+      const now = Date.now();
+      const runningState: TournamentState = {
         ...initialState,
         timer: {
           status: 'running' as const,
           remainingTime: 100,
           elapsedTime: 500,
+          startTime: now - 501000, // 501秒前に開始
+          pausedAt: null,
+        },
+      };
+      const state = tournamentReducer(runningState, { type: 'TICK' });
+      // タイムスタンプベースの計算：600 - 501秒 = 99秒
+      expect(state.timer.remainingTime).toBe(99);
+    });
+
+    it('should fallback to fixed decrement when no startTime', () => {
+      const runningState: TournamentState = {
+        ...initialState,
+        timer: {
+          status: 'running' as const,
+          remainingTime: 100,
+          elapsedTime: 500,
+          startTime: null,
+          pausedAt: null,
         },
       };
       const state = tournamentReducer(runningState, { type: 'TICK' });
@@ -89,17 +127,19 @@ describe('tournamentReducer', () => {
     });
 
     it('should not tick below 0', () => {
-      const runningState = {
+      const now = Date.now();
+      const runningState: TournamentState = {
         ...initialState,
         timer: {
           status: 'running' as const,
           remainingTime: 0,
           elapsedTime: 600,
+          startTime: now - 700000, // 700秒前（既に時間切れ）
+          pausedAt: null,
         },
       };
       const state = tournamentReducer(runningState, { type: 'TICK' });
       expect(state.timer.remainingTime).toBe(0);
-      expect(state.timer.elapsedTime).toBe(600);
     });
 
     it('should not tick when not running', () => {
@@ -108,14 +148,18 @@ describe('tournamentReducer', () => {
     });
 
     it('should tick during break', () => {
-      const breakState = {
+      const now = Date.now();
+      const breakState: TournamentState = {
         ...initialState,
         timer: {
           status: 'running' as const,
           remainingTime: 300,
           elapsedTime: 0,
+          startTime: now - 1000, // 1秒前に開始
+          pausedAt: null,
         },
         isOnBreak: true,
+        breakConfig: { enabled: true, frequency: 4, duration: 300 },
       };
       const state = tournamentReducer(breakState, { type: 'TICK' });
       expect(state.timer.remainingTime).toBe(299);
@@ -171,18 +215,22 @@ describe('tournamentReducer', () => {
 
   describe('RESET action', () => {
     it('should reset timer for current level', () => {
-      const state = {
+      const state: TournamentState = {
         ...initialState,
         timer: {
           status: 'running' as const,
           remainingTime: 100,
           elapsedTime: 500,
+          startTime: Date.now() - 500000,
+          pausedAt: null,
         },
       };
       const newState = tournamentReducer(state, { type: 'RESET' });
       expect(newState.timer.remainingTime).toBe(initialState.levelDuration);
       expect(newState.timer.elapsedTime).toBe(0);
       expect(newState.timer.status).toBe('idle');
+      expect(newState.timer.startTime).toBeNull();
+      expect(newState.timer.pausedAt).toBeNull();
     });
 
     it('should reset break timer during break', () => {
@@ -190,7 +238,13 @@ describe('tournamentReducer', () => {
         ...initialState,
         isOnBreak: true,
         breakConfig: { enabled: true, frequency: 4, duration: 600 },
-        timer: { status: 'running', remainingTime: 200, elapsedTime: 400 },
+        timer: {
+          status: 'running',
+          remainingTime: 200,
+          elapsedTime: 400,
+          startTime: Date.now() - 400000,
+          pausedAt: null,
+        },
       };
       const state = tournamentReducer(breakState, { type: 'RESET' });
       expect(state.timer.status).toBe('idle');
@@ -283,12 +337,14 @@ describe('tournamentReducer', () => {
     });
 
     it('should not update timer remaining time if running', () => {
-      const runningState = {
+      const runningState: TournamentState = {
         ...initialState,
         timer: {
           status: 'running' as const,
           remainingTime: 300,
           elapsedTime: 300,
+          startTime: Date.now() - 300000,
+          pausedAt: null,
         },
       };
       const state = tournamentReducer(runningState, {
@@ -334,6 +390,159 @@ describe('tournamentReducer', () => {
       const state = tournamentReducer(onBreakState, {
         type: 'START_BREAK_TIMER',
       });
+      expect(state.timer.status).toBe('running');
+    });
+  });
+
+  describe('SYNC_TIMER action', () => {
+    it('should sync timer based on real elapsed time', () => {
+      const now = Date.now();
+      const runningState: TournamentState = {
+        ...initialState,
+        timer: {
+          status: 'running' as const,
+          remainingTime: 500, // 表示上は500秒残っている
+          elapsedTime: 100,
+          startTime: now - 200000, // 実際は200秒経過
+          pausedAt: null,
+        },
+      };
+      const state = tournamentReducer(runningState, { type: 'SYNC_TIMER' });
+      // 実際の経過時間に基づいて再計算: 600 - 200 = 400秒
+      expect(state.timer.remainingTime).toBe(400);
+      expect(state.timer.elapsedTime).toBe(200);
+    });
+
+    it('should not sync if timer is not running', () => {
+      const state = tournamentReducer(initialState, { type: 'SYNC_TIMER' });
+      expect(state).toBe(initialState);
+    });
+
+    it('should not sync if no startTime', () => {
+      const pausedState: TournamentState = {
+        ...initialState,
+        timer: {
+          status: 'running' as const,
+          remainingTime: 500,
+          elapsedTime: 100,
+          startTime: null,
+          pausedAt: null,
+        },
+      };
+      const state = tournamentReducer(pausedState, { type: 'SYNC_TIMER' });
+      expect(state).toBe(pausedState);
+    });
+
+    it('should advance to next level if time expired during background', () => {
+      const now = Date.now();
+      const runningState: TournamentState = {
+        ...initialState,
+        timer: {
+          status: 'running' as const,
+          remainingTime: 100,
+          elapsedTime: 500,
+          startTime: now - 700000, // 700秒経過 (600秒のレベル時間を超過)
+          pausedAt: null,
+        },
+      };
+      const state = tournamentReducer(runningState, { type: 'SYNC_TIMER' });
+      // 次のレベルに進むべき
+      expect(state.currentLevel).toBe(1);
+      expect(state.timer.status).toBe('running');
+      expect(state.timer.remainingTime).toBe(600);
+    });
+
+    it('should sync break timer correctly', () => {
+      const now = Date.now();
+      const breakState: TournamentState = {
+        ...initialState,
+        isOnBreak: true,
+        breakConfig: { enabled: true, frequency: 4, duration: 300 },
+        timer: {
+          status: 'running' as const,
+          remainingTime: 250,
+          elapsedTime: 50,
+          startTime: now - 100000, // 100秒経過
+          pausedAt: null,
+        },
+      };
+      const state = tournamentReducer(breakState, { type: 'SYNC_TIMER' });
+      // 300 - 100 = 200秒
+      expect(state.timer.remainingTime).toBe(200);
+      expect(state.isOnBreak).toBe(true);
+    });
+
+    it('should stop timer when last level expires', () => {
+      const now = Date.now();
+      const lastLevelState: TournamentState = {
+        ...initialState,
+        currentLevel: 4,
+        timer: {
+          status: 'running' as const,
+          remainingTime: 100,
+          elapsedTime: 500,
+          startTime: now - 700000, // 700秒経過 (600秒を超過)
+          pausedAt: null,
+        },
+      };
+      const state = tournamentReducer(lastLevelState, { type: 'SYNC_TIMER' });
+      expect(state.timer.status).toBe('idle');
+      expect(state.timer.remainingTime).toBe(0);
+      expect(state.currentLevel).toBe(4);
+    });
+  });
+
+  describe('Timestamp-based START/PAUSE', () => {
+    it('should set startTime on START', () => {
+      const beforeStart = Date.now();
+      const state = tournamentReducer(initialState, { type: 'START' });
+      const afterStart = Date.now();
+
+      expect(state.timer.startTime).not.toBeNull();
+      expect(state.timer.startTime).toBeGreaterThanOrEqual(beforeStart);
+      expect(state.timer.startTime).toBeLessThanOrEqual(afterStart);
+    });
+
+    it('should set pausedAt on PAUSE', () => {
+      const runningState: TournamentState = {
+        ...initialState,
+        timer: {
+          ...initialState.timer,
+          status: 'running' as const,
+          startTime: Date.now() - 100000,
+          pausedAt: null,
+        },
+      };
+
+      const beforePause = Date.now();
+      const state = tournamentReducer(runningState, { type: 'PAUSE' });
+      const afterPause = Date.now();
+
+      expect(state.timer.pausedAt).not.toBeNull();
+      expect(state.timer.pausedAt).toBeGreaterThanOrEqual(beforePause);
+      expect(state.timer.pausedAt).toBeLessThanOrEqual(afterPause);
+    });
+
+    it('should adjust startTime on resume from pause', () => {
+      const originalStart = Date.now() - 100000; // 100秒前に開始
+      const pausedAt = Date.now() - 50000; // 50秒前に一時停止
+
+      const pausedState: TournamentState = {
+        ...initialState,
+        timer: {
+          status: 'paused' as const,
+          remainingTime: 550,
+          elapsedTime: 50,
+          startTime: originalStart,
+          pausedAt: pausedAt,
+        },
+      };
+
+      const state = tournamentReducer(pausedState, { type: 'START' });
+
+      // startTimeは一時停止していた時間分だけ後ろにずらされる
+      expect(state.timer.startTime).toBeGreaterThan(originalStart);
+      expect(state.timer.pausedAt).toBeNull();
       expect(state.timer.status).toBe('running');
     });
   });
