@@ -908,7 +908,175 @@ export function hasNextLevel(tournament: Tournament): boolean {
 }
 ```
 
-## 10. まとめ
+## 10. アベレージスタック関連のデータモデル
+
+### 10.1 Structure（ストラクチャー）型への初期スタック追加
+
+トーナメントのアベレージスタック（平均チップ量）を算出するため、ストラクチャーに初期スタックフィールドを追加する。
+
+```typescript
+export interface Preset {
+  id: PresetId;
+  name: string;
+  type: PresetType;
+  blindLevels: BlindLevel[];
+  levelDuration: number;      // 秒
+  breakConfig: BreakConfig;
+  initialStack: number;       // 初期スタック（チップ数）。0 = 未設定
+  createdAt: number;
+  updatedAt: number;
+}
+```
+
+**`initialStack` フィールド仕様:**
+
+| 項目 | 値 |
+|------|-----|
+| 型 | `number` |
+| 最小値 | 0（未設定を意味する） |
+| 最大値 | 10,000,000 |
+| デフォルト値 | 0 |
+| バリデーション | 0以上の整数 |
+
+**バリデーション関数:**
+
+```typescript
+export function isValidInitialStack(value: number): boolean {
+  return Number.isInteger(value) && value >= 0 && value <= 10_000_000;
+}
+```
+
+### 10.2 デフォルトストラクチャーの初期スタック値
+
+各デフォルトストラクチャーには名前に記載されている初期スタック値を設定する。
+
+| ストラクチャー | 名前 | initialStack |
+|---|---|---|
+| Deepstack | Deepstack (30min/50k Start) | 50000 |
+| Standard | Standard (20min/30k Start) | 30000 |
+| Turbo | Turbo (15min/25k Start) | 25000 |
+| Hyper Turbo | Hyper Turbo (10min/20k Start) | 20000 |
+
+### 10.3 TournamentState へのプレイヤー数追加
+
+トーナメント進行中のプレイヤー数を管理するため、TournamentState にフィールドを追加する。
+
+```typescript
+export interface Tournament {
+  // 既存フィールド
+  currentLevel: number;
+  blindLevels: BlindLevel[];
+  levelDuration: number;
+  timer: Timer;
+  breakConfig: BreakConfig;
+  isBreak: boolean;
+  activePresetId: string | null;
+
+  // 追加フィールド
+  totalPlayers: number;       // 参加人数（0 = 未設定）
+  remainingPlayers: number;   // 残り人数
+  initialStack: number;       // 現在のストラクチャーの初期スタック（参照用）
+}
+```
+
+**`totalPlayers` フィールド仕様:**
+
+| 項目 | 値 |
+|------|-----|
+| 型 | `number` |
+| 最小値 | 0（未設定を意味する） |
+| 最大値 | 10,000 |
+| デフォルト値 | 0 |
+| バリデーション | 0以上の整数 |
+
+**`remainingPlayers` フィールド仕様:**
+
+| 項目 | 値 |
+|------|-----|
+| 型 | `number` |
+| 最小値 | 0 |
+| 最大値 | totalPlayers 以下 |
+| デフォルト値 | totalPlayers と同値 |
+| バリデーション | 0以上かつ totalPlayers 以下の整数 |
+
+**動作仕様:**
+
+- `totalPlayers` を設定すると `remainingPlayers` も同値に初期化される
+- `remainingPlayers` は `totalPlayers` を超えることができない（リバイ時は `totalPlayers` を先に増やす）
+- ストラクチャーをロード（`LOAD_STRUCTURE`）すると `totalPlayers`, `remainingPlayers` は 0 にリセットされる
+- タイマーリセット（`RESET`）では `remainingPlayers` を `totalPlayers` にリセットする
+
+### 10.4 アベレージスタック計算（ドメインロジック）
+
+```typescript
+/**
+ * アベレージスタックを計算
+ * @returns 平均チップ数（整数）。計算不可の場合は null
+ */
+export function calculateAverageStack(
+  initialStack: number,
+  totalPlayers: number,
+  remainingPlayers: number
+): number | null {
+  if (initialStack <= 0 || totalPlayers <= 0 || remainingPlayers <= 0) {
+    return null;
+  }
+  return Math.round((initialStack * totalPlayers) / remainingPlayers);
+}
+
+/**
+ * アベレージスタックのBB換算
+ * @returns BB数（小数第1位まで）。計算不可の場合は null
+ */
+export function calculateAverageStackBB(
+  averageStack: number,
+  bigBlind: number
+): number | null {
+  if (averageStack <= 0 || bigBlind <= 0) {
+    return null;
+  }
+  return Math.round((averageStack / bigBlind) * 10) / 10;
+}
+
+/**
+ * アベレージスタック表示の可否判定
+ */
+export function canCalculateAverageStack(
+  initialStack: number,
+  totalPlayers: number,
+  remainingPlayers: number
+): boolean {
+  return initialStack > 0 && totalPlayers > 0 && remainingPlayers > 0;
+}
+```
+
+### 10.5 localStorage スキーマの後方互換性
+
+既存の localStorage データには `initialStack`, `totalPlayers`, `remainingPlayers` フィールドが存在しない。デシリアライズ時にこれらのフィールドがない場合はデフォルト値（0）で補完する。
+
+```typescript
+// ストラクチャーのデシリアライズ時
+function deserializeStructure(data: unknown): Preset {
+  const structure = data as Preset;
+  return {
+    ...structure,
+    initialStack: structure.initialStack ?? 0,  // 後方互換性
+  };
+}
+
+// トーナメント状態のデシリアライズ時
+function deserializeTournamentState(data: unknown): Tournament {
+  const state = data as Tournament;
+  return {
+    ...state,
+    totalPlayers: state.totalPlayers ?? 0,            // 後方互換性
+    remainingPlayers: state.remainingPlayers ?? 0,     // 後方互換性
+    initialStack: state.initialStack ?? 0,             // 後方互換性
+  };
+}
+```
+
+## 11. まとめ
 
 本データモデル仕様では以下を定義しました：
 
@@ -917,6 +1085,7 @@ export function hasNextLevel(tournament: Tournament): boolean {
 3. **localStorage スキーマ**: データ永続化の形式
 4. **バリデーション**: 入力とインポートデータの検証
 5. **ユーティリティ**: 時間・数値フォーマット関数
+6. **アベレージスタック**: 初期スタック・プレイヤー数のデータモデルと計算ロジック
 
 ---
 
@@ -925,6 +1094,7 @@ export function hasNextLevel(tournament: Tournament): boolean {
 - [01-architecture.md](./01-architecture.md) - システムアーキテクチャ
 - [features/storage.md](./features/storage.md) - データ永続化の実装詳細
 - [features/presets.md](./features/presets.md) - プリセット管理機能
+- [features/average-stack.md](./features/average-stack.md) - アベレージスタック機能
 
 ---
 
@@ -933,3 +1103,4 @@ export function hasNextLevel(tournament: Tournament): boolean {
 | バージョン | 日付       | 変更内容 | 作成者              |
 | ---------- | ---------- | -------- | ------------------- |
 | 1.0        | 2026-01-26 | 初版作成 | AI System Architect |
+| 1.1        | 2026-02-09 | アベレージスタック関連のデータモデル追加（セクション10） | AI System Architect |
