@@ -19,6 +19,10 @@ export const LIMITS = {
   MAX_BREAK_DURATION: 1800, // 30分
   MIN_BREAK_FREQUENCY: 1,
   MAX_BREAK_FREQUENCY: 20,
+  MIN_INITIAL_STACK: 0,
+  MAX_INITIAL_STACK: 10000000,
+  MIN_PLAYERS: 0,
+  MAX_PLAYERS: 10000,
 } as const;
 
 // デフォルト値
@@ -27,6 +31,9 @@ export const DEFAULTS = {
   BREAK_DURATION: 600, // 10分
   BREAK_FREQUENCY: 4, // 4レベルごと
   VOLUME: 0.7,
+  INITIAL_STACK: 0,
+  TOTAL_PLAYERS: 0,
+  REMAINING_PLAYERS: 0,
 } as const;
 
 // 音声ファイルパス

@@ -30,7 +30,11 @@ export type TournamentAction =
   | { type: 'LOAD_STRUCTURE'; payload: { structure: Structure } }
   | { type: 'UPDATE_BLIND_LEVELS'; payload: { blindLevels: BlindLevel[] } }
   | { type: 'UPDATE_BREAK_CONFIG'; payload: { breakConfig: BreakConfig } }
-  | { type: 'UPDATE_LEVEL_DURATION'; payload: { levelDuration: number } };
+  | { type: 'UPDATE_LEVEL_DURATION'; payload: { levelDuration: number } }
+  | {
+      type: 'SET_PLAYERS';
+      payload: { totalPlayers: number; remainingPlayers: number };
+    };
 
 /**
  * TournamentContext の値

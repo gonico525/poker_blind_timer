@@ -56,6 +56,7 @@ describe('isValidStructure', () => {
       blindLevels: [{ smallBlind: 100, bigBlind: 200, ante: 0 }],
       levelDuration: 600,
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
+      initialStack: 0,
     };
     expect(isValidStructure(structure)).toBe(true);
   });
@@ -68,6 +69,7 @@ describe('isValidStructure', () => {
       blindLevels: [{ smallBlind: 0, bigBlind: 200, ante: 0 }],
       levelDuration: 600,
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
+      initialStack: 0,
     };
     expect(isValidStructure(structure)).toBe(false);
   });
@@ -88,6 +90,7 @@ describe('isValidStructure', () => {
       blindLevels: 'not an array',
       levelDuration: 600,
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
+      initialStack: 0,
     };
     expect(isValidStructure(structure)).toBe(false);
   });

@@ -39,6 +39,7 @@ export function createDefaultStructures(): Structure[] {
         frequency: 4,
         duration: 600, // 10分
       },
+      initialStack: 50000,
       createdAt: now,
       updatedAt: now,
       blindLevels: [
@@ -78,6 +79,7 @@ export function createDefaultStructures(): Structure[] {
         frequency: 4,
         duration: 600, // 10分
       },
+      initialStack: 30000,
       createdAt: now,
       updatedAt: now,
       blindLevels: [
@@ -110,6 +112,7 @@ export function createDefaultStructures(): Structure[] {
         frequency: 5,
         duration: 600, // 10分
       },
+      initialStack: 25000,
       createdAt: now,
       updatedAt: now,
       blindLevels: [
@@ -139,6 +142,7 @@ export function createDefaultStructures(): Structure[] {
         frequency: 6,
         duration: 300, // 5分
       },
+      initialStack: 20000,
       createdAt: now,
       updatedAt: now,
       blindLevels: [
