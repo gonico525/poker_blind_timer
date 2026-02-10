@@ -45,10 +45,11 @@
 | `START_BREAK` | TICK/NEXT_LEVEL の処理内 | 休憩を開始 | - |
 | `END_BREAK` | 休憩タイマー終了時 | 休憩を終了 | - |
 | `SKIP_BREAK` | BreakDisplay | 休憩をスキップ | - |
-| `LOAD_PRESET` | SettingsContext経由 | プリセットのブラインド構造を適用 | タイマーをリセット |
+| `LOAD_PRESET` | SettingsContext経由 | プリセットのブラインド構造を適用 | タイマーをリセット、プレイヤー数を0にリセット |
 | `UPDATE_BLIND_LEVELS` | BlindEditor | ブラインドレベルを更新 | - |
 | `UPDATE_BREAK_CONFIG` | BreakSettings | 休憩設定を更新 | - |
 | `UPDATE_LEVEL_DURATION` | TimerSettings | レベル時間を更新 | - |
+| `SET_PLAYERS` | AverageStackDisplay | 参加人数・残り人数を設定 | アベレージスタック表示を更新 |
 
 #### SettingsContext のアクション
 
@@ -80,7 +81,10 @@
          ├─→ blindLevels を preset.blindLevels で上書き
          ├─→ breakConfig を preset.breakConfig で上書き
          ├─→ levelDuration を preset.levelDuration で上書き
+         ├─→ initialStack を preset.initialStack で上書き
          ├─→ currentLevel を 0 にリセット
+         ├─→ totalPlayers を 0 にリセット
+         ├─→ remainingPlayers を 0 にリセット
          └─→ timer を idle 状態にリセット
 ```
 
@@ -967,8 +971,59 @@ KeyboardService
 
 ---
 
+## 10. アベレージスタック関連のインターフェース
+
+### 10.1 SET_PLAYERS アクションの処理フロー
+
+```
+[ユーザーがタイマー画面でプレイヤー数を変更]
+         │
+         ▼
+[AverageStackDisplay: dispatch({ type: 'SET_PLAYERS', payload: { totalPlayers, remainingPlayers } })]
+         │
+         ├─→ totalPlayers を更新
+         ├─→ remainingPlayers を更新（totalPlayers を超えないよう制約）
+         └─→ アベレージスタック表示が自動的に再計算される
+```
+
+**アクション型定義:**
+
+```typescript
+| { type: 'SET_PLAYERS'; payload: { totalPlayers: number; remainingPlayers: number } }
+```
+
+**バリデーション:**
+
+- `totalPlayers >= 0`
+- `remainingPlayers >= 0`
+- `remainingPlayers <= totalPlayers`
+
+### 10.2 LOAD_PRESET 時のプレイヤー数リセット
+
+ストラクチャー（プリセット）をロードした際、プレイヤー数は 0 にリセットされる。
+これは新しいトーナメント構成への切り替えを意味するため。
+
+### 10.3 RESET 時の remainingPlayers リセット
+
+タイマーリセット時に `remainingPlayers` を `totalPlayers` に戻す。
+これはトーナメントの再開（最初のレベルからやり直し）を意味するため。
+
+### 10.4 アベレージスタック表示のデータフロー
+
+```
+Structure.initialStack ─┐
+                        ├─→ calculateAverageStack() ─→ AverageStackDisplay
+TournamentState ────────┘
+  ├─ totalPlayers
+  ├─ remainingPlayers
+  └─ blindLevels[currentLevel].bigBlind ─→ calculateAverageStackBB()
+```
+
+---
+
 ## 改訂履歴
 
 | バージョン | 日付 | 変更内容 | 作成者 |
 |-----------|------|---------|--------|
 | 1.0 | 2026-01-26 | 初版作成（レビュー報告書の指摘事項に対応） | システムアーキテクト |
+| 1.1 | 2026-02-09 | アベレージスタック関連のインターフェース追加（セクション10） | システムアーキテクト |
