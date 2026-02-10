@@ -63,6 +63,7 @@ export interface Structure {
   blindLevels: BlindLevel[];
   levelDuration: number;
   breakConfig: BreakConfig;
+  initialStack: number; // 初期スタック（チップ数）。0 = 未設定
   createdAt: number;
   updatedAt: number;
 }
@@ -77,6 +78,9 @@ export interface TournamentState {
   breakConfig: BreakConfig;
   levelDuration: number;
   isOnBreak: boolean;
+  totalPlayers: number; // 参加人数（0 = 未設定）
+  remainingPlayers: number; // 残り人数
+  initialStack: number; // 現在のストラクチャーの初期スタック
 }
 
 /**

@@ -3,6 +3,7 @@
  */
 
 import type { BlindLevel, Structure, BreakConfig } from '@/types';
+import { LIMITS } from './constants';
 
 /**
  * ブラインドレベルのバリデーション
@@ -41,7 +42,9 @@ export function isValidStructure(structure: unknown): structure is Structure {
     s.blindLevels.every(isValidBlindLevel) &&
     typeof s.levelDuration === 'number' &&
     s.levelDuration > 0 &&
-    isValidBreakConfig(s.breakConfig)
+    isValidBreakConfig(s.breakConfig) &&
+    typeof s.initialStack === 'number' &&
+    s.initialStack >= 0
   );
 }
 
@@ -78,6 +81,70 @@ export function validateStructureName(name: string): {
     return {
       valid: false,
       error: 'ストラクチャー名は50文字以内で入力してください',
+    };
+  }
+  return { valid: true };
+}
+
+/**
+ * 初期スタックのバリデーション
+ * @param initialStack - 初期スタック
+ * @returns バリデーション結果
+ */
+export function validateInitialStack(initialStack: number): {
+  valid: boolean;
+  error?: string;
+} {
+  if (initialStack < LIMITS.MIN_INITIAL_STACK) {
+    return {
+      valid: false,
+      error: `初期スタックは${LIMITS.MIN_INITIAL_STACK}以上で入力してください`,
+    };
+  }
+  if (initialStack > LIMITS.MAX_INITIAL_STACK) {
+    return {
+      valid: false,
+      error: `初期スタックは${LIMITS.MAX_INITIAL_STACK.toLocaleString()}以下で入力してください`,
+    };
+  }
+  return { valid: true };
+}
+
+/**
+ * プレイヤー数のバリデーション
+ * @param totalPlayers - 参加人数
+ * @param remainingPlayers - 残り人数
+ * @returns バリデーション結果
+ */
+export function validatePlayers(
+  totalPlayers: number,
+  remainingPlayers: number
+): {
+  valid: boolean;
+  error?: string;
+} {
+  if (totalPlayers < LIMITS.MIN_PLAYERS) {
+    return {
+      valid: false,
+      error: `参加人数は${LIMITS.MIN_PLAYERS}以上で入力してください`,
+    };
+  }
+  if (totalPlayers > LIMITS.MAX_PLAYERS) {
+    return {
+      valid: false,
+      error: `参加人数は${LIMITS.MAX_PLAYERS.toLocaleString()}以下で入力してください`,
+    };
+  }
+  if (remainingPlayers < LIMITS.MIN_PLAYERS) {
+    return {
+      valid: false,
+      error: `残り人数は${LIMITS.MIN_PLAYERS}以上で入力してください`,
+    };
+  }
+  if (remainingPlayers > totalPlayers) {
+    return {
+      valid: false,
+      error: '残り人数は参加人数以下で入力してください',
     };
   }
   return { valid: true };
