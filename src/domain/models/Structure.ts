@@ -174,9 +174,15 @@ export function mergeWithDefaultStructures(
   const defaults = createDefaultStructures();
   const userStructureIds = new Set(userStructures.map((s) => s.id));
 
+  // 後方互換性: initialStack フィールドがない場合は 0 で補完
+  const normalizedUserStructures = userStructures.map((structure) => ({
+    ...structure,
+    initialStack: structure.initialStack ?? 0,
+  }));
+
   // デフォルトストラクチャーのうち、ユーザーストラクチャーに含まれていないものを追加
   return [
     ...defaults.filter((d) => !userStructureIds.has(d.id)),
-    ...userStructures,
+    ...normalizedUserStructures,
   ];
 }

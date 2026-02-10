@@ -90,6 +90,17 @@ export function useTimer() {
     };
   }, [state.timer.status, dispatch]);
 
+  // プレイヤー数設定
+  const setPlayers = useCallback(
+    (totalPlayers: number, remainingPlayers: number) => {
+      dispatch({
+        type: 'SET_PLAYERS',
+        payload: { totalPlayers, remainingPlayers },
+      });
+    },
+    [dispatch]
+  );
+
   return {
     // 状態
     status: state.timer.status,
@@ -113,6 +124,11 @@ export function useTimer() {
     hasNextLevel: state.currentLevel < state.blindLevels.length - 1,
     hasPrevLevel: state.currentLevel > 0,
 
+    // アベレージスタック関連
+    totalPlayers: state.totalPlayers,
+    remainingPlayers: state.remainingPlayers,
+    initialStack: state.initialStack,
+
     // アクション
     start,
     pause,
@@ -122,5 +138,6 @@ export function useTimer() {
     prevLevel,
     skipBreak,
     startBreakTimer,
+    setPlayers,
   };
 }

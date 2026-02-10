@@ -22,6 +22,9 @@ describe('tournamentReducer', () => {
     breakConfig: { enabled: false, frequency: 4, duration: 600 },
     levelDuration: 600,
     isOnBreak: false,
+    totalPlayers: 0,
+    remainingPlayers: 0,
+    initialStack: 0,
   };
 
   describe('START action', () => {
@@ -252,6 +255,24 @@ describe('tournamentReducer', () => {
       expect(state.timer.elapsedTime).toBe(0);
       expect(state.isOnBreak).toBe(true);
     });
+
+    it('should reset remainingPlayers to totalPlayers', () => {
+      const state: TournamentState = {
+        ...initialState,
+        totalPlayers: 10,
+        remainingPlayers: 5,
+        timer: {
+          status: 'running' as const,
+          remainingTime: 100,
+          elapsedTime: 500,
+          startTime: Date.now() - 500000,
+          pausedAt: null,
+        },
+      };
+      const newState = tournamentReducer(state, { type: 'RESET' });
+      expect(newState.remainingPlayers).toBe(10);
+      expect(newState.totalPlayers).toBe(10);
+    });
   });
 
   describe('LOAD_STRUCTURE action', () => {
@@ -263,6 +284,7 @@ describe('tournamentReducer', () => {
         blindLevels: [{ smallBlind: 50, bigBlind: 100, ante: 10 }],
         breakConfig: { enabled: true, frequency: 3, duration: 300 },
         levelDuration: 900,
+        initialStack: 30000,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -277,6 +299,50 @@ describe('tournamentReducer', () => {
       expect(state.timer.status).toBe('idle');
       expect(state.timer.remainingTime).toBe(900);
       expect(state.timer.elapsedTime).toBe(0);
+    });
+
+    it('should load initialStack from structure', () => {
+      const structure = {
+        id: 'test',
+        name: 'Test',
+        type: 'custom' as const,
+        blindLevels: [{ smallBlind: 50, bigBlind: 100, ante: 10 }],
+        breakConfig: { enabled: true, frequency: 3, duration: 300 },
+        levelDuration: 900,
+        initialStack: 50000,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      const state = tournamentReducer(initialState, {
+        type: 'LOAD_STRUCTURE',
+        payload: { structure },
+      });
+      expect(state.initialStack).toBe(50000);
+    });
+
+    it('should reset player counts when loading structure', () => {
+      const stateWithPlayers: TournamentState = {
+        ...initialState,
+        totalPlayers: 10,
+        remainingPlayers: 5,
+      };
+      const structure = {
+        id: 'test',
+        name: 'Test',
+        type: 'custom' as const,
+        blindLevels: [{ smallBlind: 50, bigBlind: 100, ante: 10 }],
+        breakConfig: { enabled: true, frequency: 3, duration: 300 },
+        levelDuration: 900,
+        initialStack: 30000,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      const state = tournamentReducer(stateWithPlayers, {
+        type: 'LOAD_STRUCTURE',
+        payload: { structure },
+      });
+      expect(state.totalPlayers).toBe(0);
+      expect(state.remainingPlayers).toBe(0);
     });
   });
 
@@ -544,6 +610,54 @@ describe('tournamentReducer', () => {
       expect(state.timer.startTime).toBeGreaterThan(originalStart);
       expect(state.timer.pausedAt).toBeNull();
       expect(state.timer.status).toBe('running');
+    });
+  });
+
+  describe('SET_PLAYERS action', () => {
+    it('should set totalPlayers and remainingPlayers', () => {
+      const state = tournamentReducer(initialState, {
+        type: 'SET_PLAYERS',
+        payload: { totalPlayers: 10, remainingPlayers: 8 },
+      });
+      expect(state.totalPlayers).toBe(10);
+      expect(state.remainingPlayers).toBe(8);
+    });
+
+    it('should adjust remainingPlayers if it exceeds totalPlayers', () => {
+      const state = tournamentReducer(initialState, {
+        type: 'SET_PLAYERS',
+        payload: { totalPlayers: 5, remainingPlayers: 10 },
+      });
+      expect(state.totalPlayers).toBe(5);
+      expect(state.remainingPlayers).toBe(5);
+    });
+
+    it('should handle zero values', () => {
+      const stateWithPlayers: TournamentState = {
+        ...initialState,
+        totalPlayers: 10,
+        remainingPlayers: 5,
+      };
+      const state = tournamentReducer(stateWithPlayers, {
+        type: 'SET_PLAYERS',
+        payload: { totalPlayers: 0, remainingPlayers: 0 },
+      });
+      expect(state.totalPlayers).toBe(0);
+      expect(state.remainingPlayers).toBe(0);
+    });
+
+    it('should allow updating totalPlayers while keeping remainingPlayers', () => {
+      const stateWithPlayers: TournamentState = {
+        ...initialState,
+        totalPlayers: 10,
+        remainingPlayers: 8,
+      };
+      const state = tournamentReducer(stateWithPlayers, {
+        type: 'SET_PLAYERS',
+        payload: { totalPlayers: 12, remainingPlayers: 8 },
+      });
+      expect(state.totalPlayers).toBe(12);
+      expect(state.remainingPlayers).toBe(8);
     });
   });
 });
