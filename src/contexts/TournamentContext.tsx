@@ -288,6 +288,8 @@ export function tournamentReducer(
           startTime: null,
           pausedAt: null,
         },
+        // 残り人数を参加人数にリセット
+        remainingPlayers: state.totalPlayers,
       };
     }
 
@@ -307,6 +309,10 @@ export function tournamentReducer(
           pausedAt: null,
         },
         isOnBreak: false,
+        // 新しいストラクチャーの初期スタックを設定し、プレイヤー数をリセット
+        initialStack: structure.initialStack,
+        totalPlayers: 0,
+        remainingPlayers: 0,
       };
     }
 
@@ -500,6 +506,17 @@ export function tournamentReducer(
       };
     }
 
+    case 'SET_PLAYERS': {
+      const { totalPlayers, remainingPlayers } = action.payload;
+      // remainingPlayers が totalPlayers を超えないように調整
+      const adjustedRemainingPlayers = Math.min(remainingPlayers, totalPlayers);
+      return {
+        ...state,
+        totalPlayers,
+        remainingPlayers: adjustedRemainingPlayers,
+      };
+    }
+
     default:
       return state;
   }
@@ -536,6 +553,9 @@ export function TournamentProvider({
       breakConfig: { enabled: false, frequency: 4, duration: 600 },
       levelDuration: 600,
       isOnBreak: false,
+      totalPlayers: 0,
+      remainingPlayers: 0,
+      initialStack: 0,
     }
   );
 

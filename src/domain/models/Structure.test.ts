@@ -61,6 +61,19 @@ describe('createDefaultStructures', () => {
       });
     });
   });
+
+  it('should have initialStack defined for all default structures', () => {
+    const structures = createDefaultStructures();
+    const deepstack = structures.find((s) => s.id === 'default-deepstack');
+    const standard = structures.find((s) => s.id === 'default-standard');
+    const turbo = structures.find((s) => s.id === 'default-turbo');
+    const hyperturbo = structures.find((s) => s.id === 'default-hyperturbo');
+
+    expect(deepstack?.initialStack).toBe(50000);
+    expect(standard?.initialStack).toBe(30000);
+    expect(turbo?.initialStack).toBe(25000);
+    expect(hyperturbo?.initialStack).toBe(20000);
+  });
 });
 
 describe('mergeWithDefaultStructures', () => {
@@ -73,6 +86,7 @@ describe('mergeWithDefaultStructures', () => {
         blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
         levelDuration: 600,
         breakConfig: { enabled: false, frequency: 4, duration: 600 },
+        initialStack: 10000,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       },
@@ -104,6 +118,7 @@ describe('mergeWithDefaultStructures', () => {
         blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
         levelDuration: 600,
         breakConfig: { enabled: false, frequency: 4, duration: 600 },
+        initialStack: 10000,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       },
@@ -114,6 +129,7 @@ describe('mergeWithDefaultStructures', () => {
         blindLevels: [{ smallBlind: 50, bigBlind: 100, ante: 0 }],
         levelDuration: 900,
         breakConfig: { enabled: true, frequency: 3, duration: 300 },
+        initialStack: 20000,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       },
@@ -133,5 +149,68 @@ describe('mergeWithDefaultStructures', () => {
     const merged = mergeWithDefaultStructures([]);
     expect(merged).toHaveLength(4); // Only defaults
     expect(merged.some((s) => s.id === 'default-standard')).toBe(true);
+  });
+
+  it('should add initialStack to structures missing the field (backward compatibility)', () => {
+    // Simulate legacy data structure without initialStack
+    interface LegacyStructure {
+      id: string;
+      name: string;
+      type: 'custom';
+      blindLevels: Array<{
+        smallBlind: number;
+        bigBlind: number;
+        ante: number;
+      }>;
+      levelDuration: number;
+      breakConfig: { enabled: boolean; frequency: number; duration: number };
+      createdAt: number;
+      updatedAt: number;
+    }
+
+    const legacyStructures: LegacyStructure[] = [
+      {
+        id: 'legacy-1',
+        name: 'Legacy Structure',
+        type: 'custom' as const,
+        blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
+        levelDuration: 600,
+        breakConfig: { enabled: false, frequency: 4, duration: 600 },
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    ];
+
+    // mergeWithDefaultStructures accepts the partial type
+    const merged = mergeWithDefaultStructures(
+      legacyStructures as unknown as typeof legacyStructures &
+        { initialStack: number }[]
+    );
+    const legacy = merged.find((s) => s.id === 'legacy-1');
+
+    expect(legacy).toBeDefined();
+    expect(legacy?.initialStack).toBe(0); // Should be filled with default value
+  });
+
+  it('should preserve existing initialStack values', () => {
+    const structuresWithStack = [
+      {
+        id: 'user-1',
+        name: 'Structure With Stack',
+        type: 'custom' as const,
+        blindLevels: [{ smallBlind: 25, bigBlind: 50, ante: 0 }],
+        levelDuration: 600,
+        breakConfig: { enabled: false, frequency: 4, duration: 600 },
+        initialStack: 50000,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    ];
+
+    const merged = mergeWithDefaultStructures(structuresWithStack);
+    const user = merged.find((s) => s.id === 'user-1');
+
+    expect(user).toBeDefined();
+    expect(user?.initialStack).toBe(50000); // Should preserve existing value
   });
 });
