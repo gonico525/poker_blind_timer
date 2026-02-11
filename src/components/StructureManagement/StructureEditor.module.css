@@ -78,6 +78,13 @@
   margin-top: var(--spacing-1);
 }
 
+.helperText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-2);
+  margin-bottom: 0;
+}
+
 .settingsGrid {
   display: grid;
   gap: var(--spacing-4);

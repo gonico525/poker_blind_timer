@@ -18,6 +18,7 @@ const createTestStructure = (overrides?: Partial<Structure>): Structure => ({
     frequency: 4,
     duration: 10,
   },
+  initialStack: 0, // 初期スタック（0 = 未設定）
   createdAt: Date.now(),
   updatedAt: Date.now(),
   ...overrides,
@@ -229,6 +230,59 @@ describe('StructureEditor', () => {
     await waitFor(() => {
       expect(screen.getByText('休憩頻度')).toBeInTheDocument();
       expect(screen.getByText('休憩時間')).toBeInTheDocument();
+    });
+  });
+
+  it('初期スタック入力フィールドが表示される', () => {
+    render(<StructureEditor {...defaultProps} />);
+
+    expect(screen.getByText('初期スタック')).toBeInTheDocument();
+    expect(
+      screen.getByText('0の場合、アベレージスタックは表示されません')
+    ).toBeInTheDocument();
+  });
+
+  it('初期スタックの値が正しく表示される', () => {
+    const structure = createTestStructure({ initialStack: 30000 });
+    render(<StructureEditor {...defaultProps} structure={structure} />);
+
+    // NumberInputは2番目（レベル時間、初期スタックの順）
+    const initialStackInput = screen.getAllByTestId('number-input')[1];
+    expect(initialStackInput).toHaveValue(30000);
+  });
+
+  it('初期スタックを変更できる', async () => {
+    const user = userEvent.setup();
+    render(<StructureEditor {...defaultProps} />);
+
+    // NumberInputは2番目
+    const incrementButton = screen.getAllByTestId('increment-button')[1];
+    await user.click(incrementButton);
+
+    const initialStackInput = screen.getAllByTestId('number-input')[1];
+    expect(initialStackInput).toHaveValue(1000); // step=1000
+  });
+
+  it('初期スタックの変更が保存される', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    render(
+      <StructureEditor {...defaultProps} onSave={onSave} isDirty={true} />
+    );
+
+    // NumberInputは2番目
+    const incrementButton = screen.getAllByTestId('increment-button')[1];
+    await user.click(incrementButton);
+
+    const saveButton = screen.getByTestId('save-button');
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          initialStack: 1000,
+        })
+      );
     });
   });
 });
