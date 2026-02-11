@@ -39,11 +39,11 @@ TournamentState {
 既存のデフォルトストラクチャー名から読み取れる初期スタック値:
 
 | ストラクチャー | 名前の記載 | initialStack |
-|---|---|---|
-| Deepstack | 50k Start | 50000 |
-| Standard | 30k Start | 30000 |
-| Turbo | 25k Start | 25000 |
-| Hyper Turbo | 20k Start | 20000 |
+| -------------- | ---------- | ------------ |
+| Deepstack      | 50k Start  | 50000        |
+| Standard       | 30k Start  | 30000        |
+| Turbo          | 25k Start  | 25000        |
+| Hyper Turbo    | 20k Start  | 20000        |
 
 ## 確認事項
 
@@ -187,6 +187,7 @@ TournamentState {
    - プレイヤー数のバリデーション関数（残り人数 ≤ 参加人数）
 
 **テスト:**
+
 - `AverageStack.ts` のユニットテスト（計算ロジック、境界値、エッジケース）
 - バリデーション関数のテスト
 
@@ -213,6 +214,7 @@ Context / Reducer の拡張。
    - 既存データからの復元時、フィールドがなければデフォルト値で補完
 
 **テスト:**
+
 - Reducer の `SET_PLAYERS` アクションテスト
 - `LOAD_STRUCTURE` 時のプレイヤー数リセットテスト
 - `RESET` 時の `remainingPlayers` リセットテスト
@@ -351,6 +353,7 @@ PC（コンパクト横一列）:
    - BB数の表示フォーマット（小数第1位）
 
 **テスト:**
+
 - AverageStackDisplay のレンダリングテスト
 - プレイヤー数変更時の表示更新テスト
 - −1 ボタンの動作テスト
@@ -361,7 +364,7 @@ PC（コンパクト横一列）:
 
 ### フェーズ 4: UI層の実装（ストラクチャー編集）
 
-ストラクチャー編集画面への初期スタック入力の追加。
+ストラクチャー編集・管理画面への初期スタック対応。
 
 **タスク:**
 
@@ -369,13 +372,19 @@ PC（コンパクト横一列）:
    - 初期スタック入力フィールドの追加（NumberInput 使用）
    - バリデーションの統合
 
-2. **ストラクチャー保存・読み込みの確認**
+2. **StructureManagementModal の拡張** (`src/components/StructureManagement/StructureManagementModal.tsx`)
+   - 新規ストラクチャー作成時に `initialStack: 0` をデフォルト値として設定
+   - `addStructure` 呼び出し時に `initialStack` フィールドを含める
+
+3. **ストラクチャー保存・読み込みの確認**
    - `initialStack` が正しく保存・復元されることを確認
    - デフォルトストラクチャーの `initialStack` が正しく表示されることを確認
    - インポート/エクスポートでの `initialStack` の扱い
 
 **テスト:**
+
 - StructureEditor での初期スタック入力テスト
+- StructureManagementModal での新規作成・保存テスト
 - ストラクチャー保存・読み込みテスト
 - インポート/エクスポートテスト
 
@@ -410,33 +419,34 @@ PC（コンパクト横一列）:
 
 ### 新規作成
 
-| ファイル | フェーズ | 概要 |
-|---|---|---|
-| `docs/specs/features/average-stack.md` | 0 | フィーチャー仕様書 |
-| `src/domain/models/AverageStack.ts` | 1 | アベレージスタック計算ロジック |
-| `src/domain/models/AverageStack.test.ts` | 1 | 計算ロジックのテスト |
-| `src/components/AverageStackDisplay/AverageStackDisplay.tsx` | 3 | 表示コンポーネント |
-| `src/components/AverageStackDisplay/AverageStackDisplay.module.css` | 3 | スタイル |
-| `src/components/AverageStackDisplay/AverageStackDisplay.test.tsx` | 3 | コンポーネントテスト |
-| `src/components/AverageStackDisplay/index.ts` | 3 | re-export |
+| ファイル                                                            | フェーズ | 概要                           |
+| ------------------------------------------------------------------- | -------- | ------------------------------ |
+| `docs/specs/features/average-stack.md`                              | 0        | フィーチャー仕様書             |
+| `src/domain/models/AverageStack.ts`                                 | 1        | アベレージスタック計算ロジック |
+| `src/domain/models/AverageStack.test.ts`                            | 1        | 計算ロジックのテスト           |
+| `src/components/AverageStackDisplay/AverageStackDisplay.tsx`        | 3        | 表示コンポーネント             |
+| `src/components/AverageStackDisplay/AverageStackDisplay.module.css` | 3        | スタイル                       |
+| `src/components/AverageStackDisplay/AverageStackDisplay.test.tsx`   | 3        | コンポーネントテスト           |
+| `src/components/AverageStackDisplay/index.ts`                       | 3        | re-export                      |
 
 ### 変更
 
-| ファイル | フェーズ | 概要 |
-|---|---|---|
-| `docs/specs/02-data-models.md` | 0 | データモデル仕様更新 |
-| `docs/specs/04-interface-definitions.md` | 0 | インターフェース定義更新 |
-| `src/types/domain.ts` | 1 | Structure, TournamentState 型拡張 |
-| `src/types/context.ts` | 1 | SET_PLAYERS アクション追加 |
-| `src/domain/models/Structure.ts` | 1 | デフォルトストラクチャーに initialStack 追加 |
-| `src/utils/constants.ts` | 1 | 定数追加 |
-| `src/utils/validation.ts` | 1 | バリデーション関数追加 |
-| `src/contexts/TournamentContext.tsx` | 2 | Reducer 拡張、初期状態更新 |
-| `src/hooks/useTimer.ts` | 2 | プレイヤー数・initialStack の公開 |
-| `src/components/MainLayout.tsx` | 3 | AverageStackDisplay の組み込み（通常時・ブレイク時共通） |
-| `src/components/MainLayout.css` | 3 | レイアウト調整（子要素追加に伴う nth-child 更新） |
-| `src/components/StructureManagement/StructureEditor.tsx` | 4 | 初期スタック入力欄追加 |
-| `src/components/index.ts` | 3 | AverageStackDisplay のエクスポート追加 |
+| ファイル                                                          | フェーズ | 概要                                                     |
+| ----------------------------------------------------------------- | -------- | -------------------------------------------------------- |
+| `docs/specs/02-data-models.md`                                    | 0        | データモデル仕様更新                                     |
+| `docs/specs/04-interface-definitions.md`                          | 0        | インターフェース定義更新                                 |
+| `src/types/domain.ts`                                             | 1        | Structure, TournamentState 型拡張                        |
+| `src/types/context.ts`                                            | 1        | SET_PLAYERS アクション追加                               |
+| `src/domain/models/Structure.ts`                                  | 1        | デフォルトストラクチャーに initialStack 追加             |
+| `src/utils/constants.ts`                                          | 1        | 定数追加                                                 |
+| `src/utils/validation.ts`                                         | 1        | バリデーション関数追加                                   |
+| `src/contexts/TournamentContext.tsx`                              | 2        | Reducer 拡張、初期状態更新                               |
+| `src/hooks/useTimer.ts`                                           | 2        | プレイヤー数・initialStack の公開                        |
+| `src/components/MainLayout.tsx`                                   | 3        | AverageStackDisplay の組み込み（通常時・ブレイク時共通） |
+| `src/components/MainLayout.css`                                   | 3        | レイアウト調整（子要素追加に伴う nth-child 更新）        |
+| `src/components/StructureManagement/StructureEditor.tsx`          | 4        | 初期スタック入力欄追加                                   |
+| `src/components/StructureManagement/StructureManagementModal.tsx` | 4        | 新規作成・保存時の initialStack 対応                     |
+| `src/components/index.ts`                                         | 3        | AverageStackDisplay のエクスポート追加                   |
 
 ## リスク・注意事項
 
@@ -459,12 +469,12 @@ PC（コンパクト横一列）:
 
 ### 将来の拡張が必要なケース
 
-| ケース | totalPlayers 増加で対応可能か |
-|---|---|
-| リバイ額 = 初期スタック | **対応可能** |
-| リバイ額 ≠ 初期スタック（例: 半額リバイ） | 不正確になる |
-| アドオン（追加チップ購入、金額が異なる） | 人数操作では表現しにくい |
-| リバイ回数の記録・表示 | できない |
+| ケース                                    | totalPlayers 増加で対応可能か |
+| ----------------------------------------- | ----------------------------- |
+| リバイ額 = 初期スタック                   | **対応可能**                  |
+| リバイ額 ≠ 初期スタック（例: 半額リバイ） | 不正確になる                  |
+| アドオン（追加チップ購入、金額が異なる）  | 人数操作では表現しにくい      |
+| リバイ回数の記録・表示                    | できない                      |
 
 ## 将来の拡張可能性（本計画のスコープ外）
 

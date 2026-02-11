@@ -148,6 +148,7 @@ export function StructureManagementModal({
         frequency: 4,
         duration: 10,
       },
+      initialStack: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -198,6 +199,7 @@ export function StructureManagementModal({
           blindLevels: structure.blindLevels,
           levelDuration: structure.levelDuration,
           breakConfig: structure.breakConfig,
+          initialStack: structure.initialStack,
         });
         setSelectedStructureId(savedStructure.id);
         setEditingStructure(savedStructure);

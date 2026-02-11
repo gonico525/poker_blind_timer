@@ -32,7 +32,7 @@
 ```typescript
 interface Structure {
   // 既存フィールド（省略）
-  initialStack: number;  // 初期スタック（チップ数）。0 = 未設定
+  initialStack: number; // 初期スタック（チップ数）。0 = 未設定
 }
 ```
 
@@ -43,19 +43,19 @@ interface Structure {
 ```typescript
 interface TournamentState {
   // 既存フィールド（省略）
-  totalPlayers: number;       // 参加人数（0 = 未設定）
-  remainingPlayers: number;   // 残り人数
-  initialStack: number;       // 現在のストラクチャーの初期スタック
+  totalPlayers: number; // 参加人数（0 = 未設定）
+  remainingPlayers: number; // 残り人数
+  initialStack: number; // 現在のストラクチャーの初期スタック
 }
 ```
 
 ### 3.3 制約条件
 
-| フィールド | 最小値 | 最大値 | デフォルト | 備考 |
-|---|---|---|---|---|
-| initialStack | 0 | 10,000,000 | 0 | 0は未設定を意味する |
-| totalPlayers | 0 | 10,000 | 0 | 0は未設定を意味する |
-| remainingPlayers | 0 | totalPlayers | 0 | totalPlayersを超えない |
+| フィールド       | 最小値 | 最大値       | デフォルト | 備考                   |
+| ---------------- | ------ | ------------ | ---------- | ---------------------- |
+| initialStack     | 0      | 10,000,000   | 0          | 0は未設定を意味する    |
+| totalPlayers     | 0      | 10,000       | 0          | 0は未設定を意味する    |
+| remainingPlayers | 0      | totalPlayers | 0          | totalPlayersを超えない |
 
 ## 4. 計算ロジック
 
@@ -87,16 +87,18 @@ averageStackBB = averageStack / currentBigBlind
 
 ### 4.4 計算例
 
-| 初期スタック | 参加人数 | 残り人数 | BB | アベレージスタック | BB換算 |
-|---|---|---|---|---|---|
-| 30,000 | 10 | 10 | 200 | 30,000 | 150.0BB |
-| 30,000 | 10 | 5 | 600 | 60,000 | 100.0BB |
-| 30,000 | 10 | 2 | 2,000 | 150,000 | 75.0BB |
-| 30,000 | 11（リバイ1回） | 10 | 200 | 33,000 | 165.0BB |
+| 初期スタック | 参加人数        | 残り人数 | BB    | アベレージスタック | BB換算  |
+| ------------ | --------------- | -------- | ----- | ------------------ | ------- |
+| 30,000       | 10              | 10       | 200   | 30,000             | 150.0BB |
+| 30,000       | 10              | 5        | 600   | 60,000             | 100.0BB |
+| 30,000       | 10              | 2        | 2,000 | 150,000            | 75.0BB  |
+| 30,000       | 11（リバイ1回） | 10       | 200   | 33,000             | 165.0BB |
 
 ## 5. UIコンポーネント
 
-### 5.1 ストラクチャー編集画面（StructureEditor）
+### 5.1 ストラクチャー管理画面
+
+#### 編集画面（StructureEditor）
 
 レベル時間設定の付近に「初期スタック」入力欄を追加する。
 
@@ -112,6 +114,16 @@ averageStackBB = averageStack / currentBigBlind
 **デフォルトストラクチャーの場合:**
 
 - デフォルトストラクチャーは編集不可のため、初期スタック値は表示のみ
+
+#### 新規作成時のデフォルト値
+
+新規ストラクチャーを作成する際、`initialStack` のデフォルト値は **0（未設定）** とする。
+
+**要件:**
+
+- 新規ストラクチャーオブジェクトに `initialStack: 0` を含める
+- ストラクチャー保存処理時に `initialStack` フィールドを含める
+- これにより、ユーザーが明示的に設定するまでアベレージスタック表示は無効化される
 
 ### 5.2 タイマー画面（AverageStackDisplay）
 
@@ -131,10 +143,10 @@ averageStackBB = averageStack / currentBigBlind
 
 **画面サイズとレイアウト:**
 
-| 画面幅 | NextLevelInfo と AverageStackDisplay の関係 |
-|---|---|
-| 768px+ | 横並び（`flex-direction: row`、各 `flex: 1`） |
-| < 768px | 縦スタック（`flex-direction: column`） |
+| 画面幅  | NextLevelInfo と AverageStackDisplay の関係   |
+| ------- | --------------------------------------------- |
+| 768px+  | 横並び（`flex-direction: row`、各 `flex: 1`） |
+| < 768px | 縦スタック（`flex-direction: column`）        |
 
 #### ビジュアルデザイン
 
@@ -150,12 +162,12 @@ NextLevelInfo と同系統のコンパクトなバー形式を採用する。
 
 **プレイヤー数入力エリア:**
 
-| 要素 | 仕様 |
-|---|---|
-| 参加人数ラベル | 「エントリー」 |
-| 参加人数入力 | NumberInput、0〜10,000 |
-| 残り人数ラベル | 「残り」 |
-| 残り人数入力 | NumberInput、0〜totalPlayers |
+| 要素               | 仕様                                    |
+| ------------------ | --------------------------------------- |
+| 参加人数ラベル     | 「エントリー」                          |
+| 参加人数入力       | NumberInput、0〜10,000                  |
+| 残り人数ラベル     | 「残り」                                |
+| 残り人数入力       | NumberInput、0〜totalPlayers            |
 | 残り人数 −1 ボタン | 残り人数を1減らす専用ボタン（主要操作） |
 
 **−1 ボタン詳細仕様:**
@@ -170,11 +182,11 @@ NextLevelInfo と同系統のコンパクトなバー形式を採用する。
 
 **アベレージスタック表示エリア:**
 
-| 要素 | 仕様 |
-|---|---|
-| ラベル | 「Avg Stack」 |
-| チップ数 | カンマ区切り表示（例: 「33,000」） |
-| BB換算 | 小数第1位まで表示（例: 「55.0BB」） |
+| 要素     | 仕様                                |
+| -------- | ----------------------------------- |
+| ラベル   | 「Avg Stack」                       |
+| チップ数 | カンマ区切り表示（例: 「33,000」）  |
+| BB換算   | 小数第1位まで表示（例: 「55.0BB」） |
 
 #### レイアウトワイヤーフレーム
 
@@ -232,28 +244,36 @@ BreakDisplay 自体は変更しない。MainLayout で AverageStackDisplay を B
 ### 6.1 SET_PLAYERS
 
 ```typescript
-{ type: 'SET_PLAYERS'; payload: { totalPlayers: number; remainingPlayers: number } }
+{
+  type: 'SET_PLAYERS';
+  payload: {
+    totalPlayers: number;
+    remainingPlayers: number;
+  }
+}
 ```
 
 **発行元:** AverageStackDisplay コンポーネント
 
 **処理内容:**
+
 - `totalPlayers` と `remainingPlayers` を更新
 - `remainingPlayers` が `totalPlayers` を超えている場合、`totalPlayers` に切り詰める
 
 **バリデーション:**
+
 - `totalPlayers >= 0`
 - `remainingPlayers >= 0`
 - `remainingPlayers <= totalPlayers`（超える場合は totalPlayers に調整）
 
 ### 6.2 関連アクションへの影響
 
-| アクション | アベレージスタック関連の処理 |
-|---|---|
-| `LOAD_STRUCTURE` | `totalPlayers`, `remainingPlayers` を 0 にリセット。`initialStack` を新ストラクチャーの値に更新 |
-| `RESET` | `remainingPlayers` を `totalPlayers` にリセット |
-| `START` / `PAUSE` / `TICK` | 影響なし |
-| `NEXT_LEVEL` / `PREV_LEVEL` | 影響なし（ブラインド変更によりBB換算が自動更新される） |
+| アクション                  | アベレージスタック関連の処理                                                                    |
+| --------------------------- | ----------------------------------------------------------------------------------------------- |
+| `LOAD_STRUCTURE`            | `totalPlayers`, `remainingPlayers` を 0 にリセット。`initialStack` を新ストラクチャーの値に更新 |
+| `RESET`                     | `remainingPlayers` を `totalPlayers` にリセット                                                 |
+| `START` / `PAUSE` / `TICK`  | 影響なし                                                                                        |
+| `NEXT_LEVEL` / `PREV_LEVEL` | 影響なし（ブラインド変更によりBB換算が自動更新される）                                          |
 
 ## 7. 永続化
 
@@ -277,11 +297,11 @@ BreakDisplay 自体は変更しない。MainLayout で AverageStackDisplay を B
 
 ### 8.2 公開関数
 
-| 関数 | 引数 | 戻り値 | 説明 |
-|---|---|---|---|
-| `calculateAverageStack` | initialStack, totalPlayers, remainingPlayers | `number \| null` | 平均チップ数 |
-| `calculateAverageStackBB` | averageStack, bigBlind | `number \| null` | BB換算値 |
-| `canCalculateAverageStack` | initialStack, totalPlayers, remainingPlayers | `boolean` | 計算可否判定 |
+| 関数                       | 引数                                         | 戻り値           | 説明         |
+| -------------------------- | -------------------------------------------- | ---------------- | ------------ |
+| `calculateAverageStack`    | initialStack, totalPlayers, remainingPlayers | `number \| null` | 平均チップ数 |
+| `calculateAverageStackBB`  | averageStack, bigBlind                       | `number \| null` | BB換算値     |
+| `canCalculateAverageStack` | initialStack, totalPlayers, remainingPlayers | `boolean`        | 計算可否判定 |
 
 ## 9. エッジケース
 
@@ -381,8 +401,8 @@ describe('Backward Compatibility', () => {
 
 ## 改訂履歴
 
-| バージョン | 日付 | 変更内容 | 作成者 |
-|-----------|------|---------|--------|
-| 1.0 | 2026-02-09 | 初版作成 | AI System Architect |
-| 1.1 | 2026-02-11 | UI仕様の改善: コンパクトバーデザイン、ブレイク時の統合方式変更（BreakDisplay非変更）、−1ボタン詳細仕様追加 | AI Designer |
-| 1.2 | 2026-02-11 | レイアウト改善: PCではNextLevelInfoと横並び配置に変更（縦方向追加消費ゼロ）、画面サイズ別レイアウト仕様追加、ブレイク時全幅表示仕様追加 | AI Designer |
+| バージョン | 日付       | 変更内容                                                                                                                                | 作成者              |
+| ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| 1.0        | 2026-02-09 | 初版作成                                                                                                                                | AI System Architect |
+| 1.1        | 2026-02-11 | UI仕様の改善: コンパクトバーデザイン、ブレイク時の統合方式変更（BreakDisplay非変更）、−1ボタン詳細仕様追加                              | AI Designer         |
+| 1.2        | 2026-02-11 | レイアウト改善: PCではNextLevelInfoと横並び配置に変更（縦方向追加消費ゼロ）、画面サイズ別レイアウト仕様追加、ブレイク時全幅表示仕様追加 | AI Designer         |
