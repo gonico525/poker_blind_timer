@@ -14,6 +14,7 @@ import {
   NextLevelInfo,
   BreakDisplay,
   StructureManagementModal,
+  AverageStackDisplay,
 } from '@/components';
 import type { StructureId } from '@/types';
 import './MainLayout.css';
@@ -102,11 +103,32 @@ function MainLayout() {
                 level={timer.currentLevel}
                 blindLevel={timer.currentBlind}
               />
-              <NextLevelInfo
-                nextBlind={timer.nextBlind}
-                levelsUntilBreak={timer.levelsUntilBreak}
-              />
+              <div className="info-bar-row">
+                <NextLevelInfo
+                  nextBlind={timer.nextBlind}
+                  levelsUntilBreak={timer.levelsUntilBreak}
+                />
+                {timer.initialStack > 0 && (
+                  <AverageStackDisplay
+                    initialStack={timer.initialStack}
+                    totalPlayers={timer.totalPlayers}
+                    remainingPlayers={timer.remainingPlayers}
+                    currentBigBlind={timer.currentBlind.bigBlind}
+                    onPlayersChange={timer.setPlayers}
+                  />
+                )}
+              </div>
             </>
+          )}
+
+          {timer.isOnBreak && timer.initialStack > 0 && (
+            <AverageStackDisplay
+              initialStack={timer.initialStack}
+              totalPlayers={timer.totalPlayers}
+              remainingPlayers={timer.remainingPlayers}
+              currentBigBlind={timer.currentBlind.bigBlind}
+              onPlayersChange={timer.setPlayers}
+            />
           )}
 
           <TimerControls

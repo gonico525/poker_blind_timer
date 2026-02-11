@@ -44,16 +44,25 @@
   padding: var(--spacing-4) 0;
 }
 
-/* Bottom Section - Next Level and Controls */
+/* Bottom Section - Blind Info, Info Bar Row, and Controls */
 .timer-view > :nth-child(2),
 .timer-view > :nth-child(3),
 .timer-view > :nth-child(4) {
   flex-shrink: 0;
 }
 
-/* Next Level Info - Compact horizontal layout */
-.timer-view > :nth-child(3) {
+/* Info Bar Row - Horizontal layout for NextLevelInfo and AverageStackDisplay */
+.info-bar-row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-4);
   align-self: stretch;
+  flex-shrink: 0;
+}
+
+.info-bar-row > * {
+  flex: 1;
+  min-width: 0;
 }
 
 /* Controls - Full width at bottom */
@@ -98,6 +107,10 @@
 
   .timer-view {
     gap: var(--spacing-4);
+  }
+
+  .info-bar-row {
+    flex-direction: column;
   }
 }
 
