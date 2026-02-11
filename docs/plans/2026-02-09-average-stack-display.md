@@ -226,10 +226,11 @@ Context / Reducer の拡張。
 
 #### デザイン方針
 
-**配置**: NextLevelInfo の**下**（NextLevelInfo と TimerControls の間）に配置する。BlindInfo と NextLevelInfo の間には配置しない。理由:
+**配置**: NextLevelInfo と**横並び**（PC では同一行内に左右配置）にする。
 
-- Timer → BlindInfo → NextLevelInfo はタイマーのコア情報であり、この流れを分断すべきでない
-- アベレージスタックは補助的な情報であり、コア情報より下に配置するのが情報階層として適切
+- Timer → BlindInfo はタイマーのコア情報であり、この流れを分断すべきでない
+- NextLevelInfo と AverageStackDisplay は補助情報として同一の行にまとめることで、**縦方向の追加消費をゼロ**にする
+- PC（特に HD 1280×720 のノートPC）での画面圧迫を防ぎ、タイマー表示の視認性を最大限維持する
 - 通常時・ブレイク時で同じ位置に表示されるため、ユーザーが迷わない
 
 **ビジュアルスタイル**: NextLevelInfo と同じコンパクトなバー形式（`bg-tertiary` 背景、ボーダー付き、小さめフォント）。タイマーやブラインド表示より低い視覚的優先度を維持する。
@@ -240,42 +241,79 @@ Context / Reducer の拡張。
 - 通常時・ブレイク時で AverageStackDisplay は同じコンポーネントを再利用
 - 配置位置が一貫する（常に TimerControls の直上）
 
+**横並びレイアウトの実装**: MainLayout に `.info-bar-row` ラッパーを追加し、NextLevelInfo と AverageStackDisplay を包む。
+
+```jsx
+<div className="info-bar-row">
+  <NextLevelInfo ... />
+  {showAverageStack && <AverageStackDisplay ... />}
+</div>
+```
+
+```css
+.info-bar-row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-4);
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .info-bar-row {
+    flex-direction: column;
+  }
+}
+```
+
 **レイアウトワイヤーフレーム:**
 
 ```
-通常時:
+通常時（PC 768px+）:
+┌─────────────────────────────────────────────┐
+│  TimerDisplay（flex: 1）                     │
+│  BlindInfo                                  │
+├──────────────────┬──────────────────────────┤
+│  NextLevelInfo   │  AverageStackDisplay     │
+│  (flex: 1)       │  (flex: 1)              │
+├──────────────────┴──────────────────────────┤
+│  TimerControls                              │
+└─────────────────────────────────────────────┘
+→ 縦方向の追加消費: 0px（既存の NextLevelInfo 行を共有）
+
+通常時（モバイル < 768px）:
 ┌─────────────────────────────────────────────┐
 │  TimerDisplay（flex: 1）                     │
 │  BlindInfo                                  │
 ├─────────────────────────────────────────────┤
-│  NextLevelInfo（コンパクトバー）              │
+│  NextLevelInfo                              │
 ├─────────────────────────────────────────────┤
-│  AverageStackDisplay（コンパクトバー）        │
+│  AverageStackDisplay                        │
 ├─────────────────────────────────────────────┤
 │  TimerControls                              │
 └─────────────────────────────────────────────┘
+→ モバイルは縦スタック（スクロール前提）
 
-ブレイク時:
+ブレイク時（PC 768px+）:
 ┌─────────────────────────────────────────────┐
 │  BreakDisplay（flex: 1）                     │
 ├─────────────────────────────────────────────┤
-│  AverageStackDisplay（コンパクトバー）        │
+│  AverageStackDisplay（全幅）                 │
 ├─────────────────────────────────────────────┤
 │  TimerControls                              │
 └─────────────────────────────────────────────┘
+→ NextLevelInfo 不在のため AverageStackDisplay が全幅を使用
 ```
 
-**デスクトップ（1280px+）レイアウト:**
+**AverageStackDisplay 内部レイアウト:**
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│ エントリー [ 10 ] │ 残り [ 8 ] [−1] │ Avg Stack  37,500 (62.5BB)│
-└──────────────────────────────────────────────────────────────────┘
-```
+PC（コンパクト横一列）:
+┌──────────────────────────────────────────────────┐
+│ エントリー [10]  残り [8] [−1]  Avg 37,500 62.5BB│
+└──────────────────────────────────────────────────┘
 
-**モバイル（< 768px）レイアウト:**
-
-```
+モバイル（2行折り返し）:
 ┌─────────────────────────────────────┐
 │  エントリー [10]   残り [8]  [−1]   │
 │       Avg Stack: 37,500 (62.5BB)    │
@@ -293,18 +331,22 @@ Context / Reducer の拡張。
    - コンパクトなバー形式（NextLevelInfo と同系統のスタイル）
    - 未設定時の表示制御（`initialStack === 0` で非表示）
    - CSS Module によるスタイリング
-   - レスポンシブ対応（デスクトップ: 横一列、モバイル: 2行折り返し）
+   - レスポンシブ対応（PC: 横一列、モバイル: 2行折り返し）
 
 2. **MainLayout への組み込み** (`src/components/MainLayout.tsx`)
-   - NextLevelInfo と TimerControls の間に AverageStackDisplay を配置
+   - `.info-bar-row` ラッパーで NextLevelInfo と AverageStackDisplay を横並びに配置
    - 通常時・ブレイク時ともに同じ位置に描画（BreakDisplay の変更は不要）
-   - `initialStack === 0` の場合は描画しない（レイアウトに影響なし）
+   - `initialStack === 0` の場合は AverageStackDisplay を描画しない
+   - ブレイク時は NextLevelInfo が不在のため AverageStackDisplay のみが全幅表示
 
 3. **MainLayout.css のレイアウト調整** (`src/components/MainLayout.css`)
-   - 子要素数の変更に対応（nth-child セレクタの更新）
-   - AverageStackDisplay に `flex-shrink: 0` を適用
+   - `.info-bar-row` の追加（PC: `flex-direction: row`、モバイル: `column`）
+   - 既存の nth-child セレクタの調整（ラッパー追加に伴う子要素構造の変更）
 
-4. **フォーマットユーティリティ** (`src/utils/blindFormat.ts` に追加、または既存の関数を活用)
+4. **NextLevelInfo.module.css の微調整**
+   - `.info-bar-row` 内で `flex: 1` を適用するための調整
+
+5. **フォーマットユーティリティ** (`src/utils/blindFormat.ts` に追加、または既存の関数を活用)
    - チップ数の表示フォーマット（カンマ区切り）
    - BB数の表示フォーマット（小数第1位）
 
@@ -314,7 +356,6 @@ Context / Reducer の拡張。
 - −1 ボタンの動作テスト
 - 未設定時の非表示テスト（`initialStack === 0`）
 - ブレイク中の表示テスト
-- レスポンシブ: モバイルでの2行レイアウトテスト（任意）
 
 **完了条件:** `npm test` と `npm run lint` がパスすること
 

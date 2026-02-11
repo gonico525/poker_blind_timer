@@ -6,7 +6,7 @@
 
 ## 概要
 
-アベレージスタック表示機能のフェーズ3（UI層の実装）に着手する前に、既存のデザイン仕様・UI実装・情報設計を精査し、UX改善点を検討した。結果として4点の改善を特定し、計画書および仕様書を更新した。
+アベレージスタック表示機能のフェーズ3（UI層の実装）に着手する前に、既存のデザイン仕様・UI実装・情報設計を精査し、UX改善点を検討した。結果として5点の改善を特定し、計画書および仕様書を更新した。
 
 ## 関連計画書
 
@@ -81,7 +81,7 @@
 - このフローの途中にアベレージスタック（補助統計情報）を挿入すると、ユーザーの視線の流れが中断される
 - NextLevelInfo の下であれば、「コア情報 → 補助情報 → 操作」という自然な階層が維持される
 
-**決定:** NextLevelInfo の下（TimerControls の直上）に配置する。
+**決定:** BlindInfo と NextLevelInfo の間には配置しない。TimerControls の直上の情報バー行に配置する（改善5でさらに横並びレイアウトに発展）。
 
 **影響:**
 
@@ -159,6 +159,66 @@
 - 明確なラベル「−1」
 - disabled 状態: `remainingPlayers <= 0`
 
+### 改善 5: PC での横並びレイアウト（縦方向追加消費ゼロ）
+
+**問題:** AverageStackDisplay を NextLevelInfo の下に独立した行として配置すると、PC（特に HD 1280×720 のノートPC）で縦方向のスペースが圧迫され、タイマー表示領域が縮小する。
+
+**分析（1280×720px での垂直スペース）:**
+
+| 要素 | 推定高さ |
+|---|---|
+| AppHeader | ~56px |
+| main-content padding | ~32px |
+| TimerDisplay（flex:1） | **残り全部** |
+| BlindInfo | ~90px |
+| NextLevelInfo | ~50px |
+| **[NEW] AverageStackDisplay** | **~50px + 16px gap = ~66px** |
+| TimerControls | ~100px |
+| 各要素間の gap | ~64px |
+
+AverageStackDisplay を独立行で追加すると、TimerDisplay の領域が ~328px → ~262px に減少。タイマーフォント 120px + 経過時間で最低 ~160px 必要なため表示は可能だが、余白が大幅に圧迫される。
+
+一方、PC では横方向のスペース（1280px+）が十分に余っている。
+
+**決定:** PC（768px+）では NextLevelInfo と AverageStackDisplay を **横並び（同一行）** に配置する。
+
+```jsx
+// MainLayout での実装
+<div className="info-bar-row">
+  <NextLevelInfo ... />
+  {showAverageStack && <AverageStackDisplay ... />}
+</div>
+```
+
+```css
+.info-bar-row {
+  display: flex;
+  flex-direction: row;  /* PC: 横並び */
+  gap: var(--spacing-4);
+}
+
+@media (max-width: 767px) {
+  .info-bar-row {
+    flex-direction: column;  /* モバイル: 縦スタック */
+  }
+}
+```
+
+**結果:**
+
+| 画面サイズ | レイアウト | 縦方向の追加消費 |
+|---|---|---|
+| PC（768px+） | NextLevelInfo と横並び | **0px** |
+| モバイル（< 768px） | 縦スタック | ~66px（スクロール前提のため許容） |
+
+**メリット:**
+
+- タイマー表示の視認性（120px フォント）を一切犠牲にしない
+- PC の横方向スペースを有効活用
+- 変更範囲が最小限（MainLayout に wrapper div を追加）
+- `initialStack === 0` の場合は AverageStackDisplay が非表示になり、NextLevelInfo が全幅を使用（従来通り）
+- ブレイク時は NextLevelInfo 不在のため AverageStackDisplay が全幅で表示
+
 ## 変更ファイル一覧
 
 ### 更新した仕様書・計画書
@@ -205,4 +265,12 @@
 
 ## まとめ
 
-フェーズ3のUI実装に先立ち、デザインレビューを実施した。4つの改善点（配置の確定、ブレイク時の統合方式、ビジュアルデザインの統一、−1ボタンの詳細仕様）を特定し、計画書と仕様書を更新した。これらの改善により、情報階層の明確化、コンポーネントの疎結合、視覚的一貫性、主要操作のユーザビリティ向上が期待できる。
+フェーズ3のUI実装に先立ち、デザインレビューを実施した。5つの改善点を特定し、計画書と仕様書を更新した:
+
+1. **配置の確定**: BlindInfo と NextLevelInfo の間には配置しない
+2. **ブレイク時の統合方式**: BreakDisplay を変更せず兄弟要素として描画
+3. **ビジュアルデザインの統一**: NextLevelInfo と同系統のコンパクトバー
+4. **−1 ボタンの詳細仕様**: アクセントカラーの専用ボタン
+5. **PC での横並びレイアウト**: NextLevelInfo と同一行に配置し、縦方向の追加消費をゼロに
+
+特に改善5により、PC（HD 1280×720 含む）でタイマー表示の視認性を一切犠牲にせず、アベレージスタック情報を追加できる設計を実現した。
