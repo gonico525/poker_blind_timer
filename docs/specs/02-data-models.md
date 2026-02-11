@@ -920,9 +920,9 @@ export interface Preset {
   name: string;
   type: PresetType;
   blindLevels: BlindLevel[];
-  levelDuration: number;      // 秒
+  levelDuration: number; // 秒
   breakConfig: BreakConfig;
-  initialStack: number;       // 初期スタック（チップ数）。0 = 未設定
+  initialStack: number; // 初期スタック（チップ数）。0 = 未設定
   createdAt: number;
   updatedAt: number;
 }
@@ -930,13 +930,13 @@ export interface Preset {
 
 **`initialStack` フィールド仕様:**
 
-| 項目 | 値 |
-|------|-----|
-| 型 | `number` |
-| 最小値 | 0（未設定を意味する） |
-| 最大値 | 10,000,000 |
-| デフォルト値 | 0 |
-| バリデーション | 0以上の整数 |
+| 項目           | 値                    |
+| -------------- | --------------------- |
+| 型             | `number`              |
+| 最小値         | 0（未設定を意味する） |
+| 最大値         | 10,000,000            |
+| デフォルト値   | 0                     |
+| バリデーション | 0以上の整数           |
 
 **バリデーション関数:**
 
@@ -946,16 +946,40 @@ export function isValidInitialStack(value: number): boolean {
 }
 ```
 
+**影響を受けるコンポーネント:**
+
+Structure型に`initialStack`フィールドを追加することで、以下のコンポーネント・モジュールが影響を受ける。
+
+| コンポーネント/モジュール      | 影響内容                                                     | 対応必要性 |
+| ------------------------------ | ------------------------------------------------------------ | ---------- |
+| `Structure.ts`                 | デフォルトストラクチャーに`initialStack`値を設定             | 必須       |
+| `StructureEditor.tsx`          | 初期スタック編集UIの追加                                     | 必須       |
+| `StructureManagementModal.tsx` | 新規作成時のデフォルト値設定、保存処理での`initialStack`追加 | 必須       |
+| `useStructures.ts`             | `addStructure`/`updateStructure`で`initialStack`を扱う       | 自動対応   |
+| `ImportExport.tsx`             | インポート/エクスポート時の`initialStack`処理                | 自動対応   |
+| テストファイル                 | モックデータに`initialStack`追加                             | 必須       |
+
+**後方互換性:**
+
+既存のlocalStorageデータには`initialStack`フィールドが存在しないため、以下の対応が必要:
+
+```typescript
+const normalizedStructure = {
+  ...structure,
+  initialStack: structure.initialStack ?? 0, // デフォルト値で補完
+};
+```
+
 ### 10.2 デフォルトストラクチャーの初期スタック値
 
 各デフォルトストラクチャーには名前に記載されている初期スタック値を設定する。
 
-| ストラクチャー | 名前 | initialStack |
-|---|---|---|
-| Deepstack | Deepstack (30min/50k Start) | 50000 |
-| Standard | Standard (20min/30k Start) | 30000 |
-| Turbo | Turbo (15min/25k Start) | 25000 |
-| Hyper Turbo | Hyper Turbo (10min/20k Start) | 20000 |
+| ストラクチャー | 名前                          | initialStack |
+| -------------- | ----------------------------- | ------------ |
+| Deepstack      | Deepstack (30min/50k Start)   | 50000        |
+| Standard       | Standard (20min/30k Start)    | 30000        |
+| Turbo          | Turbo (15min/25k Start)       | 25000        |
+| Hyper Turbo    | Hyper Turbo (10min/20k Start) | 20000        |
 
 ### 10.3 TournamentState へのプレイヤー数追加
 
@@ -973,30 +997,30 @@ export interface Tournament {
   activePresetId: string | null;
 
   // 追加フィールド
-  totalPlayers: number;       // 参加人数（0 = 未設定）
-  remainingPlayers: number;   // 残り人数
-  initialStack: number;       // 現在のストラクチャーの初期スタック（参照用）
+  totalPlayers: number; // 参加人数（0 = 未設定）
+  remainingPlayers: number; // 残り人数
+  initialStack: number; // 現在のストラクチャーの初期スタック（参照用）
 }
 ```
 
 **`totalPlayers` フィールド仕様:**
 
-| 項目 | 値 |
-|------|-----|
-| 型 | `number` |
-| 最小値 | 0（未設定を意味する） |
-| 最大値 | 10,000 |
-| デフォルト値 | 0 |
-| バリデーション | 0以上の整数 |
+| 項目           | 値                    |
+| -------------- | --------------------- |
+| 型             | `number`              |
+| 最小値         | 0（未設定を意味する） |
+| 最大値         | 10,000                |
+| デフォルト値   | 0                     |
+| バリデーション | 0以上の整数           |
 
 **`remainingPlayers` フィールド仕様:**
 
-| 項目 | 値 |
-|------|-----|
-| 型 | `number` |
-| 最小値 | 0 |
-| 最大値 | totalPlayers 以下 |
-| デフォルト値 | totalPlayers と同値 |
+| 項目           | 値                                |
+| -------------- | --------------------------------- |
+| 型             | `number`                          |
+| 最小値         | 0                                 |
+| 最大値         | totalPlayers 以下                 |
+| デフォルト値   | totalPlayers と同値               |
 | バリデーション | 0以上かつ totalPlayers 以下の整数 |
 
 **動作仕様:**
@@ -1060,7 +1084,7 @@ function deserializeStructure(data: unknown): Preset {
   const structure = data as Preset;
   return {
     ...structure,
-    initialStack: structure.initialStack ?? 0,  // 後方互換性
+    initialStack: structure.initialStack ?? 0, // 後方互換性
   };
 }
 
@@ -1069,9 +1093,9 @@ function deserializeTournamentState(data: unknown): Tournament {
   const state = data as Tournament;
   return {
     ...state,
-    totalPlayers: state.totalPlayers ?? 0,            // 後方互換性
-    remainingPlayers: state.remainingPlayers ?? 0,     // 後方互換性
-    initialStack: state.initialStack ?? 0,             // 後方互換性
+    totalPlayers: state.totalPlayers ?? 0, // 後方互換性
+    remainingPlayers: state.remainingPlayers ?? 0, // 後方互換性
+    initialStack: state.initialStack ?? 0, // 後方互換性
   };
 }
 ```
@@ -1100,7 +1124,7 @@ function deserializeTournamentState(data: unknown): Tournament {
 
 ## 改訂履歴
 
-| バージョン | 日付       | 変更内容 | 作成者              |
-| ---------- | ---------- | -------- | ------------------- |
-| 1.0        | 2026-01-26 | 初版作成 | AI System Architect |
+| バージョン | 日付       | 変更内容                                                 | 作成者              |
+| ---------- | ---------- | -------------------------------------------------------- | ------------------- |
+| 1.0        | 2026-01-26 | 初版作成                                                 | AI System Architect |
 | 1.1        | 2026-02-09 | アベレージスタック関連のデータモデル追加（セクション10） | AI System Architect |
