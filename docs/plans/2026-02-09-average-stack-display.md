@@ -224,29 +224,97 @@ Context / Reducer の拡張。
 
 タイマー画面へのアベレージスタック表示コンポーネントの追加。
 
+#### デザイン方針
+
+**配置**: NextLevelInfo の**下**（NextLevelInfo と TimerControls の間）に配置する。BlindInfo と NextLevelInfo の間には配置しない。理由:
+
+- Timer → BlindInfo → NextLevelInfo はタイマーのコア情報であり、この流れを分断すべきでない
+- アベレージスタックは補助的な情報であり、コア情報より下に配置するのが情報階層として適切
+- 通常時・ブレイク時で同じ位置に表示されるため、ユーザーが迷わない
+
+**ビジュアルスタイル**: NextLevelInfo と同じコンパクトなバー形式（`bg-tertiary` 背景、ボーダー付き、小さめフォント）。タイマーやブラインド表示より低い視覚的優先度を維持する。
+
+**ブレイク時の統合**: BreakDisplay を変更せず、MainLayout で AverageStackDisplay を BreakDisplay と同列（兄弟要素）として描画する。これにより:
+
+- BreakDisplay の変更が不要（コンポーネントの疎結合を維持）
+- 通常時・ブレイク時で AverageStackDisplay は同じコンポーネントを再利用
+- 配置位置が一貫する（常に TimerControls の直上）
+
+**レイアウトワイヤーフレーム:**
+
+```
+通常時:
+┌─────────────────────────────────────────────┐
+│  TimerDisplay（flex: 1）                     │
+│  BlindInfo                                  │
+├─────────────────────────────────────────────┤
+│  NextLevelInfo（コンパクトバー）              │
+├─────────────────────────────────────────────┤
+│  AverageStackDisplay（コンパクトバー）        │
+├─────────────────────────────────────────────┤
+│  TimerControls                              │
+└─────────────────────────────────────────────┘
+
+ブレイク時:
+┌─────────────────────────────────────────────┐
+│  BreakDisplay（flex: 1）                     │
+├─────────────────────────────────────────────┤
+│  AverageStackDisplay（コンパクトバー）        │
+├─────────────────────────────────────────────┤
+│  TimerControls                              │
+└─────────────────────────────────────────────┘
+```
+
+**デスクトップ（1280px+）レイアウト:**
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ エントリー [ 10 ] │ 残り [ 8 ] [−1] │ Avg Stack  37,500 (62.5BB)│
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**モバイル（< 768px）レイアウト:**
+
+```
+┌─────────────────────────────────────┐
+│  エントリー [10]   残り [8]  [−1]   │
+│       Avg Stack: 37,500 (62.5BB)    │
+└─────────────────────────────────────┘
+```
+
+**−1 ボタンの設計**: 残り人数の −1 ボタンはトーナメント進行中の主要操作であるため、NumberInput の標準的な増減ボタンとは別に、視覚的に目立つ専用ボタンとして実装する。アクセントカラー（ゴールド系）を使用し、タッチターゲットは最低 44×44px を確保する。
+
 **タスク:**
 
 1. **AverageStackDisplay コンポーネント新規作成** (`src/components/AverageStackDisplay/`)
    - プレイヤー数入力UI（参加人数、残り人数）
-   - 残り人数の＋/−ボタン（1人ずつ増減）
+   - 残り人数の専用 −1 ボタン（主要操作として目立つデザイン）
    - アベレージスタック表示（チップ数 + BB換算）
-   - 未設定時の表示制御
+   - コンパクトなバー形式（NextLevelInfo と同系統のスタイル）
+   - 未設定時の表示制御（`initialStack === 0` で非表示）
    - CSS Module によるスタイリング
-   - レスポンシブ対応
+   - レスポンシブ対応（デスクトップ: 横一列、モバイル: 2行折り返し）
 
 2. **MainLayout への組み込み** (`src/components/MainLayout.tsx`)
-   - 通常時: BlindInfo / NextLevelInfo の付近に AverageStackDisplay を配置
-   - ブレイク時: BreakDisplay 内または近くに AverageStackDisplay を配置
+   - NextLevelInfo と TimerControls の間に AverageStackDisplay を配置
+   - 通常時・ブレイク時ともに同じ位置に描画（BreakDisplay の変更は不要）
+   - `initialStack === 0` の場合は描画しない（レイアウトに影響なし）
 
-3. **フォーマットユーティリティ** (`src/utils/blindFormat.ts` に追加、または既存の関数を活用)
+3. **MainLayout.css のレイアウト調整** (`src/components/MainLayout.css`)
+   - 子要素数の変更に対応（nth-child セレクタの更新）
+   - AverageStackDisplay に `flex-shrink: 0` を適用
+
+4. **フォーマットユーティリティ** (`src/utils/blindFormat.ts` に追加、または既存の関数を活用)
    - チップ数の表示フォーマット（カンマ区切り）
    - BB数の表示フォーマット（小数第1位）
 
 **テスト:**
 - AverageStackDisplay のレンダリングテスト
 - プレイヤー数変更時の表示更新テスト
-- 未設定時の非表示テスト
+- −1 ボタンの動作テスト
+- 未設定時の非表示テスト（`initialStack === 0`）
 - ブレイク中の表示テスト
+- レスポンシブ: モバイルでの2行レイアウトテスト（任意）
 
 **完了条件:** `npm test` と `npm run lint` がパスすること
 
@@ -324,9 +392,8 @@ Context / Reducer の拡張。
 | `src/utils/validation.ts` | 1 | バリデーション関数追加 |
 | `src/contexts/TournamentContext.tsx` | 2 | Reducer 拡張、初期状態更新 |
 | `src/hooks/useTimer.ts` | 2 | プレイヤー数・initialStack の公開 |
-| `src/components/MainLayout.tsx` | 3 | AverageStackDisplay の組み込み |
-| `src/components/MainLayout.css` | 3 | レイアウト調整 |
-| `src/components/BreakDisplay/BreakDisplay.tsx` | 3 | アベレージスタック表示追加 |
+| `src/components/MainLayout.tsx` | 3 | AverageStackDisplay の組み込み（通常時・ブレイク時共通） |
+| `src/components/MainLayout.css` | 3 | レイアウト調整（子要素追加に伴う nth-child 更新） |
 | `src/components/StructureManagement/StructureEditor.tsx` | 4 | 初期スタック入力欄追加 |
 | `src/components/index.ts` | 3 | AverageStackDisplay のエクスポート追加 |
 
