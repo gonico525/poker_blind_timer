@@ -1,0 +1,242 @@
+/* ============================================
+   Average Stack Display - Compact Bar Layout
+   Matches NextLevelInfo visual style
+   ============================================ */
+
+.averageStackDisplay {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+/* ============================================
+   Input Section - Player Counts
+   ============================================ */
+
+.inputSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+}
+
+.inputGroup {
+  /* NumberInput コンポーネントのラッパー */
+  min-width: 100px;
+}
+
+/* ============================================
+   Decrement Button - Primary Action
+   ============================================ */
+
+.decrementButton {
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--spacing-2) var(--spacing-3);
+  background-color: var(--color-accent);
+  color: var(--color-text-on-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
+  user-select: none;
+}
+
+.decrementButton:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+  transform: scale(1.05);
+}
+
+.decrementButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.decrementButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   Stats Section - Average Stack Display
+   ============================================ */
+
+.statsSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-family: var(--font-family-numeric);
+  white-space: nowrap;
+}
+
+.label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+}
+
+.value {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.bbValue {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+/* Large Desktop (1920px+) */
+@media (min-width: 1920px) {
+  .averageStackDisplay {
+    gap: var(--spacing-6);
+    padding: var(--spacing-5) var(--spacing-8);
+  }
+
+  .inputSection {
+    gap: var(--spacing-4);
+  }
+
+  .decrementButton {
+    min-width: 52px;
+    min-height: 52px;
+    font-size: var(--font-size-lg);
+  }
+
+  .value {
+    font-size: var(--font-size-h3);
+  }
+
+  .label {
+    font-size: var(--font-size-base);
+  }
+
+  .bbValue {
+    font-size: var(--font-size-lg);
+  }
+}
+
+/* Desktop (1280px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1280px) {
+  .averageStackDisplay {
+    gap: var(--spacing-4);
+  }
+}
+
+/* Tablet Landscape (768px - 1279px) */
+@media (max-width: 1279px) {
+  .averageStackDisplay {
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-5);
+  }
+
+  .inputSection {
+    gap: var(--spacing-2);
+  }
+
+  .decrementButton {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: var(--font-size-sm);
+  }
+
+  .value {
+    font-size: var(--font-size-h5);
+  }
+
+  .label,
+  .bbValue {
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* Tablet Portrait / Mobile (< 768px) - 2行折り返し */
+@media (max-width: 767px) {
+  .averageStackDisplay {
+    flex-direction: column;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .inputSection {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .statsSection {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .value {
+    font-size: var(--font-size-h6);
+  }
+
+  .label,
+  .bbValue {
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* Small Mobile (< 640px) */
+@media (max-width: 639px) {
+  .averageStackDisplay {
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-3);
+  }
+
+  .inputSection {
+    gap: var(--spacing-2);
+  }
+
+  .decrementButton {
+    min-width: 44px;
+    min-height: 44px;
+    padding: var(--spacing-2);
+    font-size: var(--font-size-sm);
+  }
+
+  .value {
+    font-size: var(--font-size-base);
+  }
+
+  .label,
+  .bbValue {
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* Small Mobile (< 375px) */
+@media (max-width: 374px) {
+  .averageStackDisplay {
+    padding: var(--spacing-2);
+  }
+
+  .inputGroup {
+    min-width: 80px;
+  }
+
+  .value {
+    font-size: var(--font-size-sm);
+  }
+}
