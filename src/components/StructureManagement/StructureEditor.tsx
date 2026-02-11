@@ -103,6 +103,10 @@ export function StructureEditor({
     });
   };
 
+  const handleInitialStackChange = (chips: number) => {
+    setEditedStructure({ ...editedStructure, initialStack: chips });
+  };
+
   const handleImport = (importedStructures: Structure[]) => {
     if (importedStructures.length > 0) {
       // 最初のストラクチャーをロード
@@ -195,6 +199,22 @@ export function StructureEditor({
               unit="分"
               aria-label="レベル時間（分）"
             />
+
+            <div>
+              <NumberInput
+                label="初期スタック"
+                value={editedStructure.initialStack}
+                min={0}
+                max={10000000}
+                step={1000}
+                onChange={handleInitialStackChange}
+                unit="チップ"
+                aria-label="初期スタック（チップ）"
+              />
+              <p className={styles.helperText}>
+                0の場合、アベレージスタックは表示されません
+              </p>
+            </div>
 
             <Toggle
               label="休憩を有効にする"
