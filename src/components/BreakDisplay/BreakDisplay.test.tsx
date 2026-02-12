@@ -11,7 +11,9 @@ describe('BreakDisplay', () => {
 
   it('should display break message', () => {
     render(<BreakDisplay remainingTime={300} />);
-    expect(screen.getByText(/break/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /break time/i })
+    ).toBeInTheDocument();
   });
 
   it('should show skip button', () => {
