@@ -7,7 +7,9 @@ This document provides essential context for AI assistants working on the Poker 
 A browser-based poker blind timer for No-Limit Hold'em tournaments. The application is:
 - **Client-side only** - No backend, runs entirely in the browser
 - **Offline-first** - All data persisted in localStorage
-- **Japanese localized** - Documentation and UI text in Japanese
+- **PWA-enabled** - Installable with offline support via service worker
+- **Japanese localized** - Documentation and UI text in Japanese (button labels in English)
+- **Deployed on GitHub Pages** - Base path `/poker_blind_timer/`
 
 ## Tech Stack
 
@@ -21,13 +23,15 @@ A browser-based poker blind timer for No-Limit Hold'em tournaments. The applicat
 | ESLint | 9.39.2 | Linting (Flat Config) |
 | Prettier | 3.8.1 | Code formatting |
 | Husky | 9.0.11 | Git hooks |
+| vite-plugin-pwa | 1.2.0 | PWA support |
+| lint-staged | 16.2.7 | Pre-commit formatting |
 
 ## Quick Commands
 
 ```bash
 npm run dev          # Start development server
 npm run build        # TypeScript check + Vite build
-npm test             # Run Vitest
+npm test             # Run Vitest (watch mode)
 npm run test:ui      # Vitest with UI
 npm run test:coverage # Coverage report
 npm run lint         # ESLint (zero warnings policy)
@@ -40,11 +44,11 @@ npm run format:check # Prettier check
 ### Three-Layer Architecture
 
 ```
-UI Layer (React)
+UI Layer (React components, contexts, hooks)
     ↓ depends on
-Services Layer (Audio, Keyboard, Storage)
+Services Layer (AudioService, KeyboardService, StorageService)
     ↓ depends on
-Domain Layer (Pure business logic)
+Domain Layer (Pure business logic - AverageStack, Break, Structure)
 ```
 
 **Dependency rules:**
@@ -56,24 +60,77 @@ Domain Layer (Pure business logic)
 
 ```
 src/
-├── components/     # React components (17 subdirectories)
-│   ├── common/     # Reusable UI components (Button, Modal, etc.)
-│   ├── timer/      # Timer-related components
-│   ├── settings/   # Settings panel components
-│   └── ...
-├── contexts/       # React Context for state management
-│   ├── TournamentContext.tsx  # Timer, blind levels, breaks
+├── components/         # React components
+│   ├── common/         # 7 reusable UI components
+│   │   ├── ConfirmDialog/
+│   │   ├── Dropdown/
+│   │   ├── Modal/
+│   │   ├── NumberInput/
+│   │   ├── Slider/
+│   │   ├── Toggle/
+│   │   └── UpdatePrompt/
+│   ├── AppHeader/
+│   ├── AverageStackDisplay/
+│   ├── BlindEditor/
+│   ├── BlindInfo/
+│   ├── BreakDisplay/
+│   ├── ErrorScreen/
+│   ├── ImportExport/
+│   ├── LoadingScreen/
+│   ├── MainLayout/
+│   ├── NextLevelInfo/
+│   ├── SettingsPanel/
+│   ├── StructureManagement/
+│   ├── StructureManager/
+│   ├── StructureSelector/
+│   ├── ThemeToggle/
+│   ├── TimerControls/
+│   ├── TimerDisplay/
+│   └── VolumeControl/
+├── contexts/           # React Context for state management
+│   ├── TournamentContext.tsx  # Timer, blind levels, breaks, player counts
 │   ├── SettingsContext.tsx    # Theme, audio, keyboard
 │   └── NotificationContext.tsx # Toast/confirm dialogs
-├── hooks/          # Custom React hooks (9 hooks)
-├── services/       # Browser API abstractions
+├── hooks/              # Custom React hooks (4 hooks)
+│   ├── useAudioNotification.ts  # Audio notification management
+│   ├── useKeyboardShortcuts.ts  # Keyboard shortcut handling
+│   ├── useStructures.ts         # Structure CRUD management
+│   └── useTimer.ts              # Timer state management
+├── services/           # Browser API abstractions
 │   ├── AudioService.ts      # Sound playback
 │   ├── KeyboardService.ts   # Keyboard shortcuts
-│   └── StorageService.ts    # localStorage wrapper
-├── domain/models/  # Pure business logic
-├── types/          # TypeScript type definitions
-├── utils/          # Utility functions & constants
-└── test/           # Test setup files
+│   ├── StorageService.ts    # localStorage wrapper
+│   └── __mocks__/           # Service mocks for testing
+├── domain/models/      # Pure business logic
+│   ├── AverageStack.ts      # Average stack calculation
+│   ├── Break.ts             # Break interval logic
+│   └── Structure.ts         # Structure management logic
+├── types/              # TypeScript type definitions
+│   ├── domain.ts            # Core domain types
+│   ├── context.ts           # Context/action types
+│   ├── notification.ts      # Notification types
+│   └── storage.ts           # Storage schema types
+├── utils/              # Utility functions & constants
+│   ├── blindFormat.ts       # Blind level formatting
+│   ├── constants.ts         # App-wide constants
+│   ├── timeFormat.ts        # Time formatting
+│   └── validation.ts        # Input validation
+├── test/               # Test setup files
+│   ├── setup.ts             # Vitest setup
+│   └── mocks/pwa-register.ts
+└── assets/             # Static assets (logo)
+```
+
+### Public Assets
+
+```
+public/
+├── sounds/             # Audio files
+│   ├── level-change.mp3
+│   ├── warning-1min.mp3
+│   └── break-start.mp3
+├── icons/              # PWA icons (192, 512, maskable, apple-touch)
+└── .nojekyll           # GitHub Pages config
 ```
 
 ## Naming Conventions
@@ -91,7 +148,7 @@ src/
 
 ## Code Style
 
-Enforced by Prettier:
+Enforced by Prettier (`.prettierrc`):
 - Semicolons: required
 - Quotes: single quotes
 - Trailing commas: ES5 style
@@ -99,7 +156,7 @@ Enforced by Prettier:
 - Tab width: 2 spaces
 - Arrow parens: always
 
-ESLint rules:
+ESLint rules (Flat Config):
 - Zero warnings policy (`--max-warnings 0`)
 - Unused vars prefixed with `_` are allowed
 - React Hooks rules enforced
@@ -192,6 +249,10 @@ describe('Component', () => {
 - Use `data-status`, `data-warning` for state testing
 - Use semantic queries (`getByRole`, `getByLabelText`) when possible
 
+### Service Mocks
+
+Service mocks live in `src/services/__mocks__/` for consistent test isolation.
+
 ## Path Aliases
 
 The `@` alias points to `src/`:
@@ -202,31 +263,64 @@ import { formatTime } from '@/utils';
 
 ## Key Types
 
-Located in `src/types/`:
+Located in `src/types/domain.ts`:
 
 ```typescript
-// Core domain types
 interface BlindLevel {
-  smallBlind: number;
-  bigBlind: number;
-  ante?: number;
-  bbAnte?: boolean;
+  readonly smallBlind: number;
+  readonly bigBlind: number;
+  readonly ante: number;
 }
 
 type TimerStatus = 'idle' | 'running' | 'paused';
 
+interface Timer {
+  status: TimerStatus;
+  remainingTime: number;
+  elapsedTime: number;
+  startTime: number | null;
+  pausedAt: number | null;
+}
+
+type StructureType = 'default' | 'standard' | 'turbo' | 'deepstack' | 'custom';
+
 interface Structure {
-  id: string;
+  id: StructureId;
   name: string;
+  type: StructureType;
   blindLevels: BlindLevel[];
   levelDuration: number;
   breakConfig: BreakConfig;
+  initialStack: number;    // 0 = unset
+  createdAt: number;
+  updatedAt: number;
 }
 
 interface BreakConfig {
-  enabled: boolean;
-  frequency: number;
-  duration: number;
+  readonly enabled: boolean;
+  readonly frequency: number;
+  readonly duration: number;
+}
+
+interface TournamentState {
+  timer: Timer;
+  currentLevel: number;
+  blindLevels: BlindLevel[];
+  breakConfig: BreakConfig;
+  levelDuration: number;
+  isOnBreak: boolean;
+  totalPlayers: number;      // 0 = unset
+  remainingPlayers: number;
+  initialStack: number;
+}
+
+type Theme = 'light' | 'dark';
+
+interface Settings {
+  theme: Theme;
+  soundEnabled: boolean;
+  volume: number;
+  keyboardShortcutsEnabled: boolean;
 }
 ```
 
@@ -245,6 +339,20 @@ interface BreakConfig {
 ### KeyboardService
 - Manages global keyboard shortcuts
 - Initialize/cleanup on mount/unmount
+
+## Domain Models
+
+### AverageStack
+- Calculates average stack based on total players, remaining players, and initial stack
+- Pure calculation logic with no dependencies
+
+### Break
+- Determines when breaks should occur based on break config and current level
+- Break interval logic
+
+### Structure
+- Tournament structure management and validation
+- Default structure generation
 
 ## Constants
 
@@ -271,30 +379,42 @@ chore: Build/config changes
 
 ## CI/CD
 
-GitHub Actions runs on push/PR:
-1. Lint check (ESLint + Prettier)
-2. Tests (Vitest)
-3. Build verification
-4. Coverage report (Codecov)
+### GitHub Actions (`ci.yml`)
 
-Pre-commit hooks (Husky + lint-staged):
-- ESLint fix
-- Prettier format
+Runs on push/PR to `main` and `develop`:
+1. Lint check (ESLint + Prettier)
+2. Tests (Vitest with `--run` flag)
+3. Build verification (`tsc` + `vite build`)
+4. Coverage report (Codecov) - separate job
+
+### GitHub Pages Deployment (`deploy.yml`)
+
+Runs on push to `main` + manual trigger:
+1. Run tests and build
+2. Deploy `dist/` to GitHub Pages
+
+### Pre-commit hooks (Husky + lint-staged)
+
+Configured in `.lintstagedrc.json`:
+- `*.{ts,tsx}`: ESLint fix + Prettier format
+- `*.{css,md,json}`: Prettier format
 
 ## Documentation
 
 ```
 docs/
-├── urs/        # User requirements
-├── specs/      # Technical specifications
+├── urs/           # User requirements specification
+├── specs/         # Technical specifications
 │   ├── 01-architecture.md
 │   ├── 02-data-models.md
 │   ├── 03-design-system.md
-│   ├── features/  # Feature-specific specs
-│   └── testing.md
-├── plans/      # Implementation plans
-├── reports/    # Completion reports
-└── reviews/    # Code/spec reviews
+│   ├── 04-interface-definitions.md
+│   ├── deployment.md
+│   ├── testing.md
+│   └── features/  # Feature-specific specs (7 specs)
+├── plans/         # Implementation plans (13 plans)
+├── reports/       # Completion reports (43 reports)
+└── reviews/       # Code/spec reviews (5 reviews)
 ```
 
 ## Common Pitfalls
@@ -304,22 +424,30 @@ docs/
 3. **Run lint before commit** - Zero warnings policy
 4. **Use CSS Modules** - No global CSS for components
 5. **Context is the state source** - Don't duplicate state
-6. **Japanese UI text** - Keep UI strings in Japanese
+6. **Japanese UI text** - Keep UI strings in Japanese (button labels may be English)
+7. **Use unified timer** - `timer.remainingTime` is the single source for both level and break time
+8. **Use `Structure` terminology** - Not "Preset" (renamed project-wide)
 
 ## Quick Reference
 
 | Need | Location |
 |------|----------|
-| Add a component | `src/components/<Category>/` |
+| Add a component | `src/components/<ComponentName>/` |
+| Add a common component | `src/components/common/<ComponentName>/` |
 | Add a hook | `src/hooks/` |
 | Add a type | `src/types/` |
 | Add a utility | `src/utils/` |
 | Add a test | Co-locate with source file |
 | Add business logic | `src/domain/models/` |
 | Update global state | `src/contexts/` |
+| Add a service | `src/services/` |
 
 ## Recent Changes (2026-02)
 
-- Timer state unification refactoring completed
-- `breakRemainingTime` removed, now uses unified `timer.remainingTime`
-- Terminology change: "Preset" renamed to "Structure"
+- **Average stack display** - Multi-phase implementation (phases 1-4) completed: domain logic, state management, UI component, and structure editor integration with initial stack input
+- **Timer state unification** - `breakRemainingTime` removed, now uses unified `timer.remainingTime`
+- **Terminology change** - "Preset" renamed to "Structure" project-wide
+- **English button labels** - Button labels standardized to English with fix for -1 button color
+- **CI test fixes** - Test queries updated to match English labels
+- **Player tracking** - `totalPlayers`, `remainingPlayers` added to TournamentState
+- **Structure enhancements** - `type`, `initialStack`, `createdAt`, `updatedAt` fields added
