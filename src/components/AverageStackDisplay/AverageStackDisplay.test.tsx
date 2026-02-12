@@ -27,8 +27,8 @@ describe('AverageStackDisplay', () => {
 
     it('プレイヤー数入力欄が表示される', () => {
       render(<AverageStackDisplay {...defaultProps} />);
-      expect(screen.getByLabelText('参加人数')).toBeInTheDocument();
-      expect(screen.getByLabelText('残り人数')).toBeInTheDocument();
+      expect(screen.getByLabelText('Entries')).toBeInTheDocument();
+      expect(screen.getByLabelText('Remaining')).toBeInTheDocument();
     });
 
     it('−1 ボタンが表示される', () => {
@@ -87,7 +87,7 @@ describe('AverageStackDisplay', () => {
         />
       );
 
-      const totalPlayersInput = screen.getByLabelText('参加人数');
+      const totalPlayersInput = screen.getByLabelText('Entries');
       await user.clear(totalPlayersInput);
       await user.type(totalPlayersInput, '12');
 
@@ -104,7 +104,7 @@ describe('AverageStackDisplay', () => {
         />
       );
 
-      const remainingPlayersInput = screen.getByLabelText('残り人数');
+      const remainingPlayersInput = screen.getByLabelText('Remaining');
       await user.clear(remainingPlayersInput);
       await user.type(remainingPlayersInput, '7');
 
