@@ -19,17 +19,17 @@ export const BreakDisplay: React.FC<BreakDisplayProps> = ({
     <div className={styles.breakDisplay}>
       <div className={styles.breakHeader}>
         <h2 className={styles.breakTitle}>Break Time</h2>
-        <p className={styles.breakMessage}>休憩中です</p>
+        <p className={styles.breakMessage}>Take a break</p>
       </div>
 
       <div className={styles.breakTimer}>
-        <div className={styles.breakLabel}>残り時間</div>
+        <div className={styles.breakLabel}>Remaining</div>
         <div
           className={styles.breakTime}
           data-testid="break-time"
           role="timer"
           aria-live="polite"
-          aria-label={`休憩残り時間 ${formatTime(remainingTime)}`}
+          aria-label={`Break remaining time ${formatTime(remainingTime)}`}
         >
           {formatTime(remainingTime)}
         </div>

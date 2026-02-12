@@ -52,13 +52,13 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
 
       {/* 残り時間 */}
       <div className={styles.timerWrapper}>
-        <div className={styles.label}>残り時間</div>
+        <div className={styles.label}>Remaining</div>
         <div
           className={styles.timer}
           data-testid="remaining-time"
           role="timer"
           aria-live="polite"
-          aria-label={`残り時間 ${formatTime(remainingTime)}`}
+          aria-label={`Remaining time ${formatTime(remainingTime)}`}
         >
           {formatTime(remainingTime)}
         </div>
@@ -66,7 +66,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
 
       {/* 経過時間 */}
       <div className={styles.elapsedWrapper}>
-        <div className={styles.elapsedLabel}>経過時間</div>
+        <div className={styles.elapsedLabel}>Elapsed</div>
         <div className={styles.elapsed} data-testid="elapsed-time">
           {formatTime(elapsedTime)}
         </div>
@@ -74,7 +74,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
 
       {/* 状態インジケーター */}
       {status === 'paused' && (
-        <div className={styles.pausedIndicator}>一時停止中</div>
+        <div className={styles.pausedIndicator}>Paused</div>
       )}
     </div>
   );
