@@ -69,23 +69,23 @@ export const AverageStackDisplay: React.FC<AverageStackDisplayProps> = ({
       <div className={styles.inputSection}>
         <div className={styles.inputGroup}>
           <NumberInput
-            label="エントリー"
+            label="Entries"
             value={totalPlayers}
             min={LIMITS.MIN_PLAYERS}
             max={LIMITS.MAX_PLAYERS}
             onChange={handleTotalPlayersChange}
-            aria-label="参加人数"
+            aria-label="Total players"
           />
         </div>
 
         <div className={styles.inputGroup}>
           <NumberInput
-            label="残り"
+            label="Remaining"
             value={remainingPlayers}
             min={LIMITS.MIN_PLAYERS}
             max={totalPlayers}
             onChange={handleRemainingPlayersChange}
-            aria-label="残り人数"
+            aria-label="Remaining players"
           />
         </div>
 
