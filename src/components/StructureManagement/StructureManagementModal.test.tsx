@@ -139,14 +139,19 @@ describe('StructureManagementModal', () => {
     });
   });
 
-  it('既存ストラクチャーを編集して保存するとupdateStructureが呼ばれる', async () => {
+  it('カスタムストラクチャーを編集して保存するとupdateStructureが呼ばれる', async () => {
     const user = userEvent.setup();
-    render(<StructureManagementModal {...defaultProps} />);
+    render(
+      <StructureManagementModal
+        {...defaultProps}
+        currentStructureId={'custom-1' as StructureId}
+      />
+    );
 
     // ストラクチャー名を変更
     const nameInput = screen.getByTestId('structure-name-input');
     await user.clear(nameInput);
-    await user.type(nameInput, 'Updated Standard');
+    await user.type(nameInput, 'Updated Custom');
 
     await waitFor(() => {
       const saveButton = screen.getByTestId('save-button');
@@ -158,12 +163,65 @@ describe('StructureManagementModal', () => {
 
     await waitFor(() => {
       expect(mockUpdateStructure).toHaveBeenCalledWith(
-        'default-standard',
+        'custom-1',
         expect.objectContaining({
-          name: 'Updated Standard',
+          name: 'Updated Custom',
         })
       );
     });
+  });
+
+  it('デフォルトストラクチャーを名前変更して保存するとaddStructureが呼ばれupdateStructureは呼ばれない', async () => {
+    const user = userEvent.setup();
+    render(<StructureManagementModal {...defaultProps} />);
+
+    // 名前を変更
+    const nameInput = screen.getByTestId('structure-name-input');
+    await user.clear(nameInput);
+    await user.type(nameInput, 'My Custom Standard');
+
+    await waitFor(() => {
+      const saveButton = screen.getByTestId('save-button');
+      expect(saveButton).not.toBeDisabled();
+    });
+
+    const saveButton = screen.getByTestId('save-button');
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockAddStructure).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'My Custom Standard',
+        })
+      );
+    });
+    expect(mockUpdateStructure).not.toHaveBeenCalled();
+  });
+
+  it('デフォルトストラクチャーを名前変更なしで保存すると "(コピー)" が付加されaddStructureが呼ばれる', async () => {
+    const user = userEvent.setup();
+    render(<StructureManagementModal {...defaultProps} />);
+
+    // ブラインドレベルを追加して名前はそのまま（isDirtyにするため）
+    const addLevelButton = screen.getByRole('button', { name: 'レベルを追加' });
+    await user.click(addLevelButton);
+
+    await waitFor(() => {
+      const saveButton = screen.getByTestId('save-button');
+      expect(saveButton).not.toBeDisabled();
+    });
+
+    const saveButton = screen.getByTestId('save-button');
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockAddStructure).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Standard (コピー)',
+        })
+      );
+    });
+    expect(mockUpdateStructure).not.toHaveBeenCalled();
   });
 
   it('このストラクチャーを使うボタンクリックでloadStructureが呼ばれる', async () => {

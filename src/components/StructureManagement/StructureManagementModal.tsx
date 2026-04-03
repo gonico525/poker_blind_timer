@@ -5,7 +5,10 @@ import { StructureList } from './StructureList';
 import { StructureEditor } from './StructureEditor';
 import { useStructures } from '@/hooks/useStructures';
 import type { Structure, StructureId } from '@/types';
-import { generateStructureId } from '@/domain/models/Structure';
+import {
+  generateStructureId,
+  isDefaultStructure,
+} from '@/domain/models/Structure';
 import styles from './StructureManagementModal.module.css';
 
 export interface StructureManagementModalProps {
@@ -192,10 +195,20 @@ export function StructureManagementModal({
 
   const handleSaveStructure = useCallback(
     (structure: Structure) => {
-      if (isNewStructure) {
-        // 新規ストラクチャーの場合はaddStructureを呼ぶ
+      if (isNewStructure || isDefaultStructure(structure.id)) {
+        // 新規ストラクチャーまたはデフォルトストラクチャーの場合はaddStructureを呼ぶ
+        // デフォルトストラクチャーの場合、名前が未変更なら "(コピー)" を付加
+        let name = structure.name;
+        if (isDefaultStructure(structure.id)) {
+          const originalStructure = structures.find(
+            (s) => s.id === structure.id
+          );
+          if (originalStructure && name === originalStructure.name) {
+            name = `${name} (コピー)`;
+          }
+        }
         const savedStructure = addStructure({
-          name: structure.name,
+          name,
           blindLevels: structure.blindLevels,
           levelDuration: structure.levelDuration,
           breakConfig: structure.breakConfig,
@@ -205,7 +218,7 @@ export function StructureManagementModal({
         setEditingStructure(savedStructure);
         setIsNewStructure(false);
       } else {
-        // 既存ストラクチャーの場合はupdateStructureを呼ぶ
+        // 既存カスタムストラクチャーの場合はupdateStructureを呼ぶ
         updateStructure(structure.id, {
           name: structure.name,
           blindLevels: structure.blindLevels,
@@ -216,7 +229,7 @@ export function StructureManagementModal({
       }
       setIsDirty(false);
     },
-    [isNewStructure, addStructure, updateStructure]
+    [isNewStructure, structures, addStructure, updateStructure]
   );
 
   const handleUseStructure = useCallback(
