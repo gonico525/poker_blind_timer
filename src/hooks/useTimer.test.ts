@@ -5,6 +5,17 @@ import { TournamentProvider } from '@/contexts/TournamentContext';
 import type { TournamentState } from '@/types';
 import React from 'react';
 
+// useNotification モック
+const mockShowConfirm = vi.fn<() => Promise<boolean>>();
+vi.mock('@/contexts/NotificationContext', () => ({
+  useNotification: () => ({
+    showConfirm: mockShowConfirm,
+    showNotification: vi.fn(),
+    dismissNotification: vi.fn(),
+    notifications: [],
+  }),
+}));
+
 // Test wrapper with TournamentProvider
 const createWrapper =
   (initialState?: Partial<TournamentState>) =>
@@ -37,6 +48,7 @@ const createWrapper =
 describe('useTimer', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    mockShowConfirm.mockReset();
   });
 
   afterEach(() => {
@@ -345,6 +357,154 @@ describe('useTimer', () => {
       });
 
       expect(result.current.status).toBe('running');
+    });
+  });
+
+  describe('nextLevel (paused state confirmation)', () => {
+    const pausedState: Partial<TournamentState> = {
+      timer: {
+        status: 'paused',
+        remainingTime: 300,
+        elapsedTime: 300,
+        startTime: Date.now() - 300000,
+        pausedAt: Date.now(),
+      },
+      currentLevel: 0,
+    };
+
+    it('should show confirmation dialog when paused', async () => {
+      mockShowConfirm.mockResolvedValue(true);
+
+      const { result } = renderHook(() => useTimer(), {
+        wrapper: createWrapper(pausedState),
+      });
+
+      await act(async () => {
+        await result.current.nextLevel();
+      });
+
+      expect(mockShowConfirm).toHaveBeenCalledWith({
+        title: '次のレベルへ進みますか？',
+        message: 'タイマーは一時停止中です。次のレベルに進みますか？',
+        confirmLabel: '進む',
+        cancelLabel: 'キャンセル',
+        variant: 'warning',
+      });
+    });
+
+    it('should advance level when confirmation is accepted', async () => {
+      mockShowConfirm.mockResolvedValue(true);
+
+      const { result } = renderHook(() => useTimer(), {
+        wrapper: createWrapper(pausedState),
+      });
+
+      await act(async () => {
+        await result.current.nextLevel();
+      });
+
+      expect(result.current.currentLevel).toBe(1);
+    });
+
+    it('should not advance level when confirmation is cancelled', async () => {
+      mockShowConfirm.mockResolvedValue(false);
+
+      const { result } = renderHook(() => useTimer(), {
+        wrapper: createWrapper(pausedState),
+      });
+
+      await act(async () => {
+        await result.current.nextLevel();
+      });
+
+      expect(result.current.currentLevel).toBe(0);
+    });
+
+    it('should advance level without confirmation when idle', async () => {
+      const { result } = renderHook(() => useTimer(), {
+        wrapper: createWrapper(),
+      });
+
+      await act(async () => {
+        await result.current.nextLevel();
+      });
+
+      expect(mockShowConfirm).not.toHaveBeenCalled();
+      expect(result.current.currentLevel).toBe(1);
+    });
+  });
+
+  describe('prevLevel (paused state confirmation)', () => {
+    const pausedState: Partial<TournamentState> = {
+      timer: {
+        status: 'paused',
+        remainingTime: 300,
+        elapsedTime: 300,
+        startTime: Date.now() - 300000,
+        pausedAt: Date.now(),
+      },
+      currentLevel: 1,
+    };
+
+    it('should show confirmation dialog when paused', async () => {
+      mockShowConfirm.mockResolvedValue(true);
+
+      const { result } = renderHook(() => useTimer(), {
+        wrapper: createWrapper(pausedState),
+      });
+
+      await act(async () => {
+        await result.current.prevLevel();
+      });
+
+      expect(mockShowConfirm).toHaveBeenCalledWith({
+        title: '前のレベルに戻りますか？',
+        message: 'タイマーは一時停止中です。前のレベルに戻りますか？',
+        confirmLabel: '戻る',
+        cancelLabel: 'キャンセル',
+        variant: 'warning',
+      });
+    });
+
+    it('should go back when confirmation is accepted', async () => {
+      mockShowConfirm.mockResolvedValue(true);
+
+      const { result } = renderHook(() => useTimer(), {
+        wrapper: createWrapper(pausedState),
+      });
+
+      await act(async () => {
+        await result.current.prevLevel();
+      });
+
+      expect(result.current.currentLevel).toBe(0);
+    });
+
+    it('should not go back when confirmation is cancelled', async () => {
+      mockShowConfirm.mockResolvedValue(false);
+
+      const { result } = renderHook(() => useTimer(), {
+        wrapper: createWrapper(pausedState),
+      });
+
+      await act(async () => {
+        await result.current.prevLevel();
+      });
+
+      expect(result.current.currentLevel).toBe(1);
+    });
+
+    it('should go back without confirmation when idle', async () => {
+      const { result } = renderHook(() => useTimer(), {
+        wrapper: createWrapper({ currentLevel: 1 }),
+      });
+
+      await act(async () => {
+        await result.current.prevLevel();
+      });
+
+      expect(mockShowConfirm).not.toHaveBeenCalled();
+      expect(result.current.currentLevel).toBe(0);
     });
   });
 });
