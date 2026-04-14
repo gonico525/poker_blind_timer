@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useTournament } from '@/contexts/TournamentContext';
+import { useNotification } from '@/contexts/NotificationContext';
 import { getLevelsUntilBreak } from '@/domain/models/Break';
 
 /**
@@ -8,6 +9,7 @@ import { getLevelsUntilBreak } from '@/domain/models/Break';
  */
 export function useTimer() {
   const { state, dispatch } = useTournament();
+  const { showConfirm } = useNotification();
   const intervalRef = useRef<number | null>(null);
 
   // タイマーの開始
@@ -36,15 +38,35 @@ export function useTimer() {
     dispatch({ type: 'RESET' });
   }, [dispatch]);
 
-  // 次のレベルへ
-  const nextLevel = useCallback(() => {
+  // 次のレベルへ（ポーズ中は確認ダイアログを表示）
+  const nextLevel = useCallback(async () => {
+    if (state.timer.status === 'paused') {
+      const confirmed = await showConfirm({
+        title: '次のレベルへ進みますか？',
+        message: 'タイマーは一時停止中です。次のレベルに進みますか？',
+        confirmLabel: '進む',
+        cancelLabel: 'キャンセル',
+        variant: 'warning',
+      });
+      if (!confirmed) return;
+    }
     dispatch({ type: 'NEXT_LEVEL' });
-  }, [dispatch]);
+  }, [state.timer.status, dispatch, showConfirm]);
 
-  // 前のレベルへ
-  const prevLevel = useCallback(() => {
+  // 前のレベルへ（ポーズ中は確認ダイアログを表示）
+  const prevLevel = useCallback(async () => {
+    if (state.timer.status === 'paused') {
+      const confirmed = await showConfirm({
+        title: '前のレベルに戻りますか？',
+        message: 'タイマーは一時停止中です。前のレベルに戻りますか？',
+        confirmLabel: '戻る',
+        cancelLabel: 'キャンセル',
+        variant: 'warning',
+      });
+      if (!confirmed) return;
+    }
     dispatch({ type: 'PREV_LEVEL' });
-  }, [dispatch]);
+  }, [state.timer.status, dispatch, showConfirm]);
 
   // 休憩スキップ
   const skipBreak = useCallback(() => {
